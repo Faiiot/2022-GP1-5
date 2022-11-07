@@ -19,13 +19,14 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen>
 with TickerProviderStateMixin {
 
-
+  //create text controlers to validate user input
   late TextEditingController _emailTextController= TextEditingController(text:'');
   late TextEditingController _passwordlTextController= TextEditingController(text:'');
   FocusNode _passwordFocusNode = FocusNode();
   bool _obsecureText = true;
   final _loginFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  //creat a Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
@@ -38,7 +39,7 @@ with TickerProviderStateMixin {
   }
 
 
-
+// A method to submit user input and authenticate it to log in
   void submitFormOnLogin() async{
     final isValid = _loginFormKey.currentState!.validate();
     FocusScope.of(context).unfocus();
@@ -47,12 +48,15 @@ with TickerProviderStateMixin {
         _isLoading=true;
       });
       try{
-
+        //call the method to log in
         await _auth.signInWithEmailAndPassword(
             email: _emailTextController.text.toLowerCase().trim(),
             password: _passwordlTextController.text.trim());
+        //pop the page to have a better device performance, then go to UserState service to check on user state (logged in , not logged in)
             Navigator.canPop(context)?Navigator.pop(context):null;
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>UserState(), ));
+
+        //Show a message indicating that user is logged in successfully
         Fluttertoast.showToast(
             msg: "You have been logged in successfully!",
             toastLength: Toast.LENGTH_SHORT,
@@ -63,7 +67,7 @@ with TickerProviderStateMixin {
         );
 
 
-      }
+      }// if any errors occur a pop-up message will appear
       catch(error){
         setState(() {
           _isLoading=false;
@@ -81,16 +85,13 @@ with TickerProviderStateMixin {
   }
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return
 
+    return
       Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-
-
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -99,6 +100,7 @@ with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              //Findly logo
               Container(
                 height: 200,
                 child: Image.asset("assets/FindlyC.png"),
@@ -247,6 +249,7 @@ with TickerProviderStateMixin {
               SizedBox(
                 height: 15,
               ),
+              //if the there are processes loading show an indicator
               _isLoading?
               Center(
                 child: Container
@@ -258,13 +261,13 @@ with TickerProviderStateMixin {
                   ),
                 ),
               )
-              :MyButton(
+              :MyButton(//submission button
                   color: Colors.blue[700]!,
                   title: "Log in",
                   onPressed: (){
                     submitFormOnLogin();
                   }),
-              Row(
+              Row(//sign up button
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -290,7 +293,7 @@ with TickerProviderStateMixin {
                   Text(
                       "Forgot your password?"
                   ),
-                  TextButton(
+                  TextButton(//reset password button
                       onPressed: (){
                         Navigator.push(context, MaterialPageRoute(
                           builder: (context)=>ForgotPasswordScreen()
