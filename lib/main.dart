@@ -1,8 +1,3 @@
-import 'package:findly_app/screens/forgot_password_screen.dart';
-import 'package:findly_app/screens/home_screen.dart';
-import 'package:findly_app/screens/login_screen.dart';
-import 'package:findly_app/screens/registration_screen.dart';
-import 'package:findly_app/screens/welcom_screen.dart';
 import 'package:findly_app/user_state.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';

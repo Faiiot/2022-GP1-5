@@ -1,6 +1,5 @@
 import 'package:findly_app/screens/home_screen.dart';
 import 'package:findly_app/screens/login_screen.dart';
-import 'package:findly_app/screens/welcom_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
