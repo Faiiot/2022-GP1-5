@@ -1,3 +1,4 @@
+import 'package:findly_app/screens/login_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +64,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
+          leading: IconButton(
+              onPressed: (){
+
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(
+                  builder: (context)=>LoginScreen()
+                  ,)
+                );
+              },
+              icon:Icon(Icons.arrow_back_ios,color: Colors.blue, )
+          ),
 
 
         ),

@@ -143,6 +143,7 @@ with TickerProviderStateMixin {
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.email),
                       hintText: "Enter your Email",
+                      labelText: "Email address",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
                         horizontal: 20,
@@ -206,6 +207,7 @@ with TickerProviderStateMixin {
                         child:Icon(_obsecureText? Icons.visibility: Icons.visibility_off),
                       ),
                       hintText: "Enter your Password",
+                      labelText: "Password",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
                         horizontal: 20,
