@@ -205,6 +205,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     onChanged: (value){},
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.mail),
+                      labelText: "Email address *",
                       hintText: "Enter your Email",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
@@ -258,6 +259,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     onChanged: (value){},
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person),
+                      labelText: "First name *",
                       hintText: "First name",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
@@ -311,6 +313,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     onChanged: (value){},
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person),
+                      labelText: "Last name *",
                       hintText: "Last name",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
@@ -368,6 +371,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     onChanged: (value){},
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.phone),
+                      labelText: "Phone number *",
                       hintText: "Phone number",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
@@ -436,6 +440,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       } ,
                         child:Icon(_obsecureText? Icons.visibility: Icons.visibility_off),
                       ),
+                      labelText: "Password *",
                       hintText: "Enter your Password",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,

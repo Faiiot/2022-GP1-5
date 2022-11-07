@@ -165,7 +165,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'Add Announcement Form',
           ),
           centerTitle: true,
-          backgroundColor: Colors.blue[700]),
+          ),
       body: Form(
         key: _addFormKey,
         child: Padding(
@@ -679,29 +679,228 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   SizedBox(
                     height: 20.0,
                   ),
-            imgFile == null
-                ?
-            Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 3),
-                    borderRadius: BorderRadius.circular(20)
-                ),
-                height: 200,
-                width: 200,
-                child:
-                Icon(Icons.hide_image_outlined, size: 100,color: Colors.blueGrey,)
-              )
-            :
-            Container(
+            // imgFile == null
+            //     ?
+            // Container(
+            //     decoration: BoxDecoration(
+            //         border: Border.all(color: Colors.blue, width: 3),
+            //         borderRadius: BorderRadius.circular(20)
+            //     ),
+            //     height: 200,
+            //     width: 200,
+            //     child:
+            //     Icon(Icons.hide_image_outlined, size: 100,color: Colors.blueGrey,)
+            //   )
+            // :
+            // Container(
+            //         decoration: BoxDecoration(
+            //           border: Border.all(color: Colors.blue, width: 3),
+            //         ),
+            //
+            //         child:
+            //             Image.file(imgFile!, fit: BoxFit.cover, ),
+            //       ),
+            //       imgFile == null
+            //       ?
+            //       Padding(
+            //         padding: const EdgeInsets.all(12.0),
+            //         child: Center(
+            //           child: ElevatedButton(
+            //             child: const Text('Upload item image') ,
+            //             onPressed: () {
+            //
+            //               showModalBottomSheet<void>(
+            //                 context: context,
+            //                 builder: (BuildContext context) {
+            //                   return Container(
+            //                     height: 200,
+            //                     color: Colors.grey[200],
+            //                     child: Center(
+            //                       child:
+            //                       Row(mainAxisAlignment: MainAxisAlignment.spaceAround,children: [
+            //                         Padding(
+            //                           padding: const EdgeInsets.all(9.0),
+            //                           child: Column(
+            //                             mainAxisAlignment: MainAxisAlignment.center,
+            //                             children: [
+            //                               Text('Gallery',
+            //                                 style: TextStyle(
+            //                                   fontSize: 22,
+            //                                   fontWeight: FontWeight
+            //                                       .bold,
+            //                                 ),
+            //                               ),
+            //                               Container(
+            //                                 height:100,
+            //                                 width:100,
+            //                                 child: IconButton(
+            //                                     onPressed: ()  {
+            //                                       _pickImageUsingGallery();
+            //
+            //                                     },
+            //                                     icon: Container(
+            //                                       height: 100,
+            //                                       width: 100,
+            //                                       child: CircleAvatar(
+            //                                         child: Icon(
+            //                                           Icons.photo_size_select_actual_outlined,
+            //                                           color: Colors.white,
+            //                                           size: 50,
+            //                                         ),
+            //                                       ),
+            //                                     )),
+            //                               ),
+            //                             ],
+            //                           ),
+            //                         ),
+            //                         Column(
+            //                           mainAxisAlignment: MainAxisAlignment.center,
+            //                           children: [Text('Camera',
+            //                             style: TextStyle(
+            //                               fontSize: 22,
+            //                               fontWeight: FontWeight
+            //                                   .bold,
+            //                             ),),
+            //                             Container(
+            //                               height: 100,
+            //                               width: 100,
+            //                               child: IconButton(
+            //                                   onPressed: ()  {
+            //                                     _pickImageUsingCamera();
+            //
+            //                                   },
+            //                                   icon: Container(
+            //                                     height: 100,
+            //                                     width: 100,
+            //                                     child: CircleAvatar(
+            //                                       child: Icon(
+            //                                         Icons.camera_alt_outlined,
+            //                                         color: Colors.white,
+            //                                         size: 50,
+            //                                       ),
+            //                                     ),
+            //                                   )),
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       ],),
+            //                     ),
+            //                   );
+            //                 },
+            //               );
+            //
+            //             },
+            //           ),
+            //         ),
+            //       )
+            //       :
+            //       Padding(
+            //           padding: const EdgeInsets.all(12.0),
+            //           child: Center(
+            //               child: ElevatedButton(
+            //                   child: const Text('Cancel') ,
+            //                   onPressed: () { setState(() {
+            //                     imgFile = null;
+            //                   }); print(imgFile); }
+            //               )
+            //           )
+            //       ),
+                  Text(
+                    'Another contact channel you prefer *',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  // contact
+                  DropdownButtonFormField(
+                    focusNode: _contactChannelFocusNode,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 20,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            )),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            )),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.blueAccent,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            )),
+                        errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            borderSide: BorderSide(color: Colors.red)),
+                      ),
+                      items: const [
+                        DropdownMenuItem<String>(
+                            child: Text(
+                              'Choose  a channel',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            value: ''),
+                        DropdownMenuItem<String>(
+                            child: Text('Phone Number'),
+                            value: 'Phone Number'),
+                        DropdownMenuItem<String>(
+                            child: Text('Email'), value: 'Email')
+                      ],
+                      onChanged: (value) {
+                        contactChanel = value.toString();
+                        setState(() {
+                          contactChanel = value.toString();
+                        });
+                      },
+                      validator: (value) {
+                        if (value == '') {
+                          return 'You must choose';
+                        }
+                      },
+                      value: dropsownValue),
+                  SizedBox(
+                    height: 25.0,
+                  ),
+                  imgFile == null
+                      ?
+                  Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blue, width: 3),
+                          borderRadius: BorderRadius.circular(20)
+                      ),
+                      height: 200,
+                      width: 200,
+                      child:
+                      Icon(Icons.hide_image_outlined, size: 100,color: Colors.blueGrey,)
+                  )
+                      :
+                  Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.blue, width: 3),
                     ),
 
                     child:
-                        Image.file(imgFile!, fit: BoxFit.cover, ),
+                    Image.file(imgFile!, fit: BoxFit.cover, ),
                   ),
                   imgFile == null
-                  ?
+                      ?
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Center(
@@ -793,7 +992,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                       ),
                     ),
                   )
-                  :
+                      :
                   Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Center(
@@ -804,79 +1003,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                               }); print(imgFile); }
                           )
                       )
-                  ),
-                  Text(
-                    'Another contact channel you prefer *',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  // contact
-                  DropdownButtonFormField(
-                    focusNode: _contactChannelFocusNode,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 20,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            )),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            )),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blueAccent,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            )),
-                        errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            ),
-                            borderSide: BorderSide(color: Colors.red)),
-                      ),
-                      items: const [
-                        DropdownMenuItem<String>(
-                            child: Text(
-                              'Choose  a channel',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            value: ''),
-                        DropdownMenuItem<String>(
-                            child: Text('Phone Number'),
-                            value: 'Phone Number'),
-                        DropdownMenuItem<String>(
-                            child: Text('Email'), value: 'Email')
-                      ],
-                      onChanged: (value) {
-                        contactChanel = value.toString();
-                        setState(() {
-                          contactChanel = value.toString();
-                        });
-                      },
-                      validator: (value) {
-                        if (value == '') {
-                          return 'You must choose';
-                        }
-                      },
-                      value: dropsownValue),
-                  SizedBox(
-                    height: 25.0,
                   ),
 
                   MyButton(

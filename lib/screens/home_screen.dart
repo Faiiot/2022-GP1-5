@@ -78,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: DrawerWidget(userName: firstName,),
       backgroundColor: Color(0xFFE4ECF4),
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         leading: Builder(
           builder: (ctx){
             return IconButton(
