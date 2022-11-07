@@ -18,6 +18,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
   final String publishedBy;
   final String announcementDes;
 
+  //constructor to require the announcement's information
   const AnnouncementDetailsScreen({
     required this.announcementID,
     required this.itemName,
@@ -54,7 +55,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             onPressed: (){
               User? user = _auth.currentUser;
               String _uid = user!.uid;
-              Navigator.pushReplacement(
+              Navigator.pushReplacement(//back button
                   context, MaterialPageRoute(
                 builder: (context)=>HomeScreen(userID: _uid)
                 ,)

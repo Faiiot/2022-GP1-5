@@ -10,6 +10,7 @@ class HomeScreen extends StatefulWidget {
   final String userID;
 
 
+  //a constuctor tat requires the user ID to return to each user her home screen
   const HomeScreen({required this.userID,});
 
 
@@ -19,7 +20,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  //create Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   bool _isLoading = false;
   String firstName="";
 
@@ -29,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   @override
-  void initState() {
+  void initState() {// methods to run when initializing the screen
     super.initState();
 
     getUserName();
@@ -37,12 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   }
 
+  //Method to retrieve the user first name
   void getUserName() async{
     _isLoading = true;
-
-
-
-    try {//Here we will fetch the users First name from the DB
+    try {
 
       final DocumentSnapshot userDoc =
       await FirebaseFirestore.instance
@@ -93,20 +94,23 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
       icon: Icon(Icons.filter_alt_rounded),
-            onPressed: (){
-        print("Log Out!");
-            },)
+            onPressed: (){},)
         ],
       ),
+
+      //Stream builder to get a snapshot of the announcement collection to show it in the home screen
       body: StreamBuilder<QuerySnapshot>(
-        //get the content of the announcement collection from DB
         stream:FirebaseFirestore.instance.collection('announcement').snapshots() ,
         builder: (context, snapshot){
+          //if the connection state is "waiting", a progress indicatior will appear
           if(snapshot.connectionState == ConnectionState.waiting){
             return Center(
               child: CircularProgressIndicator(),
             );
+
+            //if the connection state is "active"
           }else if (snapshot.connectionState == ConnectionState.active){
+            //if the collection snapshot is empty
             if(snapshot.data!.docs.isNotEmpty){
               return ListView.builder(
                   itemCount: snapshot.data!.docs.length,
@@ -127,17 +131,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   });
             }else{
-              return Center(
+              return Center(//if no announcement was uploaded
                 child: Text("No Announcements has been uploaded yet!", style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),),
               );
             }
           }
-          return Center(
+          return Center(//if something went wrong
             child: Text("Something went wrong", ),
           );
         },
       ),
-
 
 
 
@@ -157,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }
             else if(_currentIndex == 1){
-              print('Profile Page');
+              // go to profile page > next sprints
             }
             else if(_currentIndex == 2){
               Navigator.pushReplacement(
@@ -167,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }
             else if(_currentIndex == 3){
-              print('Private chat Page');
+              // go to profile page > next sprints
             }
           });
         },

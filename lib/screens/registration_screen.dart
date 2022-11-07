@@ -87,7 +87,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             backgroundColor: Colors.blueGrey,
             textColor: Colors.white,
             fontSize: 16.0,
-          timeInSecForIosWeb: 2
+
         );
       } catch(error){
         setState(() {

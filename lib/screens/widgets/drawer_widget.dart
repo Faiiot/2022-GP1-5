@@ -2,10 +2,11 @@ import 'package:findly_app/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import '../../constants/constants.dart';
 
 class DrawerWidget extends StatelessWidget {
+
+  //a constructor that requires username
   DrawerWidget({
     required this.userName,
   });
@@ -59,6 +60,7 @@ class DrawerWidget extends StatelessWidget {
           Divider(
             thickness: 1,
           ),
+          //Log out button
           _listTiles(
             label: "Log out",
             icon:  Icons.logout_outlined,
@@ -72,6 +74,8 @@ class DrawerWidget extends StatelessWidget {
       ),
     );
   }
+
+  //Log out function
   void _logout (context){
     final FirebaseAuth _auth = FirebaseAuth.instance;
     showDialog(context: context,
@@ -91,15 +95,18 @@ class DrawerWidget extends StatelessWidget {
 
           ],
         ),
+        //Log out confirmation message
         content: Text("Are you sure you want to log out?",maxLines: 2,
         style: TextStyle(color: Constants.darkBlue,fontSize: 20,fontStyle: FontStyle.italic),),
         actions: [
+          //Cancel button > back to the drawer
           TextButton(onPressed: (){
             Navigator.canPop(context)
                 ?Navigator.pop(context)
                 :null;
           }, child: Text("Cancel")),
           TextButton(onPressed: ()  async{
+            //if the user click "OK" she will be logged out and redurected to log in screen
              await _auth.signOut();
             Navigator.canPop(context)?Navigator.pop(context):null;
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>UserState(), ));
@@ -115,6 +122,7 @@ class DrawerWidget extends StatelessWidget {
       );
         });
   }
+  //Designing a reusable widget for the drawer options
   Widget _listTiles ({required String label, required Function fctn, required IconData icon}){
     return ListTile(
         onTap: (){fctn();},

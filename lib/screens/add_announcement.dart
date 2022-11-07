@@ -19,6 +19,7 @@ class AddAnnouncementScreen extends StatefulWidget {
 }
 
 class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
+  //Creat a Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late String itemName;
@@ -59,7 +60,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     super.dispose();
   }
 
-  //for picking announcement image using camera
+  //Method for picking announcement image using camera
   void _pickImageUsingCamera () async {
     XFile? pickedFile = await ImagePicker()
         .pickImage(source: ImageSource.camera,
@@ -70,7 +71,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     });
   }
 
-  //for picking announcement image using gallery
+  //Method for picking announcement image using gallery
   void _pickImageUsingGallery () async {
     XFile? pickedFile = await ImagePicker()
         .pickImage(source: ImageSource.gallery,
@@ -131,20 +132,22 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           builder: (context)=>HomeScreen(userID: _uid,)
           ,)
         );
+
+        //A confirmation message when the announcement is added
         Fluttertoast.showToast(
             msg: "Announcement has been added successfully!",
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.blueGrey,
             textColor: Colors.white,
             fontSize: 16.0,
-          timeInSecForIosWeb: 2
         );
       } catch(error){
         setState(() {
           _isLoading=false;
         });
+        //if an error occurs a pop-up message
         GlobalMethods.showErrorDialog(error: error.toString(), context: context);
-        print("error occured $error");
+        print("error occurred $error");
       }
 
     }else {
@@ -175,6 +178,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  //Announcement type
                   Text(
                     'Announcement type *',
                     style: TextStyle(
@@ -247,6 +251,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                       },
                       value: dropsownValue),
                   SizedBox(height: 20,),
+                  //Item name
                   Text(
                     'Item name *',
                     style: TextStyle(
@@ -312,7 +317,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   ),
                   SizedBox(height: 20,),
 
-                  // categury
+                  // Categury
                   Text(
                     'Item category *',
                     style: TextStyle(
@@ -395,6 +400,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                       },
                       value: dropsownValue),
                   SizedBox(height: 20,),
+
+                  //Building name
                   Text(
                     'Bullding name',
                     style: TextStyle(
@@ -608,12 +615,11 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
                             FocusScope.of(context).requestFocus(_annDesFocusNode);
                       }),
-
                   SizedBox(
                     height: 20.0,
                   ),
 
-                  //description
+                  //Announcement description
                   Text(
                     'Announcement description *',
                     style: TextStyle(
@@ -679,132 +685,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   SizedBox(
                     height: 20.0,
                   ),
-            // imgFile == null
-            //     ?
-            // Container(
-            //     decoration: BoxDecoration(
-            //         border: Border.all(color: Colors.blue, width: 3),
-            //         borderRadius: BorderRadius.circular(20)
-            //     ),
-            //     height: 200,
-            //     width: 200,
-            //     child:
-            //     Icon(Icons.hide_image_outlined, size: 100,color: Colors.blueGrey,)
-            //   )
-            // :
-            // Container(
-            //         decoration: BoxDecoration(
-            //           border: Border.all(color: Colors.blue, width: 3),
-            //         ),
-            //
-            //         child:
-            //             Image.file(imgFile!, fit: BoxFit.cover, ),
-            //       ),
-            //       imgFile == null
-            //       ?
-            //       Padding(
-            //         padding: const EdgeInsets.all(12.0),
-            //         child: Center(
-            //           child: ElevatedButton(
-            //             child: const Text('Upload item image') ,
-            //             onPressed: () {
-            //
-            //               showModalBottomSheet<void>(
-            //                 context: context,
-            //                 builder: (BuildContext context) {
-            //                   return Container(
-            //                     height: 200,
-            //                     color: Colors.grey[200],
-            //                     child: Center(
-            //                       child:
-            //                       Row(mainAxisAlignment: MainAxisAlignment.spaceAround,children: [
-            //                         Padding(
-            //                           padding: const EdgeInsets.all(9.0),
-            //                           child: Column(
-            //                             mainAxisAlignment: MainAxisAlignment.center,
-            //                             children: [
-            //                               Text('Gallery',
-            //                                 style: TextStyle(
-            //                                   fontSize: 22,
-            //                                   fontWeight: FontWeight
-            //                                       .bold,
-            //                                 ),
-            //                               ),
-            //                               Container(
-            //                                 height:100,
-            //                                 width:100,
-            //                                 child: IconButton(
-            //                                     onPressed: ()  {
-            //                                       _pickImageUsingGallery();
-            //
-            //                                     },
-            //                                     icon: Container(
-            //                                       height: 100,
-            //                                       width: 100,
-            //                                       child: CircleAvatar(
-            //                                         child: Icon(
-            //                                           Icons.photo_size_select_actual_outlined,
-            //                                           color: Colors.white,
-            //                                           size: 50,
-            //                                         ),
-            //                                       ),
-            //                                     )),
-            //                               ),
-            //                             ],
-            //                           ),
-            //                         ),
-            //                         Column(
-            //                           mainAxisAlignment: MainAxisAlignment.center,
-            //                           children: [Text('Camera',
-            //                             style: TextStyle(
-            //                               fontSize: 22,
-            //                               fontWeight: FontWeight
-            //                                   .bold,
-            //                             ),),
-            //                             Container(
-            //                               height: 100,
-            //                               width: 100,
-            //                               child: IconButton(
-            //                                   onPressed: ()  {
-            //                                     _pickImageUsingCamera();
-            //
-            //                                   },
-            //                                   icon: Container(
-            //                                     height: 100,
-            //                                     width: 100,
-            //                                     child: CircleAvatar(
-            //                                       child: Icon(
-            //                                         Icons.camera_alt_outlined,
-            //                                         color: Colors.white,
-            //                                         size: 50,
-            //                                       ),
-            //                                     ),
-            //                                   )),
-            //                             ),
-            //                           ],
-            //                         ),
-            //                       ],),
-            //                     ),
-            //                   );
-            //                 },
-            //               );
-            //
-            //             },
-            //           ),
-            //         ),
-            //       )
-            //       :
-            //       Padding(
-            //           padding: const EdgeInsets.all(12.0),
-            //           child: Center(
-            //               child: ElevatedButton(
-            //                   child: const Text('Cancel') ,
-            //                   onPressed: () { setState(() {
-            //                     imgFile = null;
-            //                   }); print(imgFile); }
-            //               )
-            //           )
-            //       ),
+
+                  //Contact channel
                   Text(
                     'Another contact channel you prefer *',
                     style: TextStyle(
@@ -815,7 +697,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  // contact
                   DropdownButtonFormField(
                     focusNode: _contactChannelFocusNode,
                       isExpanded: true,
@@ -904,7 +785,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Center(
-                      child: ElevatedButton(
+                      child: ElevatedButton(//Button to upload image
                         child: const Text('Upload item image') ,
                         onPressed: () {
 
@@ -933,7 +814,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                             height:100,
                                             width:100,
                                             child: IconButton(
-                                                onPressed: ()  {
+                                                onPressed: ()  {//pick by gallery
                                                   _pickImageUsingGallery();
 
                                                 },
@@ -964,7 +845,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                           height: 100,
                                           width: 100,
                                           child: IconButton(
-                                              onPressed: ()  {
+                                              onPressed: ()  {//pick by camera
                                                 _pickImageUsingCamera();
 
                                               },
@@ -996,7 +877,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Center(
-                          child: ElevatedButton(
+                          child: ElevatedButton(//Button to cancel the uploaded image
                               child: const Text('Cancel') ,
                               onPressed: () { setState(() {
                                 imgFile = null;
@@ -1004,7 +885,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           )
                       )
                   ),
-
+                  //Add announcement button
                   MyButton(
                       color: Colors.blue[700]!,
                       title: "Add announcement!",
@@ -1012,6 +893,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                         submitFormOnAdd();
 
                       }),
+                  //Cancel button
                   MyButton(
                       color: Colors.blue[700]!,
                       title: "Cancel",

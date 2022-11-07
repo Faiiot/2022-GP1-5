@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//Reusable button widget code across the screens
 class MyButton extends StatelessWidget {
   MyButton({
     required this.color,

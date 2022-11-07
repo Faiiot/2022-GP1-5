@@ -4,6 +4,8 @@ import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+//Reusable announcement card widget code across the screens
+
 class Announcement extends StatefulWidget {
   //dependency injection
   final String announcementID;
@@ -17,7 +19,7 @@ class Announcement extends StatefulWidget {
   final String publisherID;
   final String announcementDes;
 
-
+  // a constructor to get each announcement info
   const Announcement(
       {
         required this.announcementID,
@@ -53,11 +55,13 @@ bool _isLoading = false;
   void initState() {
 
     super.initState();
-    getNeededUserInfo();
+    getNeededPublisherInfo();
 
 
   }
-void getNeededUserInfo() async{
+
+  //Method to retrieve the puplisher info
+void getNeededPublisherInfo() async{
   try {
     _isLoading = true;
 
@@ -99,6 +103,7 @@ void getNeededUserInfo() async{
           Navigator.pushReplacement(
               context, MaterialPageRoute(
 
+            //send this announcement info to the details screen
             builder: (context)=> AnnouncementDetailsScreen(
                 announcementID: widget.announcementID,
                 itemName: widget.itemName,

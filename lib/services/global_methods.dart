@@ -1,6 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
+
+//Dart file with global methods user in the project
 class GlobalMethods {
   static validateEmail({required TextEditingController email}){
     final bool validEmail = EmailValidator.validate(email.text.trim());

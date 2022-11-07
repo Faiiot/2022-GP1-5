@@ -36,6 +36,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   }
 
 
+  //Method to send an email to reset the password
   void _forgotPasswordFCT(){
     print('_forgotPasswordController :${_forgotPasswordController.text}');
     final FirebaseAuth auth = FirebaseAuth.instance;
@@ -45,18 +46,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                .toLowerCase()
                .trim());
     Navigator.of(context).pop();
+
+    //show a message when the email is sent
     Fluttertoast.showToast(
         msg: "An Email has been sent to you!",
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.blueGrey,
         textColor: Colors.white,
         fontSize: 16.0,
-      timeInSecForIosWeb: 2
     );
   }
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+
     return
 
       Scaffold(
@@ -64,7 +66,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          leading: IconButton(
+          leading: IconButton( // back button
               onPressed: (){
 
                 Navigator.pushReplacement(
@@ -149,7 +151,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                     ),
                   ),
                 ),
-                MyButton(
+                MyButton(//Reset password by email button
                     color: Colors.blue[700]!,
                     title: "Reset Now!",
                     onPressed: (){

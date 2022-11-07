@@ -63,7 +63,7 @@ with TickerProviderStateMixin {
             backgroundColor: Colors.blueGrey,
             textColor: Colors.white,
             fontSize: 16.0,
-          timeInSecForIosWeb: 2
+
         );
 
 
