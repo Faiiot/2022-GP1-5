@@ -78,8 +78,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               'userAnnouncement':<String>[],
         });
         // Navigator.canPop(context)?Navigator.pop(context):null;
-        Navigator.canPop(context)?
-        Navigator.pop(context) : null;
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(
+            builder: (context)=>LoginScreen()));
         Fluttertoast.showToast(
             msg: "Account has been created successfully!",
             toastLength: Toast.LENGTH_SHORT,
