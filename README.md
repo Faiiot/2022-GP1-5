@@ -13,6 +13,8 @@ Launching instruction:
 2-Go to Android Studio IDE go to File > Open > then choose the project.
   *For Windows: if an error occurs, move the project to StudioProjects 
    Folder so you will be able to open it.
+  *For MAC : if an error occurs, move the project to AndroidStudioProjects 
+   Folder so you will be able to open it.
 3-Create a virtual device and launch it.
 4- Make sure the device is chosen and then run it by clicking on the green
    triangle.
