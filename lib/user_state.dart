@@ -1,5 +1,6 @@
 import 'package:findly_app/screens/home_screen.dart';
 import 'package:findly_app/screens/login_screen.dart';
+import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +25,7 @@ class UserState extends StatelessWidget {
           final FirebaseAuth _auth = FirebaseAuth.instance;
           final User? user = _auth.currentUser;
           final uid = user!.uid;
-          return HomeScreen(userID: uid,);
+          return UserDashboardScreen(userID: uid,);
         }else if(userSnapshot.hasError){
           return Center(
             // if an error occure

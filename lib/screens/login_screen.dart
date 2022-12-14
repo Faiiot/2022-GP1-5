@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/forgot_password_screen.dart';
 import 'package:findly_app/screens/registration_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
@@ -21,6 +22,7 @@ with TickerProviderStateMixin {
 
   //create text controlers to validate user input
   late TextEditingController _emailTextController= TextEditingController(text:'');
+  late TextEditingController _memberIDController = TextEditingController(text: '');
   late TextEditingController _passwordlTextController= TextEditingController(text:'');
   FocusNode _passwordFocusNode = FocusNode();
   bool _obsecureText = true;
@@ -35,6 +37,7 @@ with TickerProviderStateMixin {
     _emailTextController.dispose();
     _passwordlTextController.dispose();
     _passwordFocusNode.dispose();
+    _memberIDController.dispose();
     super.dispose();
   }
 
@@ -48,9 +51,11 @@ with TickerProviderStateMixin {
         _isLoading=true;
       });
       try{
+        QuerySnapshot snap = await FirebaseFirestore.instance.collection('users')
+            .where('memberID', isEqualTo: _memberIDController.text.trim()).get();
         //call the method to log in
         await _auth.signInWithEmailAndPassword(
-            email: _emailTextController.text.toLowerCase().trim(),
+            email: snap.docs[0]['Email'],
             password: _passwordlTextController.text.trim());
         //pop the page to have a better device performance, then go to UserState service to check on user state (logged in , not logged in)
             Navigator.canPop(context)?Navigator.pop(context):null;
@@ -131,21 +136,19 @@ with TickerProviderStateMixin {
                     validator: (value){
                       //we need to edit this
                       if(value!.isEmpty){
-                        return "Please enter your Email!";
-                      }else if(GlobalMethods.validateEmail(email: _emailTextController)==false){
-                        return "Please check the Email format!";
+                        return "ID is required!";
                       }
 
                       return null;
                     },
-                    controller: _emailTextController,
+                    controller: _memberIDController,
                     keyboardType: TextInputType.emailAddress,
                     textAlign: TextAlign.start,
                     onChanged: (value){},
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.email),
-                      hintText: "Enter your Email",
-                      labelText: "Email address",
+                      prefixIcon: Icon(Icons.perm_identity_rounded),
+                      hintText: "Enter your ID",
+                      labelText:"ID",
                       contentPadding: EdgeInsets.symmetric(
                         vertical: 10,
                         horizontal: 20,

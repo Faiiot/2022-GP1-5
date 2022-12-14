@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       //Stream builder to get a snapshot of the announcement collection to show it in the home screen
       body: StreamBuilder<QuerySnapshot>(
-        stream:FirebaseFirestore.instance.collection('announcement').snapshots() ,
+        stream:FirebaseFirestore.instance.collection('announcement').orderBy('annoucementDate', descending: true).snapshots() ,
         builder: (context, snapshot){
           //if the connection state is "waiting", a progress indicatior will appear
           if(snapshot.connectionState == ConnectionState.waiting){

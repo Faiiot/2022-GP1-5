@@ -26,6 +26,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late TextEditingController _firstNameController= TextEditingController(text:'');
   late TextEditingController _lastNameController= TextEditingController(text:'');
   late TextEditingController _phonNoController= TextEditingController(text:'');
+  late TextEditingController _memberIDController = TextEditingController(text: '');
+  FocusNode _memberIDFocusNode = FocusNode();
   FocusNode _firstNameFocusNode = FocusNode();
   FocusNode _lastNameFocusNode = FocusNode();
   FocusNode _emailFocusNode = FocusNode();
@@ -36,6 +38,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isLoading = false;
   RegExp regexPassword =
   RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*+=%~]).{8,}$');
+
+  RegExp ksuEmailRegEx = new RegExp(r'^([a-z\d\._]+)@ksu.edu.sa$',
+      multiLine: false,
+      caseSensitive: false);
+  RegExp ksuStudentEmail = new RegExp(r'^4[\d]{8}@student.ksu.edu.sa$',
+      multiLine: false,
+      caseSensitive: false);
+  RegExp studentID = RegExp(r'^4([\d]){9}$');
 
 
   @override
@@ -51,6 +61,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
     _phoneNoFocusNode.dispose();
+    _memberIDController.dispose();
+    _memberIDFocusNode.dispose();
 
     super.dispose();
   }
@@ -70,6 +82,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         final _uid = user!.uid;
         await FirebaseFirestore.instance.collection('users').doc(_uid).set({
               'id': _uid,
+              'memberID': _memberIDController.text,
               'firstName':_firstNameController.text ,
               'LastName': _lastNameController.text,
               'Email': _emailTextController.text.trim(),
@@ -186,6 +199,62 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                       ),
                     ),
+                  ),
+                  TextFormField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: _memberIDFocusNode,
+                    onEditingComplete: ()=>
+                        FocusScope.of(context).requestFocus(_emailFocusNode),
+                    validator: (value){
+                      if(value!.isEmpty ){
+                        return "ID is required!";
+                      }else if(!studentID.hasMatch(value) || value.length<2 || value.length>30){
+                        return"Enter a valid ID";
+                      }
+                      return null;
+                    },
+                    controller: _memberIDController,
+                    // keyboardType: TextInputType.number,
+                    textAlign: TextAlign.start,
+                    onChanged: (value){},
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.perm_identity_rounded),
+                      hintText: "Enter your ID",
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.blueAccent,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )
+                      ),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.red)
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
                   ),
                   TextFormField(
                     textInputAction: TextInputAction.next,

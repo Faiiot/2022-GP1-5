@@ -46,7 +46,7 @@ dependencies:
   fluttertoast: ^8.1.1
   email_validator: ^2.1.17
   password_field_validator: ^0.0.1
-
+  font_awesome_flutter: ^10.3.0
 
 
 
