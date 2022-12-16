@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
+import 'package:findly_app/screens/found_items_screen.dart';
 import 'package:findly_app/screens/home_screen.dart';
+import 'package:findly_app/screens/lost_items_screen.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
   final String publishedBy;
   final String announcementDes;
 
+
   //constructor to require the announcement's information
   const AnnouncementDetailsScreen({
     required this.announcementID,
@@ -31,6 +34,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
     required this.theChannel,
     required this.publishedBy,
     required this.announcementDes,
+
 });
 
   @override
@@ -55,11 +59,20 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             onPressed: (){
               User? user = _auth.currentUser;
               String _uid = user!.uid;
+              if(widget.announcementType == 'lost'){
               Navigator.pushReplacement(//back button
                   context, MaterialPageRoute(
-                builder: (context)=>HomeScreen(userID: _uid)
+                builder: (context)=>LostItemsScreen(userID: _uid)
                 ,)
               );
+              }else{
+                Navigator.pushReplacement(//back button
+                    context, MaterialPageRoute(
+                  builder: (context)=>FoundItemsScreen(userID: _uid)
+                  ,)
+                );
+              }
+
             },
             icon:Icon(Icons.arrow_back_ios)
         ),

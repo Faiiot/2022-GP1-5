@@ -2,6 +2,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/home_screen.dart';
+import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -109,7 +110,22 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
         _isLoading=true;
       });
       try{
-        await FirebaseFirestore.instance.collection('announcement').doc(announcementID).set({
+        if(annType == 'lost'){
+          await FirebaseFirestore.instance.collection('lostItem').doc(announcementID).set({
+            'announcementID':announcementID,
+            'publishedBy': _uid,
+            'itemName': itemName,
+            'itemCategory': annCategory,
+            'announcementDes': annDesc,
+            'announcementType': annType,
+            'contact': contactChanel,
+            'url': imageUrl,
+            'buildingName': buildingName,
+            'annoucementDate': DateTime.now()
+
+          });
+        }else{
+        await FirebaseFirestore.instance.collection('foundItem').doc(announcementID).set({
           'announcementID':announcementID,
           'publishedBy': _uid,
           'itemName': itemName,
@@ -121,7 +137,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           'buildingName': buildingName,
           'annoucementDate': DateTime.now()
 
-        });
+        });}
         await FirebaseFirestore.instance
             .collection('users')
             .doc(_uid).update({"userAnnouncement": FieldValue.arrayUnion([announcementID])});
@@ -129,7 +145,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
         Navigator.canPop(context)?Navigator.pop(context):null;
         Navigator.pushReplacement(
             context, MaterialPageRoute(
-          builder: (context)=>HomeScreen(userID: _uid,)
+          builder: (context)=>UserDashboardScreen(userID: _uid,)
           ,)
         );
 
@@ -902,7 +918,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                         String _uid = user!.uid;
 
                         Navigator.pushReplacement(context, MaterialPageRoute(
-                          builder: (context)=>HomeScreen(userID: _uid)
+                          builder: (context)=>UserDashboardScreen(userID: _uid)
                           ,)
                         );
 
