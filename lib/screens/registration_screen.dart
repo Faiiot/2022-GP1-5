@@ -90,6 +90,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               'createdAt': Timestamp.now(),
               'userAnnouncement':<String>[],
         });
+
+        GlobalMethods.addUser();
         // Navigator.canPop(context)?Navigator.pop(context):null;
         Navigator.pushReplacement(
             context, MaterialPageRoute(

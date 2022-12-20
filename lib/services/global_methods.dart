@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 //Dart file with global methods user in the project
 class GlobalMethods {
+  static int userCount = 11;
   static validateEmail({required TextEditingController email}){
     final bool validEmail = EmailValidator.validate(email.text.trim());
     return validEmail;
@@ -51,4 +52,11 @@ class GlobalMethods {
           );
         });
   }
+  static void addUser(){
+    userCount = userCount + 1;
 }
+  static int returnUserCount (){
+    return userCount;
+  }
+}
+

@@ -30,9 +30,13 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   late String contactChanel;
   late String imageUrl = '';
   late String annDesc;
+  late String floorNumber='';
+  late String roomNumber='';
 
   late TextEditingController _itemName = TextEditingController(text: '');
   late TextEditingController _annDesc = TextEditingController(text: '');
+  late TextEditingController _floorNumber = TextEditingController(text: '');
+  late TextEditingController _roomNumber = TextEditingController(text: '');
   File? imgFile;
 
   FocusNode _ItemNameFocusNode = FocusNode();
@@ -41,6 +45,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   FocusNode _contactChannelFocusNode = FocusNode();
   FocusNode _annDesFocusNode = FocusNode();
   FocusNode _annCategoryFocusNode = FocusNode();
+  FocusNode _floorNumberFocusNode = FocusNode();
+  FocusNode _roomNumberFocusNode = FocusNode();
 
 
 
@@ -58,6 +64,10 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     _contactChannelFocusNode.dispose();
     _annDesFocusNode.dispose();
     _annCategoryFocusNode.dispose();
+    _floorNumber.dispose();
+    _roomNumber.dispose();
+    _floorNumberFocusNode.dispose();
+    _roomNumberFocusNode.dispose();
     super.dispose();
   }
 
@@ -121,7 +131,9 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'contact': contactChanel,
             'url': imageUrl,
             'buildingName': buildingName,
-            'annoucementDate': DateTime.now()
+            'annoucementDate': DateTime.now(),
+            'roomnumber':roomNumber,
+            'floornumber':floorNumber
 
           });
         }else{
@@ -428,6 +440,21 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   SizedBox(
                     height: 8.0,
                   ),
+                  // StreamBuilder<QuerySnapshot>(
+                  //     stream:FirebaseFirestore.instance.collection('location').snapshots(),
+                  //     builder: (context,snapshot){
+                  //       if(!snapshot.hasData){Text('Loading!');}
+                  //       else {
+                  //
+                  //         List<DropdownMenuItem> buildingNames=[];
+                  //         for(int i=0;i<snapshot.data!.docs.length;i++){
+                  //           DocumentSnapshot snap= snapshot.data!.docs[i];
+                  //           buildingNames.add(DropdownMenuItem(child: Text(snapshot.data!.docs[i]['buildingName'],),value: "${snapshot.data!.docs[i]['buildingName']}",));
+                  //         }
+                  //
+                  //       }
+                  //     }
+                  // ),
                   DropdownButtonFormField(
                     focusNode: _buildingNameFocusNode,
                       isExpanded: true,
@@ -631,10 +658,132 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
                             FocusScope.of(context).requestFocus(_annDesFocusNode);
                       }),
+
                   SizedBox(
                     height: 20.0,
                   ),
+                  Text(
+                    'Floor number ',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  TextFormField(
+                    focusNode: _floorNumberFocusNode,
+                    onEditingComplete: ()=>
+                        FocusScope.of(context).requestFocus(_roomNumberFocusNode),
+                    maxLength: 5,
+                    controller: _floorNumber,
+                    onFieldSubmitted: (String value) {
+                      print(value);
+                    },
+                    onChanged: (value) {
+                      floorNumber = value;
+                      print(value);
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter Floor number ",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.blueAccent,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                          borderSide: BorderSide(color: Colors.red)),
+                    ),
 
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(
+                    'Room number ',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  TextFormField(
+                    focusNode: _roomNumberFocusNode,
+                    onEditingComplete: ()=>
+                        FocusScope.of(context).requestFocus(_annCategoryFocusNode),
+                    maxLength: 5,
+                    controller: _roomNumber,
+                    onFieldSubmitted: (String value) {
+                      print(value);
+                    },
+                    onChanged: (value) {
+                      roomNumber = value;
+                      print(value);
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter Room number ",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.blueAccent,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          )),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                          borderSide: BorderSide(color: Colors.red)),
+                    ),
+
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
                   //Announcement description
                   Text(
                     'Announcement description *',

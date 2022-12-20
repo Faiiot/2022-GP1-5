@@ -4,6 +4,8 @@ import 'package:findly_app/screens/add_announcement.dart';
 import 'package:findly_app/screens/found_items_screen.dart';
 import 'package:findly_app/screens/lost_items_screen.dart';
 import 'package:findly_app/screens/userProfilePage.dart';
+import 'package:findly_app/screens/user_announcements_screen.dart';
+import 'package:findly_app/services/global_methods.dart';
 import 'package:findly_app/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String firstName="";
   bool _isLoading = false;
+  String userCount = '';
 
   @override
   void initState() {
@@ -36,7 +39,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     _isLoading = true;
 
     try {//Here we will fetch the users First name from the DB
-
       final DocumentSnapshot userDoc =
       await FirebaseFirestore.instance
           .collection('users')
@@ -134,7 +136,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                     ),
                                     Spacer(),
                                     Text(
-                                      '20',
+                                      GlobalMethods.returnUserCount().toString(),
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.w400,
@@ -177,7 +179,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'User Returned',
+                                      'Returned items',
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.w900,
@@ -499,7 +501,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   height: 15,
                 ),
                 InkWell(
-                  onTap: (){},
+                  onTap: (){
+                    Navigator.pushReplacement(
+                        context, MaterialPageRoute(
+                        builder: (context)=>UserAnnouncementsScreen(userID: widget.userID)));
+                  },
                   child: Card(
                     elevation: 7,
                     color: Colors.blue,
