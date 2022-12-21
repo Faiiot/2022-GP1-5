@@ -147,7 +147,9 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           'contact': contactChanel,
           'url': imageUrl,
           'buildingName': buildingName,
-          'annoucementDate': DateTime.now()
+          'annoucementDate': DateTime.now(),
+          'roomnumber':roomNumber,
+          'floornumber':floorNumber
 
         });}
         await FirebaseFirestore.instance
@@ -1056,7 +1058,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                       title: "Add announcement!",
                       onPressed: (){
                         submitFormOnAdd();
-
                       }),
                   //Cancel button
                   MyButton(

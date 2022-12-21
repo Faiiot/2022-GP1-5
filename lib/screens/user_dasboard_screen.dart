@@ -10,6 +10,7 @@ import 'package:findly_app/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class UserDashboardScreen extends StatefulWidget {
 
@@ -28,6 +29,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   String firstName="";
   bool _isLoading = false;
   String userCount = '';
+  String type = '';
 
   @override
   void initState() {
@@ -502,9 +504,73 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 ),
                 InkWell(
                   onTap: (){
-                    Navigator.pushReplacement(
-                        context, MaterialPageRoute(
-                        builder: (context)=>UserAnnouncementsScreen(userID: widget.userID)));
+                 showDialog(
+                 context: context,
+                 builder: (context)=> AlertDialog(
+                      elevation: 7,
+                      title: Row(
+                        children: [
+                          Padding(padding: const EdgeInsets.all(8.0),
+                            child:Icon(FontAwesomeIcons.handPointer, color: Colors.blue,),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("Announcements type"),
+                          ),
+                        ],
+                      ),
+                      content: Text(
+                        "Select announcement type",
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 20,
+                        ),
+                      ),
+                      actions: [
+                        Row(
+                          mainAxisAlignment:MainAxisAlignment.center,
+                          children: [
+                            MaterialButton(
+                              onPressed: (){
+                                setState(() {
+                                  type = 'Lost';
+                                });
+                                Navigator.pushReplacement(
+                                    context, MaterialPageRoute(
+                                    builder: (context)=>UserAnnouncementsScreen(userID: widget.userID, type: type,)));
+                              },
+                              color: Colors.blue,
+                              child: Text(
+                                "Lost",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width:10,),
+                            MaterialButton(
+                              onPressed: (){
+                                setState(() {
+                                  type = 'Found';
+                                });
+                                Navigator.pushReplacement(
+                                    context, MaterialPageRoute(
+                                    builder: (context)=>UserAnnouncementsScreen(userID: widget.userID, type: type,)));
+                              },
+                              color:Colors.blue,
+                              child: Text(
+                                "Found",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+
+                    ));
+
                   },
                   child: Card(
                     elevation: 7,
@@ -544,6 +610,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       builder: (context)=> AddAnnouncementScreen()
                       ,)
                     );
+
                   },
                   child: Card(
                     elevation: 7,

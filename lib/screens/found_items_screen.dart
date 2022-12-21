@@ -31,7 +31,7 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
             );
           },
         ),
-        title: Text("Lost Items", textAlign: TextAlign.center,),
+        title: Text("Found Items", textAlign: TextAlign.center,),
         actions: [
           IconButton(
             icon: Icon(Icons.filter_alt_rounded),

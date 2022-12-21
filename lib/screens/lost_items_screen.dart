@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:findly_app/screens/widgets/announcements_widget.dart';
+import 'package:findly_app/services/findly_search_delegate.dart';
 import 'package:flutter/material.dart';
 
 class LostItemsScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class LostItemsScreen extends StatefulWidget {
 }
 
 class _LostItemsScreenState extends State<LostItemsScreen> {
+  String searchText = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,9 +35,22 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
         ),
         title: Text("Lost Items", textAlign: TextAlign.center,),
         actions: [
+          Card(
+            child: TextField(
+              decoration: InputDecoration(
+                suffixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          // IconButton(
+          //   icon: Icon(Icons.search_rounded),
+          //   onPressed: (){
+          //     showSearch(context: context, delegate: FindlySearchDelegate());
+          //   },),
           IconButton(
             icon: Icon(Icons.filter_alt_rounded),
             onPressed: (){},)
+
         ],
       ),
 

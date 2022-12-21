@@ -91,7 +91,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               'userAnnouncement':<String>[],
         });
 
-        GlobalMethods.addUser();
+        // GlobalMethods.addUser();
         // Navigator.canPop(context)?Navigator.pop(context):null;
         Navigator.pushReplacement(
             context, MaterialPageRoute(
