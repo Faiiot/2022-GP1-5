@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
+import 'package:findly_app/screens/userEidt.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -159,7 +160,9 @@ class _userProfilePage extends State<userProfilePage> {
                               Text(' '+email,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Colors.blue, fontSize: 16))
+                                      color: Colors.blue, fontSize: 16)),
+                              SizedBox(width: 8,),
+                              IconButton(onPressed: (){}, icon: Icon(Icons.edit, color: Colors.blue,))
                             ],
                           ),
                           SizedBox(
@@ -176,7 +179,9 @@ class _userProfilePage extends State<userProfilePage> {
                               Text(' '+phoneNo,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Colors.blue, fontSize: 16))
+                                      color: Colors.blue, fontSize: 16)),
+                              SizedBox(width: 8,),
+                              IconButton(onPressed: (){}, icon: Icon(Icons.edit, color: Colors.blue,))
                             ],
                           ),
                           SizedBox(height: 70,),
@@ -185,12 +190,12 @@ class _userProfilePage extends State<userProfilePage> {
                               color: Colors.blue,
                               title: 'Edit profile',
                               onPressed: (){
-                                // Navigator.pushReplacement(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //     builder: (context) =>
-                                //     editProfile()));
-                                print('-----------------------------Edit---------------------------');
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                    builder: (context) =>
+                                    userEdit(userID: widget.userID)));
+
                               })
                         ]),
                     decoration: BoxDecoration(

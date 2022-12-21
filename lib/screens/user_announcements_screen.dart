@@ -46,9 +46,10 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
             return IconButton(
               icon: Icon(Icons.arrow_back_ios),
               onPressed: (){
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(
-                    builder: (context)=>UserDashboardScreen(userID: widget.userID)));
+                Navigator.canPop(context)?Navigator.pop(context):null;
+                // Navigator.pushReplacement(
+                //     context, MaterialPageRoute(
+                //     builder: (context)=>UserDashboardScreen(userID: widget.userID)));
               },
             );
           },

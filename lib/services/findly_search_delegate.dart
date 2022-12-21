@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/widgets/announcements_widget.dart';
 
 class FindlySearchDelegate extends SearchDelegate{
-  CollectionReference _announcements = FirebaseFirestore.instance.collection('lostItem');
+  CollectionReference _announcements = FirebaseFirestore.instance.collection('foundItem');
   @override
   List<Widget>? buildActions(BuildContext context) {
     return <Widget>[
@@ -33,9 +33,45 @@ class FindlySearchDelegate extends SearchDelegate{
                 .toLowerCase()
                 .contains(query.toLowerCase())).isEmpty){
               return Center(child: Text('No results were found!', style: TextStyle(fontSize: 18),),);
+            }else{
+              return ListView(
+                children: [
+                  ...snapshot.data!.docs
+                      .where((QueryDocumentSnapshot<Object?> element) => element['itemName']
+                      .toString()
+                      .toLowerCase()
+                      .contains(query.toLowerCase())).map((QueryDocumentSnapshot<Object?> data) {
+                    final String announcementID = data['announcementID'];
+                    final String itemName = data.get('itemName');
+                    final String announcementType = data['announcementType'];
+                    final String itemCategory = data['itemCategory'];
+                    final Timestamp annoucementDate = data['annoucementDate'];
+                    final String buildingName = data['buildingName'];
+                    final String contact = data.get('contact');
+                    final String publishedBy = data['publishedBy'];
+                    final String announcementDes = data['announcementDes'];
+                    final String announcementImg = data['url'];
+
+
+                    return Announcement(
+                        announcementID: announcementID,
+                        itemName: itemName,
+                        announcementType: announcementType,
+                        itemCategory: itemCategory,
+                        postDate: annoucementDate,
+                        announcementImg: announcementImg,
+                        buildingName: buildingName,
+                        contactChannel: contact,
+                        publisherID: publishedBy,
+                        announcementDes: announcementDes);
+
+
+                  })
+                ],
+              );
             }
             ///Fetch data here
-            print(snapshot.data);
+
             // return ListView.builder(
             //     itemCount: snapshot.data!.docs.length,
             //     itemBuilder: (BuildContext context,int index){
@@ -54,41 +90,7 @@ class FindlySearchDelegate extends SearchDelegate{
             //         announcementDes: snapshot.data!.docs[index]['announcementDes'],
             //       );
             //     });
-            return ListView(
-              children: [
-                ...snapshot.data!.docs
-                    .where((QueryDocumentSnapshot<Object?> element) => element['itemName']
-                    .toString()
-                    .toLowerCase()
-                    .contains(query.toLowerCase())).map((QueryDocumentSnapshot<Object?> data) {
-                      final String announcementID = data.get('announcementID');
-                      final String itemName = data['itemName'];
-                      final String announcementType = data['announcementType'];
-                      final String itemCategory = data['itemCategory'];
-                      final Timestamp annoucementDate = data['annoucementDate'];
-                      final String buildingName = data['buildingName'];
-                      final String contact = data.get('contact');
-                      final String publishedBy = data['publishedBy'];
-                      final String announcementDes = data['announcementDes'];
-                      final String announcementImg = data['url'];
 
-
-                      return Announcement(
-                          announcementID: announcementID,
-                          itemName: itemName,
-                          announcementType: announcementType,
-                          itemCategory: itemCategory,
-                          postDate: annoucementDate,
-                          announcementImg: announcementImg,
-                          buildingName: buildingName,
-                          contactChannel: contact,
-                          publisherID: publishedBy,
-                          announcementDes: announcementDes);
-
-
-                })
-              ],
-            );
           }
         });
   }

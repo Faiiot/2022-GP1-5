@@ -35,6 +35,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   void initState() {
     super.initState();
     getUserName();
+    getUsersCount();
   }
 
   void getUserName() async{
@@ -67,6 +68,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         _isLoading = false;
       });
     }
+  }
+
+    getUsersCount() async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    final int documents = await users.snapshots().length;
+    userCount = documents.toString();
   }
 
   @override
@@ -138,7 +145,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                     ),
                                     Spacer(),
                                     Text(
-                                      GlobalMethods.returnUserCount().toString(),
+                                      userCount,
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.w400,
@@ -306,105 +313,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   height: 15,
                 ),
 
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       flex: 6,
-                //       child: InkWell(
-                //         onTap: () {},
-                //         child: Container(
-                //           height: 100,
-                //           child: Card(
-                //             shape: RoundedRectangleBorder(
-                //               borderRadius: BorderRadius.circular(15),
-                //             ),
-                //             elevation: 7,
-                //             child: Container(
-                //               decoration: BoxDecoration(
-                //                 color: Color(0xfff8f8f8),
-                //                 borderRadius: BorderRadius.circular(15),
-                //               ),
-                //               child: Padding(
-                //                 padding:  EdgeInsets.symmetric(horizontal: 15,vertical: 12),
-                //                 child: Column(
-                //                   crossAxisAlignment: CrossAxisAlignment.start,
-                //                   children: [
-                //                     Text(
-                //                       'Current User',
-                //                       style: TextStyle(
-                //                           color: Colors.black,
-                //                           fontWeight: FontWeight.w900,
-                //                           fontSize: 14),
-                //                     ),
-                //                     Spacer(),
-                //                     Text(
-                //                       '20',
-                //                       style: TextStyle(
-                //                           color: Colors.black,
-                //                           fontWeight: FontWeight.w400,
-                //                           fontSize: 16),
-                //                     ),
-                //                   ],
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //
-                //     Expanded(
-                //       flex: 1,
-                //       child: SizedBox(
-                //         height: 20,
-                //       ),
-                //     ),
-                //     Expanded(
-                //       flex: 6,
-                //       child: InkWell(
-                //         onTap: () {},
-                //         child: Container(
-                //           height: 100,
-                //           child: Card(
-                //             shape: RoundedRectangleBorder(
-                //               borderRadius: BorderRadius.circular(15),
-                //             ),
-                //             elevation: 7,
-                //             child: Container(
-                //               decoration: BoxDecoration(
-                //                   borderRadius: BorderRadius.circular(15),
-                //                   color: Color(0xfff8f8f8)
-                //               ),
-                //               child: Padding(
-                //                 padding:  EdgeInsets.symmetric(horizontal: 15,vertical: 12),
-                //                 child: Column(
-                //                   crossAxisAlignment: CrossAxisAlignment.start,
-                //                   children: [
-                //                     Text(
-                //                       'User Returned',
-                //                       style: TextStyle(
-                //                           color: Colors.black,
-                //                           fontWeight: FontWeight.w900,
-                //                           fontSize: 14),
-                //                     ),
-                //                     Spacer(),
-                //                     Text(
-                //                       '20',
-                //                       style: TextStyle(
-                //                           color: Colors.black,
-                //                           fontWeight: FontWeight.w400,
-                //                           fontSize: 16),
-                //                     ),
-                //                   ],
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
+
 
                 Row(
                   children: [

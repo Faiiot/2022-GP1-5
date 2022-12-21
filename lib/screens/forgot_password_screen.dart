@@ -66,17 +66,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          leading: IconButton( // back button
-              onPressed: (){
-
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(
-                  builder: (context)=>LoginScreen()
-                  ,)
-                );
-              },
-              icon:Icon(Icons.arrow_back_ios,color: Colors.blue, )
-          ),
+          // leading: IconButton( // back button
+          //     onPressed: (){
+          //
+          //       Navigator.pushReplacement(
+          //           context, MaterialPageRoute(
+          //         builder: (context)=>LoginScreen()
+          //         ,)
+          //       );
+          //     },
+          //     icon:Icon(Icons.arrow_back_ios,color: Colors.blue, )
+          // ),
 
 
         ),
@@ -156,6 +156,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                     title: "Reset Now!",
                     onPressed: (){
                       _forgotPasswordFCT();
+                    }),
+                MyButton(//Reset password by email button
+                    color: Colors.blue[700]!,
+                    title: "Cancel",
+                    onPressed: (){
+                      Navigator.canPop(context)?Navigator.pop(context):null;
                     }),
 
               ],

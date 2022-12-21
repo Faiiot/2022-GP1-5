@@ -45,7 +45,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   RegExp ksuStudentEmail = new RegExp(r'^4[\d]{8}@student.ksu.edu.sa$',
       multiLine: false,
       caseSensitive: false);
-  RegExp studentID = RegExp(r'^4([\d]){9}$');
+  RegExp studentID = RegExp(r'^4([0-9]){9}$');
 
 
   @override
@@ -67,57 +67,128 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     super.dispose();
   }
 
+  // void submitFormOnSignUp() async {
+  //   final isValid = _signUpFormKey.currentState!.validate();
+  //   FocusScope.of(context).unfocus();
+  //   if(isValid){
+  //     setState(() {
+  //       _isLoading=true;
+  //     });
+  //     try{
+  //       await _auth.createUserWithEmailAndPassword(
+  //           email: _emailTextController.text.toLowerCase().trim(),
+  //           password: _passwordlTextController.text.trim());
+  //       final  User? user = _auth.currentUser;
+  //       final _uid = user!.uid;
+  //       await FirebaseFirestore.instance.collection('users').doc(_uid).set({
+  //             'id': _uid,
+  //             'memberID': _memberIDController.text,
+  //             'firstName':_firstNameController.text ,
+  //             'LastName': _lastNameController.text,
+  //             'Email': _emailTextController.text.trim(),
+  //             'phoneNo':_phonNoController.text,
+  //             'createdAt': Timestamp.now(),
+  //             'userAnnouncement':<String>[],
+  //       });
+  //
+  //       // GlobalMethods.addUser();
+  //       // Navigator.canPop(context)?Navigator.pop(context):null;
+  //       Navigator.pushReplacement(
+  //           context, MaterialPageRoute(
+  //           builder: (context)=>LoginScreen()));
+  //       Fluttertoast.showToast(
+  //           msg: "Account has been created successfully!",
+  //           toastLength: Toast.LENGTH_SHORT,
+  //           backgroundColor: Colors.blueGrey,
+  //           textColor: Colors.white,
+  //           fontSize: 16.0,
+  //
+  //       );
+  //     } catch(error){
+  //       setState(() {
+  //         _isLoading=false;
+  //       });
+  //       GlobalMethods.showErrorDialog(error: error.toString(), context: context);
+  //       print("error occured $error");
+  //     }
+  //
+  //   }else {
+  //     print("form not valid!");
+  //   }
+  //   setState(() {
+  //     _isLoading=false;
+  //   });
+  // }
   void submitFormOnSignUp() async {
     final isValid = _signUpFormKey.currentState!.validate();
     FocusScope.of(context).unfocus();
-    if(isValid){
+    if (isValid) {
       setState(() {
-        _isLoading=true;
+        _isLoading = true;
       });
-      try{
-        await _auth.createUserWithEmailAndPassword(
+      try {
+        //Check weather the id exists in university's db
+        bool validId = await checkMemberId(id: _memberIDController.text);
+        if (!validId) {
+          GlobalMethods.showErrorDialog(
+            context: context,
+            error: "This ID does not exist in our database.",
+          );
+        } else {
+          await _auth.createUserWithEmailAndPassword(
             email: _emailTextController.text.toLowerCase().trim(),
-            password: _passwordlTextController.text.trim());
-        final  User? user = _auth.currentUser;
-        final _uid = user!.uid;
-        await FirebaseFirestore.instance.collection('users').doc(_uid).set({
-              'id': _uid,
-              'memberID': _memberIDController.text,
-              'firstName':_firstNameController.text ,
-              'LastName': _lastNameController.text,
-              'Email': _emailTextController.text.trim(),
-              'phoneNo':_phonNoController.text,
-              'createdAt': Timestamp.now(),
-              'userAnnouncement':<String>[],
-        });
-
-        // GlobalMethods.addUser();
-        // Navigator.canPop(context)?Navigator.pop(context):null;
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(
-            builder: (context)=>LoginScreen()));
-        Fluttertoast.showToast(
+            password: _passwordlTextController.text.trim(),
+          );
+          final User? user = _auth.currentUser;
+          final uid = user!.uid;
+          await FirebaseFirestore.instance.collection('users').doc(uid).set({
+            'id': uid,
+            'memberID': _memberIDController.text,
+            'firstName': _firstNameController.text,
+            'LastName': _lastNameController.text,
+            'Email': _emailTextController.text.trim(),
+            'phoneNo': _phonNoController.text,
+            'createdAt': Timestamp.now(),
+            'userAnnouncement': <String>[],
+          });
+          // Navigator.canPop(context)?Navigator.pop(context):null;
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>  LoginScreen(),
+            ),
+          );
+          Fluttertoast.showToast(
             msg: "Account has been created successfully!",
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.blueGrey,
             textColor: Colors.white,
             fontSize: 16.0,
-
-        );
-      } catch(error){
+          );
+        }
+      } catch (error) {
         setState(() {
-          _isLoading=false;
+          _isLoading = false;
         });
         GlobalMethods.showErrorDialog(error: error.toString(), context: context);
-        print("error occured $error");
+        debugPrint("error occurred $error");
       }
-
-    }else {
-      print("form not valid!");
+    } else {
+      debugPrint("form not valid!");
     }
     setState(() {
-      _isLoading=false;
+      _isLoading = false;
     });
+  }
+
+  Future<bool> checkMemberId({required String id}) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instanceFor(
+      app: Firebase.app("ksuMembersDatabase"),
+    );
+    final doc = await firestore.collection('ksuMembers').doc(id).get();
+    firestore.terminate();
+    return doc.exists;
   }
 
   void showErrorDialog(error){
@@ -208,10 +279,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     onEditingComplete: ()=>
                         FocusScope.of(context).requestFocus(_emailFocusNode),
                     validator: (value){
-                      if(value!.isEmpty ){
+                      if(value!.isEmpty ) {
                         return "ID is required!";
-                      }else if(!studentID.hasMatch(value) || value.length<2 || value.length>30){
-                        return"Enter a valid ID";
                       }
                       return null;
                     },

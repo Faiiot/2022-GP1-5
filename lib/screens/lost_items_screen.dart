@@ -33,20 +33,28 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
             );
           },
         ),
-        title: Text("Lost Items", textAlign: TextAlign.center,),
+        title: Text('Lost announcements'),
+        // Card(
+        //   child: TextField(
+        //     decoration: InputDecoration(
+        //       suffixIcon: Icon(Icons.search),
+        //       hintText: 'Search Lost items...',
+        //     ),
+        //
+        //     onChanged: (value){
+        //       setState(() {
+        //         searchText = value.trim();
+        //       });
+        //     },
+        //   ),
+        // ),
         actions: [
-          Card(
-            child: TextField(
-              decoration: InputDecoration(
-                suffixIcon: Icon(Icons.search),
-              ),
-            ),
-          ),
-          // IconButton(
-          //   icon: Icon(Icons.search_rounded),
-          //   onPressed: (){
-          //     showSearch(context: context, delegate: FindlySearchDelegate());
-          //   },),
+
+          IconButton(
+            icon: Icon(Icons.search_rounded),
+            onPressed: (){
+              showSearch(context: context, delegate: FindlySearchDelegate());
+            },),
           IconButton(
             icon: Icon(Icons.filter_alt_rounded),
             onPressed: (){},)
@@ -56,7 +64,11 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
 
       //Stream builder to get a snapshot of the announcement collection to show it in the home screen
       body: StreamBuilder<QuerySnapshot>(
-        stream:FirebaseFirestore.instance.collection('lostItem').orderBy('annoucementDate', descending: true).snapshots() ,
+        stream:searchText == ''?
+        FirebaseFirestore.instance.collection('lostItem').orderBy('annoucementDate', descending: true).snapshots()
+        :
+        FirebaseFirestore.instance.collection('lostItem').where('itemName', isEqualTo:searchText).snapshots()
+        ,
         builder: (context, snapshot){
           //if the connection state is "waiting", a progress indicatior will appear
           if(snapshot.connectionState == ConnectionState.waiting){
