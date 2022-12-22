@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/userEidt.dart';
 import 'package:findly_app/screens/userProfilePage.dart';
+import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class _editPhone extends State<editPhone> {
 
     Navigator.pushReplacement(
         context, MaterialPageRoute(
-      builder: (context)=>userEdit(userID: widget.userID)
+      builder: (context)=>userProfilePage(userID: widget.userID)
       ,)
     );
   }

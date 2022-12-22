@@ -64,10 +64,8 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
 
       //Stream builder to get a snapshot of the announcement collection to show it in the home screen
       body: StreamBuilder<QuerySnapshot>(
-        stream:searchText == ''?
+        stream:
         FirebaseFirestore.instance.collection('lostItem').orderBy('annoucementDate', descending: true).snapshots()
-        :
-        FirebaseFirestore.instance.collection('lostItem').where('itemName', isEqualTo:searchText).snapshots()
         ,
         builder: (context, snapshot){
           //if the connection state is "waiting", a progress indicatior will appear

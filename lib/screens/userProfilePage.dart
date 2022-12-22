@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
+import 'package:findly_app/screens/editEmail.dart';
+import 'package:findly_app/screens/editphone.dart';
+import 'package:findly_app/screens/forgot_password_screen.dart';
 import 'package:findly_app/screens/userEidt.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/screens/user_dasboard_screen.dart';
@@ -162,7 +165,15 @@ class _userProfilePage extends State<userProfilePage> {
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 16)),
                               SizedBox(width: 8,),
-                              IconButton(onPressed: (){}, icon: Icon(Icons.edit, color: Colors.blue,))
+                              IconButton(
+                                  onPressed: (){
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                editEmail(userID: widget.userID)));
+                                  },
+                                  icon: Icon(Icons.edit, color: Colors.blue,))
                             ],
                           ),
                           SizedBox(
@@ -181,22 +192,66 @@ class _userProfilePage extends State<userProfilePage> {
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 16)),
                               SizedBox(width: 8,),
-                              IconButton(onPressed: (){}, icon: Icon(Icons.edit, color: Colors.blue,))
+                              IconButton(
+                                  onPressed: (){
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                editPhone(userID: widget.userID)));
+                                  },
+                                  icon: Icon(Icons.edit, color: Colors.blue,))
                             ],
                           ),
                           SizedBox(height: 70,),
-                          
-                          MyButton(
-                              color: Colors.blue,
-                              title: 'Edit profile',
-                              onPressed: (){
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                    builder: (context) =>
-                                    userEdit(userID: widget.userID)));
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context)=>ForgotPasswordScreen()
+                                ,)
+                              );
+                            },
+                            child: Container(
+                              height: 110,
+                              width: 200,
+                              child: Card(
+                                elevation: 7,
+                                color: Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.lock_reset, color: Colors.white,size: 30,),
+                                    SizedBox(height: 10,),
+                                    Text(
+                                      'Reset Password ',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
 
-                              })
+
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          // MyButton(
+                          //     color: Colors.blue,
+                          //     title: 'Edit profile',
+                          //     onPressed: (){
+                          //       Navigator.pushReplacement(
+                          //           context,
+                          //           MaterialPageRoute(
+                          //           builder: (context) =>
+                          //           userEdit(userID: widget.userID)));
+                          //
+                          //     }),
                         ]),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
