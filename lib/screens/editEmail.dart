@@ -98,7 +98,7 @@ class _editEmail extends State<editEmail> {
         _isLoading=true;
       });
       try{
-        print('l');
+
 
         await FirebaseFirestore.instance.collection('users').doc(widget.userID).update({'Email':_emailTextController.text});
         _emailTextController.text='';
@@ -130,8 +130,6 @@ class _editEmail extends State<editEmail> {
 
 
   Widget build(BuildContext context) {
-
-
 
     FocusNode _emailFocusNode = FocusNode();
     FocusNode _phoneNoFocusNode = FocusNode();

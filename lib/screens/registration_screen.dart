@@ -67,58 +67,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     super.dispose();
   }
 
-  // void submitFormOnSignUp() async {
-  //   final isValid = _signUpFormKey.currentState!.validate();
-  //   FocusScope.of(context).unfocus();
-  //   if(isValid){
-  //     setState(() {
-  //       _isLoading=true;
-  //     });
-  //     try{
-  //       await _auth.createUserWithEmailAndPassword(
-  //           email: _emailTextController.text.toLowerCase().trim(),
-  //           password: _passwordlTextController.text.trim());
-  //       final  User? user = _auth.currentUser;
-  //       final _uid = user!.uid;
-  //       await FirebaseFirestore.instance.collection('users').doc(_uid).set({
-  //             'id': _uid,
-  //             'memberID': _memberIDController.text,
-  //             'firstName':_firstNameController.text ,
-  //             'LastName': _lastNameController.text,
-  //             'Email': _emailTextController.text.trim(),
-  //             'phoneNo':_phonNoController.text,
-  //             'createdAt': Timestamp.now(),
-  //             'userAnnouncement':<String>[],
-  //       });
-  //
-  //       // GlobalMethods.addUser();
-  //       // Navigator.canPop(context)?Navigator.pop(context):null;
-  //       Navigator.pushReplacement(
-  //           context, MaterialPageRoute(
-  //           builder: (context)=>LoginScreen()));
-  //       Fluttertoast.showToast(
-  //           msg: "Account has been created successfully!",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.blueGrey,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0,
-  //
-  //       );
-  //     } catch(error){
-  //       setState(() {
-  //         _isLoading=false;
-  //       });
-  //       GlobalMethods.showErrorDialog(error: error.toString(), context: context);
-  //       print("error occured $error");
-  //     }
-  //
-  //   }else {
-  //     print("form not valid!");
-  //   }
-  //   setState(() {
-  //     _isLoading=false;
-  //   });
-  // }
+
   void submitFormOnSignUp() async {
     final isValid = _signUpFormKey.currentState!.validate();
     FocusScope.of(context).unfocus();
