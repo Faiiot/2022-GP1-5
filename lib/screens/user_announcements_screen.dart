@@ -80,7 +80,7 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
                 return ListView.builder(
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (BuildContext context,int index){
-                      return Announcement(
+                      return UserAnnouncement(
                         //snapshot.data!.docs is a list of the announcements
                         //by pointing to the index of a specific announcement and fetching info
                         announcementID:snapshot.data!.docs[index]['announcementID'] ,
@@ -93,6 +93,7 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
                         contactChannel: snapshot.data!.docs[index]['contact'],
                         publisherID: snapshot.data!.docs[index]['publishedBy'],
                         announcementDes: snapshot.data!.docs[index]['announcementDes'],
+                        profile: true,
                       );
                     });
               }else{

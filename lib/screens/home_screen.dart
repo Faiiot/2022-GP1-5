@@ -128,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       contactChannel: snapshot.data!.docs[index]['contact'],
                       publisherID: snapshot.data!.docs[index]['publishedBy'],
                       announcementDes: snapshot.data!.docs[index]['announcementDes'],
+                      profile: false,
                     );
                   });
             }else{

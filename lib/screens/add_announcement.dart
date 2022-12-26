@@ -133,7 +133,9 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'buildingName': buildingName,
             'annoucementDate': DateTime.now(),
             'roomnumber':roomNumber,
-            'floornumber':floorNumber
+            'floornumber':floorNumber,
+            'reported': false,
+            'found':false
 
           });
         }else{
@@ -149,8 +151,9 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           'buildingName': buildingName,
           'annoucementDate': DateTime.now(),
           'roomnumber':roomNumber,
-          'floornumber':floorNumber
-
+          'floornumber':floorNumber,
+          'reported': false,
+          'returned':false
         });}
         await FirebaseFirestore.instance
             .collection('users')

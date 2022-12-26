@@ -63,7 +63,8 @@ class FindlySearchDelegate extends SearchDelegate{
                         buildingName: buildingName,
                         contactChannel: contact,
                         publisherID: publishedBy,
-                        announcementDes: announcementDes);
+                        announcementDes: announcementDes,
+                    profile: false,);
 
 
                   })

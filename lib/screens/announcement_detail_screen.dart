@@ -1,11 +1,13 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/found_items_screen.dart';
-import 'package:findly_app/screens/home_screen.dart';
 import 'package:findly_app/screens/lost_items_screen.dart';
-import 'package:findly_app/services/global_methods.dart';
+import 'package:findly_app/screens/user_announcements_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AnnouncementDetailsScreen extends StatefulWidget {
   final String announcementID;
@@ -19,6 +21,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
   final String theChannel;
   final String publishedBy;
   final String announcementDes;
+  final bool profile;
 
 
   //constructor to require the announcement's information
@@ -34,6 +37,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
     required this.theChannel,
     required this.publishedBy,
     required this.announcementDes,
+    required this.profile,
 
 });
 
@@ -59,7 +63,15 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             onPressed: (){
               User? user = _auth.currentUser;
               String _uid = user!.uid;
-              if(widget.announcementType == 'lost'){
+
+              if(widget.profile){
+                Navigator.pushReplacement(//back button
+                    context, MaterialPageRoute(
+                  builder: (context)=>UserAnnouncementsScreen(userID: _uid,type: widget.announcementType,)
+                  ,)
+                );
+              }
+              else if(widget.announcementType == 'lost'){
               Navigator.pushReplacement(//back button
                   context, MaterialPageRoute(
                 builder: (context)=>LostItemsScreen(userID: _uid)
@@ -77,6 +89,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             icon:Icon(Icons.arrow_back_ios)
         ),
         title: Text('Announcement Details',),
+        actions: [
+          widget.profile?
+        IconButton(onPressed: (){_delete(context);}, icon: Icon(Icons.delete_forever,size: 30,)):Text(widget.profile.toString())],
       ),
       body:SingleChildScrollView(
         child: Column(
@@ -267,5 +282,77 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
 
 
     );
+  }
+  void _delete(context){
+
+    showDialog(context: context,
+        builder: (context){
+          return AlertDialog(
+            title: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.delete,size: 30,color: Constants.darkBlue,),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Delete Announcement",
+                    style: TextStyle(color: Constants.darkBlue,fontSize: 22, fontWeight: FontWeight.bold),),
+                ),
+
+              ],
+            ),
+
+
+            //Delete confirmation message
+            content: Text("Are you sure you want to delete ?",maxLines: 2,
+              style: TextStyle(color: Constants.darkBlue,fontSize: 20,fontStyle: FontStyle.italic),),
+            actions: [
+              //Cancel button > back to the drawer
+              TextButton(onPressed: (){
+                Navigator.canPop(context)
+                    ?Navigator.pop(context)
+                    :null;
+              }, child: Text("Cancel")),
+              TextButton(onPressed: ()  async{
+                //if the user click "OK" she will be logged out and redurected to log in screen
+                if(widget.announcementType=='lost') {
+                  final DocumentSnapshot Doc = await FirebaseFirestore.instance.collection('lostItem').doc(widget.announcementID).get();
+                  final found = Doc.get('found');
+                  if(found) {
+                    await FirebaseFirestore.instance.collection('lostItem').doc(
+                        widget.announcementID).delete();
+                  }else{
+
+                  }
+                }
+                else{ await FirebaseFirestore.instance.collection('foundItem').doc(
+                    widget.announcementID).delete();}
+
+                Fluttertoast.showToast(
+                  msg: "Announcement has been deleted successfully!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  backgroundColor: Colors.blueGrey,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+                if(widget.announcementType == 'lost'){
+                  Navigator.pushReplacement(//back button
+                      context, MaterialPageRoute(
+                    builder: (context)=>UserAnnouncementsScreen(userID: widget.publishedBy,type: "lost",)
+                    ,)
+                  );
+                }else{
+                  Navigator.pushReplacement(//back button
+                      context, MaterialPageRoute(
+                    builder: (context)=>UserAnnouncementsScreen(userID:  widget.publishedBy,type: "found",)
+                    ,)
+
+                  );
+                }
+              }, child: Text("OK",style: TextStyle(color: Colors.red),))
+            ],
+          );
+        });
   }
 }
