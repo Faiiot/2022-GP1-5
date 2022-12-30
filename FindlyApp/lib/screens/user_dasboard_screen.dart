@@ -67,7 +67,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   getUsersCount() async {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     final int documents = await users.snapshots().length;
-    userCount = documents.toString();
+
+    setState(() {
+      userCount = documents.toString();
+    });
+    print(userCount);
   }
 
   @override
