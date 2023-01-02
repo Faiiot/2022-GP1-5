@@ -65,7 +65,7 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
       // Stream builder to get a snapshot of the announcement collection to show it in the home screen
       body:Center(
         child: StreamBuilder<QuerySnapshot>(
-          stream:FirebaseFirestore.instance.collection(widget.type=='Lost'?'lostItem':'foundItem').where('publishedBy', isEqualTo: widget.userID).snapshots() ,
+          stream:FirebaseFirestore.instance.collection(widget.type=='lost'?'lostItem':'foundItem').where('publishedBy', isEqualTo: widget.userID).snapshots() ,
           builder: (context, snapshot){
             //if the connection state is "waiting", a progress indicatior will appear
             if(snapshot.connectionState == ConnectionState.waiting){
@@ -94,6 +94,10 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
                         publisherID: snapshot.data!.docs[index]['publishedBy'],
                         announcementDes: snapshot.data!.docs[index]['announcementDes'],
                         profile: true,
+                        reportCount: snapshot.data!.docs[index]['reportCount'],
+                        reported: snapshot.data!.docs[index]['reported'],
+                        roomNumber: snapshot.data!.docs[index]['roomnumber'],
+                        floorNumber: snapshot.data!.docs[index]['floornumber'],
                       );
                     });
               }else{

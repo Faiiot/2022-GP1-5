@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:findly_app/screens/user_announcements_screen.dart';
 import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/services/global_methods.dart';
@@ -9,33 +10,71 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 
-class AddAnnouncementScreen extends StatefulWidget {
+
+class editAnnouncement extends StatefulWidget {
+
+
+  final String announcementID;
+  final String itemName;
+  final String announcementType;
+  final String itemCategory;
+  final Timestamp postDate;
+  final String announcementImg;
+  final String buildingName;
+  final String contactChannel;
+  final String theChannel;
+  final String publishedBy;
+  final String announcementDes;
+  final String roomNumber;
+  final String floorNumber;
+
+
+
+  //constructor to require the announcement's information
+  const editAnnouncement({
+    required this.announcementID,
+    required this.itemName,
+    required this.announcementType,
+    required this.itemCategory,
+    required this.postDate,
+    required this.announcementImg,
+    required this.buildingName,
+    required this.contactChannel,
+    required this.theChannel,
+    required this.publishedBy,
+    required this.announcementDes,
+    required this.roomNumber,
+    required this.floorNumber
+  });
+
 
 
   @override
-  State<AddAnnouncementScreen> createState() => _AddAnnouncementScreenState();
+  State<editAnnouncement> createState() => _editAnnouncement();
 }
 
-class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
+class _editAnnouncement extends State<editAnnouncement> {
   //Creat a Firebase Authentication instance
+
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  late String itemName;
-  late String buildingName ="";
-  late String annType;
-  late String annCategory;
-  late String contactChanel;
-  late String imageUrl = '';
-  late String annDesc;
-  late String floorNumber='';
-  late String roomNumber='';
+  late String itemName=widget.itemName;
+  late String buildingName =widget.buildingName;
+  late String annType=widget.announcementType;
+  late String annCategory=widget.itemCategory;
+  late String contactChanel=widget.contactChannel;
+  late String imageUrl =widget.announcementImg;
+  late String annDesc=widget.announcementDes;
+  late String floorNumber=widget.floorNumber;
+  late String roomNumber=widget.roomNumber;
 
-  late TextEditingController _itemName = TextEditingController(text: '');
-  late TextEditingController _annDesc = TextEditingController(text: '');
-  late TextEditingController _floorNumber = TextEditingController(text: '');
-  late TextEditingController _roomNumber = TextEditingController(text: '');
+  late TextEditingController _itemName = TextEditingController(text: widget.itemName);
+  late TextEditingController _annDesc =TextEditingController(text: widget.announcementDes);
+  late TextEditingController _floorNumber = TextEditingController(text: widget.floorNumber);
+  late TextEditingController _roomNumber = TextEditingController(text: widget.roomNumber);
+
   File? imgFile;
 
   FocusNode _ItemNameFocusNode = FocusNode();
@@ -46,6 +85,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   FocusNode _annCategoryFocusNode = FocusNode();
   FocusNode _floorNumberFocusNode = FocusNode();
   FocusNode _roomNumberFocusNode = FocusNode();
+//
+// Map <String,String> dataUpdate={};
 
 
 
@@ -70,11 +111,18 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     super.dispose();
   }
 
+
+
+
+
+
+
+
   //Method for picking announcement image using camera
   void _pickImageUsingCamera () async {
     XFile? pickedFile = await ImagePicker()
         .pickImage(source: ImageSource.camera,
-    maxHeight: 1080, maxWidth: 1080);
+        maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -89,6 +137,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
+
+
     });
   }
 
@@ -102,27 +152,41 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
         .toString();
     if(imgFile != null) {
 
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('images')
-        .child(uniqueImgID.toString()+'.jpg');
-    await ref.putFile(imgFile!);
-    imageUrl = await ref.getDownloadURL();}
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('images')
+          .child(uniqueImgID.toString()+'.jpg');
+      await ref.putFile(imgFile!);
+      imageUrl = await ref.getDownloadURL();}
     else{
-    imageUrl = "";}
+      imageUrl = "";}
     final isValid = _addFormKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
     if(isValid){
-      final announcementID = Uuid().v4();
+
       setState(() {
         _isLoading=true;
       });
       try{
+
         if(annType == 'lost'){
-          await FirebaseFirestore.instance.collection('lostItem').doc(announcementID).set({
-            'announcementID':announcementID,
-            'publishedBy': _uid,
+          await FirebaseFirestore.instance.collection('lostItem').doc(widget.announcementID).update({
+
+            'itemName': itemName,
+            'itemCategory': annCategory,
+            'announcementDes': annDesc,
+            'announcementType': annType,
+            'contact': contactChanel,
+
+            'url': imageUrl,
+            'buildingName': buildingName,
+            'roomnumber':roomNumber,
+            'floornumber':floorNumber
+
+          });
+        }else{
+          await FirebaseFirestore.instance.collection('foundItem').doc(widget.announcementID).update({
             'itemName': itemName,
             'itemCategory': annCategory,
             'announcementDes': annDesc,
@@ -130,50 +194,30 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'contact': contactChanel,
             'url': imageUrl,
             'buildingName': buildingName,
-            'annoucementDate': DateTime.now(),
+
             'roomnumber':roomNumber,
-            'floornumber':floorNumber,
-            'reported': false,
-            'reportCount':0,
+            'floornumber':floorNumber
+
+          });}
 
 
-          });
-        }else{
-        await FirebaseFirestore.instance.collection('foundItem').doc(announcementID).set({
-          'announcementID':announcementID,
-          'publishedBy': _uid,
-          'itemName': itemName,
-          'itemCategory': annCategory,
-          'announcementDes': annDesc,
-          'announcementType': annType,
-          'contact': contactChanel,
-          'url': imageUrl,
-          'buildingName': buildingName,
-          'annoucementDate': DateTime.now(),
-          'roomnumber':roomNumber,
-          'floornumber':floorNumber,
-          'reported': false,
-          'reportCount':0,
 
-        });}
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_uid).update({"userAnnouncement": FieldValue.arrayUnion([announcementID])});
-        
+
+
         Navigator.canPop(context)?Navigator.pop(context):null;
         Navigator.pushReplacement(
             context, MaterialPageRoute(
-          builder: (context)=>UserDashboardScreen(userID: _uid,)
+          builder: (context)=>UserAnnouncementsScreen(userID: _uid,type: widget.announcementType,)
           ,)
         );
 
         //A confirmation message when the announcement is added
         Fluttertoast.showToast(
-            msg: "Announcement has been added successfully!",
-            toastLength: Toast.LENGTH_SHORT,
-            backgroundColor: Colors.blueGrey,
-            textColor: Colors.white,
-            fontSize: 16.0,
+          msg: "Announcement has been updated successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.blueGrey,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
       } catch(error){
         setState(() {
@@ -195,14 +239,16 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     var dropsownValue="";
+    var droptype= widget.announcementType;
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-            'Add Announcement Form',
-          ),
-          centerTitle: true,
-          ),
+        title: Text(
+          'Update Announcement Form',
+        ),
+        centerTitle: true,
+      ),
       body: Form(
         key: _addFormKey,
         child: Padding(
@@ -212,78 +258,83 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+
                   //Announcement type
                   Text(
-                    'Announcement type *',
+                    'Announcement type is ${widget.announcementType} announcement',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red
                     ),
                   ),
                   SizedBox(
                     height: 8.0,
                   ),
-                  DropdownButtonFormField(
-
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 20,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            )),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            )),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.blueAccent,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            )),
-                        errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10),
-                            ),
-                            borderSide: BorderSide(color: Colors.red)),
-                      ),
-                      items: const [
-                        DropdownMenuItem<String>(
-                            child: Text(
-                              'Choose Announcment type',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            value: ''),
-                        DropdownMenuItem<String>(
-                            child: Text('Lost announcement'), value: 'lost'),
-                        DropdownMenuItem<String>(
-                            child: Text('Found announcement'), value: 'found')
-                      ],
-                      onChanged: (value) {
-                        annType = value.toString();//check iff it works
-                        setState(() {
-                          annType = value.toString();//check iff it works
-                        });
-                        FocusScope.of(context).requestFocus(_ItemNameFocusNode);
-
-                      },
-                      validator: (value) {
-                        if (value == '') {
-                          return 'You must choose';
-                        }
-                        return null;
-                      },
-                      value: dropsownValue),
+                  // DropdownButtonFormField(
+                  //
+                  //     isExpanded: true,
+                  //     decoration: InputDecoration(
+                  //       contentPadding: EdgeInsets.symmetric(
+                  //         vertical: 10,
+                  //         horizontal: 20,
+                  //       ),
+                  //       border: OutlineInputBorder(
+                  //           borderRadius: BorderRadius.all(
+                  //             Radius.circular(10),
+                  //           )),
+                  //       enabledBorder: OutlineInputBorder(
+                  //           borderSide: BorderSide(
+                  //             color: Colors.black,
+                  //             width: 2,
+                  //           ),
+                  //           borderRadius: BorderRadius.all(
+                  //             Radius.circular(10),
+                  //           )),
+                  //       focusedBorder: OutlineInputBorder(
+                  //           borderSide: BorderSide(
+                  //             color: Colors.blueAccent,
+                  //             width: 2,
+                  //           ),
+                  //           borderRadius: BorderRadius.all(
+                  //             Radius.circular(10),
+                  //           )),
+                  //       errorBorder: OutlineInputBorder(
+                  //           borderRadius: BorderRadius.all(
+                  //             Radius.circular(10),
+                  //           ),
+                  //           borderSide: BorderSide(color: Colors.red)),
+                  //     ),
+                  //     items: const [
+                  //       DropdownMenuItem<String>(
+                  //           child: Text(
+                  //             'Choose Announcment type',
+                  //             style: TextStyle(color: Colors.grey),
+                  //           ),
+                  //           value: ''),
+                  //       DropdownMenuItem<String>(
+                  //           child: Text('Lost announcement'), value: 'lost'),
+                  //       DropdownMenuItem<String>(
+                  //           child: Text('Found announcement'), value: 'found')
+                  //     ],
+                  //
+                  //
+                  //     onChanged: (value) {
+                  //       annType = value.toString();//check iff it works
+                  //       setState(() {
+                  //         annType = value.toString();//check iff it works
+                  //       }
+                  //       );
+                  //       FocusScope.of(context).requestFocus(_ItemNameFocusNode);
+                  //       print(widget.announcementImg);
+                  //     },
+                  //     validator: (value) {
+                  //       if (value == '') {
+                  //         return 'You must choose';
+                  //       }
+                  //       return null;
+                  //     },
+                  //     value: droptype),
                   SizedBox(height: 20,),
                   //Item name
                   Text(
@@ -308,6 +359,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                     onChanged: (value) {
                       itemName = value;
                       print(value);
+
                     },
                     decoration: InputDecoration(
                       hintText: "Enter Item name ",
@@ -363,7 +415,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                     height: 8.0,
                   ),
                   DropdownButtonFormField(
-                    focusNode: _annCategoryFocusNode,
+                      focusNode: _annCategoryFocusNode,
 
                       isExpanded: true,
                       decoration: InputDecoration(
@@ -424,7 +476,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                         setState(() {
                           annCategory = value.toString();
                         });
-                            FocusScope.of(context).requestFocus(_buildingNameFocusNode);
+                        FocusScope.of(context).requestFocus(_buildingNameFocusNode);
                       },
                       validator: (value) {
                         if (value == '') {
@@ -432,7 +484,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                         }
                         //return null;
                       },
-                      value: dropsownValue),
+                      value:widget.itemCategory),
                   SizedBox(height: 20,),
 
                   //Building name
@@ -462,7 +514,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   //     }
                   // ),
                   DropdownButtonFormField(
-                    focusNode: _buildingNameFocusNode,
+                      focusNode: _buildingNameFocusNode,
                       isExpanded: true,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
@@ -655,14 +707,14 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                             child: Text('Operational ِAffairs', maxLines: 3),
                             value: 'Operational ِAffairs'),
                       ],
-                      value: dropsownValue,
+                      value: widget.buildingName,
                       onChanged: (value) {
                         buildingName = value.toString();
                         setState(() {
                           buildingName = value.toString();
                         });
 
-                            FocusScope.of(context).requestFocus(_annDesFocusNode);
+                        FocusScope.of(context).requestFocus(_annDesFocusNode);
                       }),
 
                   SizedBox(
@@ -869,7 +921,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                     height: 10.0,
                   ),
                   DropdownButtonFormField(
-                    focusNode: _contactChannelFocusNode,
+                      focusNode: _contactChannelFocusNode,
                       isExpanded: true,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
@@ -926,39 +978,63 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           return 'You must choose';
                         }
                       },
-                      value: dropsownValue),
+                      value: widget.contactChannel),
                   SizedBox(
                     height: 25.0,
                   ),
-                  imgFile == null
-                      ?
-                  Container(
+
+
+                  if(imageUrl == '' && imgFile==null)
+                    Container(
                       decoration: BoxDecoration(
                           border: Border.all(color: Colors.blue, width: 3),
                           borderRadius: BorderRadius.circular(20)
                       ),
                       height: 200,
                       width: 200,
-                      child:
-                      Icon(Icons.hide_image_outlined, size: 100,color: Colors.blueGrey,)
-                  )
-                      :
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 3),
-                    ),
+                      child: Icon(Icons.hide_image_outlined, size: 100,color: Colors.blueGrey,),
+                    )
+                  else if(imageUrl != ''&& imgFile==null)
+                    Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blue, width: 3),
+                        ),
 
-                    child:
-                    Image.file(imgFile!, fit: BoxFit.cover, ),
-                  ),
-                  imgFile == null
+
+                        child:
+                        Image.network(
+                          imageUrl,
+                        )
+
+                    )
+                  else  if(imageUrl == ''&& imgFile!=null)
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blue, width: 3),
+                        ),
+
+
+                        child:
+                        Image.file(imgFile!, fit: BoxFit.cover, ),
+
+                      )
+
+
+
+
+
+
+
+
+
+                  ,imageUrl == '' && imgFile==null
                       ?
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Center(
                       child: ElevatedButton(//Button to upload image
                         child: const Text('Upload item image') ,
-                        onPressed: () {
+                        onPressed: () async {
 
                           showModalBottomSheet<void>(
                             context: context,
@@ -1040,6 +1116,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                             },
                           );
 
+
+
                         },
                       ),
                     ),
@@ -1051,30 +1129,35 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           child: ElevatedButton(//Button to cancel the uploaded image
                               child: const Text('Cancel') ,
                               onPressed: () { setState(() {
-                                imgFile = null;
-                              }); print(imgFile); }
+                                imageUrl ='';
+                                imgFile=null;
+                              });  }
                           )
                       )
                   ),
                   //Add announcement button
                   MyButton(
                       color: Colors.blue[700]!,
-                      title: "Add announcement!",
+                      title: "Update announcement!",
                       onPressed: (){
                         submitFormOnAdd();
+
                       }),
                   //Cancel button
                   MyButton(
+
                       color: Colors.blue[700]!,
                       title: "Cancel",
                       onPressed: (){
+
                         User? user = _auth.currentUser;
                         String _uid = user!.uid;
 
                         Navigator.pushReplacement(context, MaterialPageRoute(
-                          builder: (context)=>UserDashboardScreen(userID: _uid)
+                          builder: (context)=>UserAnnouncementsScreen(userID: _uid,type: widget.announcementType,)
                           ,)
                         );
+
 
 
                       }),

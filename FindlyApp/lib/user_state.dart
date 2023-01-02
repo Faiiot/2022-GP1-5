@@ -1,4 +1,3 @@
-import 'package:findly_app/screens/home_screen.dart';
 import 'package:findly_app/screens/login_screen.dart';
 import 'package:findly_app/screens/user_dasboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';

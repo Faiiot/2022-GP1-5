@@ -105,6 +105,10 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
                       publisherID: data[index]['publishedBy'],
                       announcementDes: data[index]['announcementDes'],
                       profile: false,
+                      reported: data[index]['reported'],
+                      reportCount: data[index]['reportCount'],
+                      roomnumber: data[index]['roomnumber'],
+                      floornumber:data[index]['floornumber'] ,
                     );
                   });
             } else {

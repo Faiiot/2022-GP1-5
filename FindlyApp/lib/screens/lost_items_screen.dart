@@ -61,7 +61,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
         ],
       ),
 
-      //Stream builder to get a snapshot of the announcement collection to show it in the home screen
+      //Stream builder to get a snapshot of the announcement collection to show it on the screen
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('lostItem')
@@ -106,6 +106,10 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                       publisherID: data[index]['publishedBy'],
                       announcementDes: data[index]['announcementDes'],
                       profile: false,
+                      reported: data[index]['reported'],
+                      reportCount: data[index]['reportCount'],
+                      roomnumber: data[index]['roomnumber'],
+                      floornumber:data[index]['floornumber'] ,
                     );
                   });
             } else {

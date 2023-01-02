@@ -19,6 +19,10 @@ class Announcement extends StatefulWidget {
   final String publisherID;
   final String announcementDes;
   final bool profile;
+  final String roomnumber;
+  final String floornumber;
+  final bool reported;
+  final int reportCount;
 
   // a constructor to get each announcement info
   const Announcement({
@@ -33,6 +37,10 @@ class Announcement extends StatefulWidget {
     required this.publisherID,
     required this.announcementDes,
     required this.profile,
+    required this.roomnumber,
+    required this.floornumber,
+    required this.reported,
+    required this.reportCount,
   });
 
   @override
@@ -112,6 +120,10 @@ class _AnnouncementState extends State<Announcement> {
                   announcementDes: widget.announcementDes,
                   theChannel: theChannel,
                   profile: false,
+                  reported: widget.reported,
+                  reportCount: widget.reportCount,
+                  roomNumber: widget.roomnumber,
+                  floorNumber: widget.floornumber,
                 ),
               ));
         },
@@ -147,17 +159,10 @@ class _AnnouncementState extends State<Announcement> {
               Icons.linear_scale,
               color: Colors.blue.shade800,
             ),
-            // Text(
-            //   "Type: ${widget.announcementType}",
-            //   maxLines: 2,
-            //   overflow: TextOverflow.ellipsis,
-            //   style: TextStyle(
-            //     fontSize: 15,
-            //   ),
-            // ),
-            // SizedBox(
-            //   height: 8,
-            // ),
+
+            SizedBox(
+              height: 8,
+            ),
             Text(
               "Category: ${widget.itemCategory}",
               maxLines: 2,

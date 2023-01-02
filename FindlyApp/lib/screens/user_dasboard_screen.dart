@@ -440,7 +440,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 MaterialButton(
                                   onPressed: () {
                                     setState(() {
-                                      type = 'Lost';
+                                      type = 'lost';
                                     });
                                     Navigator.pushReplacement(
                                         context,
@@ -464,7 +464,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 MaterialButton(
                                   onPressed: () {
                                     setState(() {
-                                      type = 'Found';
+                                      type = 'found';
                                     });
                                     Navigator.pushReplacement(
                                         context,
