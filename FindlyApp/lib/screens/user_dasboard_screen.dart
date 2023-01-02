@@ -25,6 +25,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   String firstName = "";
   bool _isLoading = false;
   String userCount = '';
+  String lostCount = '';
+  String foundCount = '';
   String type = '';
 
   @override
@@ -32,6 +34,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     super.initState();
     getUserName();
     getUsersCount();
+    getLostCount();
+    getFoundCount();
   }
 
   void getUserName() async {
@@ -65,14 +69,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   getUsersCount() async {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    final int documents = await users.snapshots().length;
-
-    setState(() {
-      userCount = documents.toString();
-    });
-    print(userCount);
+    QuerySnapshot userCollection = await FirebaseFirestore.instance.collection('users').get();
+    userCount = userCollection.size.toString();
   }
+
+  getLostCount() async {
+    QuerySnapshot lostCollection = await FirebaseFirestore.instance.collection('lostItem').get();
+    lostCount = lostCollection.size.toString();
+  }
+
+  getFoundCount() async {
+    QuerySnapshot foundCollection = await FirebaseFirestore.instance.collection('foundItem').get();
+    foundCount = foundCollection.size.toString();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +240,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                   height: 5,
                                 ),
                                 Text(
-                                  '10',
+                                  lostCount,
                                   style: TextStyle(
                                     color: Colors.blue,
                                     fontSize: 18,
@@ -279,7 +289,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                   height: 5,
                                 ),
                                 Text(
-                                  '10',
+                                  foundCount,
                                   style: TextStyle(
                                     color: Colors.blue,
                                     fontSize: 18,

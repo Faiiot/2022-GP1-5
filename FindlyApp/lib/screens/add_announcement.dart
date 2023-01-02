@@ -135,7 +135,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'roomnumber':roomNumber,
             'floornumber':floorNumber,
             'reported': false,
-            'found':false
+            'reportCount':0,
+
 
           });
         }else{
@@ -153,7 +154,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           'roomnumber':roomNumber,
           'floornumber':floorNumber,
           'reported': false,
-          'returned':false
+          'reportCount':0,
+
         });}
         await FirebaseFirestore.instance
             .collection('users')
