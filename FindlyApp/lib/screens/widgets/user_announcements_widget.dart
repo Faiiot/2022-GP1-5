@@ -103,7 +103,7 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
         onTap: () {
-          Navigator.pushReplacement(
+          Navigator.push(
               context,
               MaterialPageRoute(
                 //send this announcement info to the details screen
