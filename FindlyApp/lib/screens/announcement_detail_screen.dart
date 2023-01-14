@@ -11,6 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class AnnouncementDetailsScreen extends StatefulWidget {
   final String announcementID;
+  final String publisherID;
   final String itemName;
   final String announcementType;
   final String itemCategory;
@@ -30,6 +31,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
   //constructor to require the announcement's information
   const AnnouncementDetailsScreen({
     required this.announcementID,
+    required this.publisherID,
     required this.itemName,
     required this.announcementType,
     required this.itemCategory,
@@ -54,10 +56,19 @@ class AnnouncementDetailsScreen extends StatefulWidget {
 class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+
   @override
   void initState() {
     super.initState();
+    // print(widget.publisherID +"       " +_auth.currentUser!.uid.toString());
   }
+
+  bool sameUser(){
+    if(widget.publisherID == _auth.currentUser!.uid.toString())
+
+      return true;
+    return false;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -70,28 +81,13 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
 
               if (widget.profile) {
                 Navigator.pop(context);
-                // Navigator.pushReplacement(
-                //     //back button
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => UserAnnouncementsScreen(userID: _uid),
-                //     ));
+
               } else if (widget.announcementType == 'lost') {
                 Navigator.pop(context);
-                // Navigator.pushReplacement(
-                //     //back button
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => LostItemsScreen(userID: _uid),
-                //     ));
+
               } else {
                 Navigator.pop(context);
-                // Navigator.pushReplacement(
-                //     //back button
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => FoundItemsScreen(userID: _uid),
-                //     ));
+
               }
             },
             icon: Icon(Icons.arrow_back_ios)),
@@ -99,21 +95,23 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           'Announcement Details',
         ),
         actions: [
-          widget.profile
-              ? IconButton(
+          if (widget.profile) IconButton(
                   onPressed: () {
                     _delete(context);
                   },
                   icon: Icon(
                     Icons.delete_forever,
                     size: 30,
-                  ))
-              : IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.report,
-                    size: 30,
                   )),
+
+          if (!sameUser())
+               IconButton(
+                onPressed: () {report();},
+                icon: Icon(
+                  Icons.report,
+                  size: 30,
+                )),
+
           widget.profile
               ? IconButton(
                   onPressed: () {
@@ -326,78 +324,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     );
   }
 
-  // void _delete(context){
-  //
-  //   showDialog(context: context,
-  //       builder: (context){
-  //         return AlertDialog(
-  //           title: Row(
-  //             children: [
-  //               Padding(
-  //                 padding: const EdgeInsets.all(8.0),
-  //                 child: Icon(Icons.delete,size: 30,color: Constants.darkBlue,),
-  //               ),
-  //               Padding(
-  //                 padding: const EdgeInsets.all(8.0),
-  //                 child: Text("Delete Announcement",
-  //                   style: TextStyle(color: Constants.darkBlue,fontSize: 22, fontWeight: FontWeight.bold),),
-  //               ),
-  //
-  //             ],
-  //           ),
-  //
-  //
-  //           //Delete confirmation message
-  //           content: Text("Are you sure you want to delete ?",maxLines: 2,
-  //             style: TextStyle(color: Constants.darkBlue,fontSize: 20,fontStyle: FontStyle.italic),),
-  //           actions: [
-  //             //Cancel button > back to the drawer
-  //             TextButton(onPressed: (){
-  //               Navigator.canPop(context)
-  //                   ?Navigator.pop(context)
-  //                   :null;
-  //             }, child: Text("Cancel")),
-  //             TextButton(onPressed: ()  async{
-  //               //if the user click "OK" she will be logged out and redurected to log in screen
-  //               if(widget.announcementType=='lost') {
-  //                 final DocumentSnapshot Doc = await FirebaseFirestore.instance.collection('lostItem').doc(widget.announcementID).get();
-  //                 final found = Doc.get('found');
-  //                 if(found) {
-  //                   await FirebaseFirestore.instance.collection('lostItem').doc(
-  //                       widget.announcementID).delete();
-  //                 }else{
-  //
-  //                 }
-  //               }
-  //               else{ await FirebaseFirestore.instance.collection('foundItem').doc(
-  //                   widget.announcementID).delete();}
-  //
-  //               Fluttertoast.showToast(
-  //                 msg: "Announcement has been deleted successfully!",
-  //                 toastLength: Toast.LENGTH_SHORT,
-  //                 backgroundColor: Colors.blueGrey,
-  //                 textColor: Colors.white,
-  //                 fontSize: 16.0,
-  //               );
-  //               if(widget.announcementType == 'lost'){
-  //                 Navigator.pushReplacement(//back button
-  //                     context, MaterialPageRoute(
-  //                   builder: (context)=>UserAnnouncementsScreen(userID: widget.publishedBy,type: "lost",)
-  //                   ,)
-  //                 );
-  //               }else{
-  //                 Navigator.pushReplacement(//back button
-  //                     context, MaterialPageRoute(
-  //                   builder: (context)=>UserAnnouncementsScreen(userID:  widget.publishedBy,type: "found",)
-  //                   ,)
-  //
-  //                 );
-  //               }
-  //             }, child: Text("OK",style: TextStyle(color: Colors.red),))
-  //           ],
-  //         );
-  //       });
-  // }
+
   Future<void> _delete(context) async {
     showDialog(
         context: context,
@@ -601,5 +528,65 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             ],
           );
         });
+  }
+  Future<void> report() async {
+    //print(count);
+    if(widget.reported!=true) {
+      var count=widget.reportCount;
+      count++;
+      print(count);
+      if (widget.reportCount == 2) {
+        await FirebaseFirestore.instance.collection('reportedItem').doc(
+            widget.announcementID).set({
+          'announcementID': widget.announcementID,
+          'publishedBy': widget.publishedBy,
+          'itemName': widget.itemName,
+          'itemCategory': widget.itemCategory,
+          'announcementDes': widget.announcementDes,
+          'announcementType': widget.announcementType,
+          'contact': widget.theChannel,
+          'url': widget.announcementImg,
+          'buildingName': widget.buildingName,
+          'annoucementDate': widget.postDate,
+          'roomnumber': widget.roomNumber,
+          'floornumber': widget.floorNumber,
+          'reported': true,
+          'reportCount': count,
+        });
+        if(widget.announcementType=='lost'){await FirebaseFirestore.instance.collection('lostItem').doc(
+            widget.announcementID).update({'reported': true,'reportCount': count,});}
+        else{await FirebaseFirestore.instance.collection('foundItem').doc(
+            widget.announcementID).update({'reported': true,'reportCount': count,});}
+
+      }
+      else{
+        if(widget.announcementType=='lost'){await FirebaseFirestore.instance.collection('lostItem').doc(
+            widget.announcementID).update({'reportCount':count++});}
+        else{await FirebaseFirestore.instance.collection('foundItem').doc(
+            widget.announcementID).update({'reportCount':count++});}
+
+
+
+
+      }
+
+    }
+    // Navigator.canPop(context)?
+    Navigator.pop(context);
+    // Navigator.pushReplacement(
+    //     context, MaterialPageRoute(
+    //   builder: (context)=>UserDashboardScreen(userID: widget.publishedBy)
+    //   ,)
+    // );
+
+//A confirmation message when the announcement is added
+    Fluttertoast.showToast(
+      msg: "Announcement has been reported successfully!\nFindly team thanks you!",
+      toastLength: Toast.LENGTH_LONG,
+      backgroundColor: Colors.blueGrey,
+      textColor: Colors.white,
+      fontSize: 16.0,
+
+    );
   }
 }

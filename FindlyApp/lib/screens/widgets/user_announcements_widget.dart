@@ -109,6 +109,7 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
                 //send this announcement info to the details screen
                 builder: (context) => AnnouncementDetailsScreen(
                   announcementID: widget.announcementID,
+                  publisherID: widget.publisherID,
                   itemName: widget.itemName,
                   announcementType: widget.announcementType,
                   itemCategory: widget.itemCategory,
