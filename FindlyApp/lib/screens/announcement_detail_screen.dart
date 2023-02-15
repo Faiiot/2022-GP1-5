@@ -3,6 +3,8 @@ import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/editAnnouncement.dart';
 import 'package:findly_app/screens/found_items_screen.dart';
 import 'package:findly_app/screens/lost_items_screen.dart';
+import 'package:findly_app/screens/private_chat/chatMethods.dart';
+import 'package:findly_app/screens/private_chat/private_chat_screen.dart';
 import 'package:findly_app/screens/user_announcements_screen.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,7 +57,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
 
 class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  ChatMethods chatMethods = new ChatMethods();
 
   @override
   void initState() {
@@ -66,18 +68,40 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   bool sameUser(){
     if(widget.publisherID == _auth.currentUser!.uid.toString())
 
-      return true;
+      {return true;}
     return false;
 }
 
+///create chat room, then send the user to the conversation or chat screen to exchange msgs
+  void createChatRoomAndSendUserToConvScreen(){
+    //get the current user id
+    User? user = _auth.currentUser;
+    String uid = user!.uid.toString();
+    //users id list in the form of String
+    List<String> users = [uid,widget.publisherID];
+    //users names
+    String myName = chatMethods.getUsername(uid);
+    String peerName = widget.publishedBy;
+    String usersNames = "${myName}_${peerName}";
+    //generating the chatroom id
+    String chatroomID = chatMethods.generateChatroomId(uid, widget.publisherID);
+    //chatroom info 
+    Map<String,dynamic> chatroomMap = {
+      "users": users,
+      "chatroomID": chatroomID,
+      "usersNames": usersNames,
+    };
+    chatMethods.createChatRoom(chatroomID, chatroomMap);
+    Navigator.push(context, MaterialPageRoute(builder: (context)=> PrivateChatScreen(chatroomID)));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              User? user = _auth.currentUser;
-              String _uid = user!.uid;
+              // User? user = _auth.currentUser;
+              // String _uid = user!.uid;
 
               if (widget.profile) {
                 Navigator.pop(context);
@@ -176,6 +200,33 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             SizedBox(
               height: 14,
             ),
+            sameUser() == false?
+                GestureDetector(
+                  onTap: (){
+                    createChatRoomAndSendUserToConvScreen();
+                  },
+                  child: Center(
+                    child: Container(
+                      width: 130,
+                      decoration: BoxDecoration(
+                        color: Constants.darkBlue,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding:EdgeInsets.symmetric(horizontal: 16,vertical: 16) ,
+                      child: Row(
+                        children: [
+                          Text("Message", style: TextStyle(color: Colors.white, fontSize: 16),textAlign: TextAlign.center,),
+                          SizedBox(width: 8),
+                          Icon(Icons.chat,color: Colors.white,),
+                        ],
+
+                      ),
+                    ),
+                  ),
+                )
+            :
+                Text(""),
+
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(

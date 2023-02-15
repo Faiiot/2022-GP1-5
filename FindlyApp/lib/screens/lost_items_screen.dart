@@ -187,11 +187,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
           ),
         ),
         actions: [
-          // IconButton(
-          //   icon: Icon(Icons.search_rounded),
-          //   onPressed: (){
-          //     showSearch(context: context, delegate: FindlySearchDelegate());
-          //   },),
+
           IconButton(
             icon: const Icon(Icons.filter_alt_rounded),
             onPressed: () {

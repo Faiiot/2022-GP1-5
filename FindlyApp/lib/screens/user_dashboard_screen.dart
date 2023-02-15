@@ -4,6 +4,7 @@ import 'package:findly_app/screens/add_announcement.dart';
 import 'package:findly_app/screens/chatbot.dart';
 import 'package:findly_app/screens/found_items_screen.dart';
 import 'package:findly_app/screens/lost_items_screen.dart';
+import 'package:findly_app/screens/private_chat/user_chat_history_screen.dart';
 import 'package:findly_app/screens/user_announcements_screen.dart';
 import 'package:findly_app/screens/user_profile_page.dart';
 import 'package:findly_app/user_state.dart';
@@ -17,7 +18,7 @@ class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({
     super.key,
     required this.userID,
-  });//test github---------------------------------------------------
+  });
 
   @override
   State<UserDashboardScreen> createState() => _UserDashboardScreenState();
@@ -55,8 +56,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       setState(() {
         firstName = userDoc.get('firstName');
       });
-      // User? user = _auth.currentUser;
-      // String uid = user!.uid;
+
     } catch (error) {
       debugPrint(error.toString());
     } finally {
@@ -159,7 +159,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                             elevation: 7,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xfff8f8f8),
+                                color: const Color(0xffc2deff),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Padding(
@@ -204,7 +204,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                             elevation: 7,
                             child: Container(
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15), color: const Color(0xfff8f8f8)),
+                                  borderRadius: BorderRadius.circular(15), color: const Color(
+                                  0xffc2deff)),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                                 child: Column(
@@ -215,11 +216,17 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 14),
                                     ),
                                     const Spacer(),
-                                    Text(
-                                      returnedItems.toString(),
-                                      style: const TextStyle(
-                                          color: Colors.black, fontWeight: FontWeight.w400, fontSize: 16),
-                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          returnedItems.toString(),
+                                          style: const TextStyle(
+                                              color: Colors.black, fontWeight: FontWeight.w400, fontSize: 16),
+                                        ),
+                                        // SizedBox(width: 50,),
+                                        // Icon(Icons.assignment_returned_outlined,size: 30,color: Colors.blue,),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),
@@ -231,7 +238,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   ],
                 ),
                 const SizedBox(
-                  height: 30,
+                  height: 10,
+                ),
+                Divider(thickness: 3,),
+                const SizedBox(
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -489,6 +500,53 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ),
                           Icon(
                             Icons.post_add_rounded,
+                            size: 35,
+                            color: Colors.blue,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15,),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserChatHistoryScreen(
+                          userID: widget.userID,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    elevation: 7,
+                    color: Colors.blue,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    child: Container(
+                      height: 70,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xfff8f8f8),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            'Chat History',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Icon(
+                            Icons.chat,
                             size: 35,
                             color: Colors.blue,
                           ),

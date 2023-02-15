@@ -81,9 +81,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         if (!validId) {
           GlobalMethods.showErrorDialog(
             context: context,
-            error: "This ID does not exist in our database.",
+            error: "This ID does not exist in KSU database.",
           );
-        } else {
+        } else {//we must check the users collection has the ID already (user has account already)
           await _auth.createUserWithEmailAndPassword(
             email: _emailTextController.text.toLowerCase().trim(),
             password: _passwordlTextController.text.trim(),
@@ -99,6 +99,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             'phoneNo': _phonNoController.text,
             'createdAt': Timestamp.now(),
             'userAnnouncement': <String>[],
+            'chatWith': <String>[],//other users that the current user has chat history with
           });
           // Navigator.canPop(context)?Navigator.pop(context):null;
           if (!mounted) return;

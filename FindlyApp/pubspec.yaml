@@ -48,6 +48,8 @@ dependencies:
   password_field_validator: ^0.0.1
   font_awesome_flutter: ^10.3.0
   slidable_button: ^2.0.0+1
+  shared_preferences: ^2.0.17
+  intl: ^0.18.0
 
 
 
