@@ -11,16 +11,24 @@ class ReferenceData {
 
   static final List<String> _categories = [];
   static final List<String> _locations = [];
+  int returnedItems = 0;
 
   Future<void> _getDbCategories() async {
     _categories.addAll(
-      await _getData(collection: "category", fieldName: "categoryName"),
+      await _getData(
+        collection: "category",
+        fieldName: "categoryName",
+      ),
     );
+    if (_categories.isNotEmpty) _categories.add("Others");
   }
 
   Future<void> _getDbLocations() async {
     _locations.addAll(
-      await _getData(collection: "location", fieldName: "buildingName"),
+      await _getData(
+        collection: "location",
+        fieldName: "buildingName",
+      ),
     );
   }
 

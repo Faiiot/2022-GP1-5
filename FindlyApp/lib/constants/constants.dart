@@ -40,3 +40,26 @@ const kInputDecoration = InputDecoration(
     borderSide: BorderSide(color: Colors.red),
   ),
 );
+
+const kLinearGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    secondaryColor,
+    primaryColor,
+  ],
+);
+const kSecondaryLinearGradient = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    color1,
+    color2,
+  ],
+);
+
+const Color primaryColor = Color(0xFF035AA6);
+const Color secondaryColor = Color(0xFF60A5FA);
+
+const Color color1 = Color(0xFF8EC7ED);
+const Color color2 = Color(0x86CDEEFF);

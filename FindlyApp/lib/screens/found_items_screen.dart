@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/widgets/announcements_widget.dart';
 import 'package:findly_app/services/global_methods.dart';
@@ -21,8 +22,6 @@ class FoundItemsScreen extends StatefulWidget {
 
 class _FoundItemsScreenState extends State<FoundItemsScreen> {
   String searchText = '';
-
-  //
   DateTime? selectedDate;
   String? selectedCategory;
   String? selectedBuildingName;
@@ -57,11 +56,6 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
           ),
         ),
         actions: [
-          // IconButton(
-          //   icon: Icon(Icons.search_rounded),
-          //   onPressed: (){
-          //     showSearch(context: context, delegate: FindlySearchDelegate());
-          //   },),
           IconButton(
             icon: const Icon(Icons.filter_alt_rounded),
             onPressed: () {
@@ -142,33 +136,54 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
                           },
                         ),
                         const SizedBox(height: 20),
-                        DropdownButtonFormField(
-                          isExpanded: true,
-                          value: selectedBuildingName,
-                          decoration: kInputDecoration,
-                          items: [
-                            const DropdownMenuItem<String?>(
-                              value: null,
-                              child: Text(
-                                'Building name',
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                        DropdownSearch<String>(
+                          mode: Mode.DIALOG,
+                          showSelectedItems: true,
+                          items: ReferenceData.instance.locations,
+                          dropdownSearchDecoration: const InputDecoration(
+                            hintText: "Building name",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
                             ),
-                            ...ReferenceData.instance.locations
-                                .map(
-                                  (buildingName) => DropdownMenuItem<String>(
-                                    value: buildingName,
-                                    child: Text(
-                                      buildingName,
-                                      maxLines: 3,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ],
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            )),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.blueAccent,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              borderSide: BorderSide(color: Colors.red),
+                            ),
+                          ),
                           onChanged: (value) {
                             selectedBuildingName = value;
                           },
+                          selectedItem: selectedBuildingName,
+                          popupShape: const RoundedRectangleBorder(),
+                          showSearchBox: true,
+                          searchFieldProps: const TextFieldProps(
+                            cursorColor: Colors.blue,
+                            decoration: kInputDecoration,
+                          ),
                         ),
                       ],
                     ),
@@ -208,7 +223,7 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
             .snapshots()
             .asBroadcastStream(),
         builder: (context, snapshot) {
-          //if the connection state is "waiting", a progress indicatior will appear
+          //if the connection state is "waiting", a progress indicator will appear
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -251,7 +266,7 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
                       reported: data[index]['reported'],
                       reportCount: data[index]['reportCount'],
                       roomnumber: data[index]['roomnumber'],
-                      floornumber:data[index]['floornumber'] ,
+                      floornumber: data[index]['floornumber'],
                     );
                   });
             } else {

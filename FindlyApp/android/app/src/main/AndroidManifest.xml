@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.findly_app">
    <application
         android:label="findly_app"
@@ -30,5 +31,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <activity
+           android:name="com.yalantis.ucrop.UCropActivity"
+           android:screenOrientation="portrait"
+           android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+           tools:ignore="MissingClass" />
     </application>
 </manifest>

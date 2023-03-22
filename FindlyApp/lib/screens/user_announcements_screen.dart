@@ -16,11 +16,6 @@ class UserAnnouncementsScreen extends StatefulWidget {
 
 class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
@@ -109,7 +104,6 @@ class _StreamBuilderWidget extends StatelessWidget {
           return const Center(
             child: CircularProgressIndicator(),
           );
-
           //if the connection state is "active"
         } else if (snapshot.connectionState == ConnectionState.active) {
           //if the collection snapshot is empty

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "findlychatbot-kced",
+  "private_key_id": "4ec1ae67aa93803d9b80cdbf77489aaa22b5b17d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCsBwKNS1Tt+MUa\n9yAFEkal2CvzX/iRvhJcns9Huv8JgS+2ZHCoXr91K97aeCV9ecLl2OwyBVX0g41J\nRmkxTZS13bzo5D0BR+CrK3OXORLJ1QHptK0LLCSSKP5I0IA7q3qfzhjoUDkhif7s\n/teg6DiG5VCL/jq4NILemKsJ1zl9hN+/eXBgUdlQ4W+VFrVpMOTgTWhQhtkjc+oy\nP4X+1vs1lUmQpwPAwW2tQSr9NfPa0B93/1oT7zjbdcJXewYc6qTl4uvgn6TCt5/S\nM6yifS1OY/LulwnTHQ8Lr3sbhPwj4gVOziBGq/Sv4WpU53u1jdwmQacBj4UIRcxb\n/xmrfbpzAgMBAAECggEAA7bXCEPzHnw7jTx+tX1ShywmrseIr2TiMpu/L/ZKoWLn\nq9F5WTlKevYqhp8HeDET0zCe0OmqlG/usgFSLh1Vs6OI+6JJ6ugpYqi6gy5ZSIBP\n3ULoZZBbbchyzRGrYx5ttFuX0BRDV4UKOwW5lCDPb6It3gfsLqP7m2DCeKDr/djC\nh9BDza5zDYtBy6hkPH7ZEy0XWcA4PzOu1ekFtzdfIveiEf9kolbxVhWeeg9UWNLl\nXQj5pzxG2sTyIqLpZzCgftDyyEpQOWCQVIIueAFdRxK1uR4hZu9ppZ0mHEpsry14\nazpEQzZVs/xDPWGTo3gRpelvezPexWgvu82voCS/KQKBgQDVI9AxMv0EPsQRKD7U\nsTVij/d0Xq0SGsVfUHOGg1c3aaWuPQvwYm0sepWSvIUCQhP5ZN2W/Se/quxj4YXL\n+zJwXe5Utk5OBVAgIFfrAOiUx5DMWkMTUMOj5CdxU1WJDPS6TFhRIdZlxRz45zGd\nTL+H4CZLsDTii0Fw8QP4LJGMJQKBgQDOnsYVCGDSLWCb8/SpvWUP+ARxtjmqMQoU\nooBCvbMU98KNGc8Q4kuhFHcG2iUzbF2s3yWeJLj7zfjVCcKQDLpAkoyihR8hmxFv\nN9Oef8dh/bDQIabpG/uY7AvMAlgpKnArlZqgvfbc1cl30z0xQwwAVL8EXIHmGg/p\nFD63ghyctwKBgQCi6AOZhxpCI2MipfsX//YIxnbhd/eabeHLjyctebewv8wFl91H\nN0OwimVGSVb0OeMgbEq9u/KkmZSiZt4n4XBU2EZwcwL4uTDbzTzFfuVFyh7PQnIg\nEkvmOV04TfSDkuZ+ehnKsS04jecuCy8txlpiFR3QHfbd7IfxNhXNmusIDQKBgCew\njiJKKrcU6mLquMvGStyHausg8vDDXMlb8cFgST803JVYKNN4dMircrXJP64iGdh0\nQPig2zvbc/oQVuRu3XQ78nHhmnpNHEs98ROYPgePwOAqJrLOokTcyuNUa/T0Zvmo\nUjygYQRIuNugozeMRojlvo+q6XT2+qluLyH3B2H/AoGADXg4UKPT+1c6/xr4ZB7Z\noYpIJ78RDt4Qc9LUeWSeITDsBJqVQh0Jb88flP8OnUhMQQ8egefsKjQtGx12FVpj\nQsspNwfngN+iozYpw7jk5V9kM2cWwu4lyb3m+M2ADqdFmciIyOxvgwHO5Y6rOtfF\n8velu6hdSZ6Mb9heekG1Trk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "findlychatbotfinal@findlychatbot-kced.iam.gserviceaccount.com",
+  "client_id": "113972666820930920191",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/findlychatbotfinal%40findlychatbot-kced.iam.gserviceaccount.com"
+}

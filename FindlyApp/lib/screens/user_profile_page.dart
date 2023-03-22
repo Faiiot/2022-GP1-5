@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String userID;
-
   //A constructor that requires the user ID to return to each user her home screen
   const UserProfilePage({
     super.key,
@@ -112,10 +111,12 @@ class UserProfileState extends State<UserProfilePage> {
                           const Text(
                             '  Name :',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(' $fullName',
-                              textAlign: TextAlign.center, style: const TextStyle(color: Colors.blue, fontSize: 16))
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.blue, fontSize: 16))
                         ],
                       ),
                       const SizedBox(
@@ -125,9 +126,11 @@ class UserProfileState extends State<UserProfilePage> {
                         children: [
                           const Text('  ID :',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                              style: TextStyle(
+                                  color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
                           Text(' $id',
-                              textAlign: TextAlign.center, style: const TextStyle(color: Colors.blue, fontSize: 16))
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.blue, fontSize: 16))
                         ],
                       ),
                       const SizedBox(
@@ -137,16 +140,20 @@ class UserProfileState extends State<UserProfilePage> {
                         children: [
                           const Text('  Email : ',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                              style: TextStyle(
+                                  color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
                           Text(' $email',
-                              textAlign: TextAlign.center, style: const TextStyle(color: Colors.blue, fontSize: 16)),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.blue, fontSize: 16)),
                           const SizedBox(
                             width: 8,
                           ),
                           IconButton(
                               onPressed: () {
                                 Navigator.pushReplacement(
-                                    context, MaterialPageRoute(builder: (context) => EditEmail(userID: widget.userID)));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => EditEmail(userID: widget.userID)));
                               },
                               icon: const Icon(
                                 Icons.edit,
@@ -161,16 +168,20 @@ class UserProfileState extends State<UserProfilePage> {
                         children: [
                           const Text('  Phone Number :',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                              style: TextStyle(
+                                  color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
                           Text(' $phoneNo',
-                              textAlign: TextAlign.center, style: const TextStyle(color: Colors.blue, fontSize: 16)),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.blue, fontSize: 16)),
                           const SizedBox(
                             width: 8,
                           ),
                           IconButton(
                               onPressed: () {
                                 Navigator.pushReplacement(
-                                    context, MaterialPageRoute(builder: (context) => EditPhone(userID: widget.userID)));
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => EditPhone(userID: widget.userID)));
                               },
                               icon: const Icon(
                                 Icons.edit,
@@ -186,7 +197,7 @@ class UserProfileState extends State<UserProfilePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ForgotPasswordScreen(),
+                                builder: (context) => const ForgotPasswordScreen(),
                               ));
                         },
                         child: SizedBox(
@@ -223,17 +234,6 @@ class UserProfileState extends State<UserProfilePage> {
                           ),
                         ),
                       ),
-                      // MyButton(
-                      //     color: Colors.blue,
-                      //     title: 'Edit profile',
-                      //     onPressed: (){
-                      //       Navigator.pushReplacement(
-                      //           context,
-                      //           MaterialPageRoute(
-                      //           builder: (context) =>
-                      //           userEdit(userID: widget.userID)));
-                      //
-                      //     }),
                     ]),
                   ),
                 ),

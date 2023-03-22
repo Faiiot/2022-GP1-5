@@ -1,12 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/editAnnouncement.dart';
-import 'package:findly_app/screens/found_items_screen.dart';
-import 'package:findly_app/screens/lost_items_screen.dart';
 import 'package:findly_app/screens/private_chat/chatMethods.dart';
 import 'package:findly_app/screens/private_chat/private_chat_screen.dart';
-import 'package:findly_app/screens/user_announcements_screen.dart';
-import 'package:findly_app/screens/user_dashboard_screen.dart';
+import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,6 +29,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
 
   //constructor to require the announcement's information
   const AnnouncementDetailsScreen({
+    super.key,
     required this.announcementID,
     required this.publisherID,
     required this.itemName,
@@ -57,85 +55,79 @@ class AnnouncementDetailsScreen extends StatefulWidget {
 
 class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  ChatMethods chatMethods = new ChatMethods();
+  ChatMethods chatMethods = ChatMethods();
 
-  @override
-  void initState() {
-    super.initState();
-    // print(widget.publisherID +"       " +_auth.currentUser!.uid.toString());
+  bool sameUser() {
+    if (widget.publisherID == _auth.currentUser!.uid.toString()) {
+      return true;
+    }
+    return false;
   }
 
-  bool sameUser(){
-    if(widget.publisherID == _auth.currentUser!.uid.toString())
-
-      {return true;}
-    return false;
-}
-
-///create chat room, then send the user to the conversation or chat screen to exchange msgs
-  void createChatRoomAndSendUserToConvScreen(){
+  //create chat room, then send the user to the conversation or chat screen to exchange messages
+  void createChatRoomAndSendUserToConvScreen() {
     //get the current user id
     User? user = _auth.currentUser;
     String uid = user!.uid.toString();
     //users id list in the form of String
-    List<String> users = [uid,widget.publisherID];
+    List<String> users = [uid, widget.publisherID];
     //users names
     String myName = chatMethods.getUsername(uid);
     String peerName = widget.publishedBy;
-    String usersNames = "${myName}_${peerName}";
+    String usersNames = "${myName}_$peerName";
     //generating the chatroom id
     String chatroomID = chatMethods.generateChatroomId(uid, widget.publisherID);
-    //chatroom info 
-    Map<String,dynamic> chatroomMap = {
+    //chatroom info
+    Map<String, dynamic> chatroomMap = {
       "users": users,
       "chatroomID": chatroomID,
       "usersNames": usersNames,
+      "lastMessage": "",
     };
     chatMethods.createChatRoom(chatroomID, chatroomMap);
-    Navigator.push(context, MaterialPageRoute(builder: (context)=> PrivateChatScreen(chatroomID)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PrivateChatScreen(chatroomID, peerId: widget.publisherID)));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              // User? user = _auth.currentUser;
-              // String _uid = user!.uid;
-
               if (widget.profile) {
                 Navigator.pop(context);
-
               } else if (widget.announcementType == 'lost') {
                 Navigator.pop(context);
-
               } else {
                 Navigator.pop(context);
-
               }
             },
-            icon: Icon(Icons.arrow_back_ios)),
-        title: Text(
+            icon: const Icon(Icons.arrow_back_ios)),
+        title: const Text(
           'Announcement Details',
         ),
         actions: [
-          if (widget.profile) IconButton(
-                  onPressed: () {
-                    _delete(context);
-                  },
-                  icon: Icon(
-                    Icons.delete_forever,
-                    size: 30,
-                  )),
-
+          if (widget.profile)
+            IconButton(
+                onPressed: () {
+                  _delete(context);
+                },
+                icon: const Icon(
+                  Icons.delete_forever,
+                  size: 30,
+                )),
           if (!sameUser())
-               IconButton(
-                onPressed: () {report();},
-                icon: Icon(
+            IconButton(
+                onPressed: () {
+                  report();
+                },
+                icon: const Icon(
                   Icons.report,
                   size: 30,
                 )),
-
           widget.profile
               ? IconButton(
                   onPressed: () {
@@ -143,7 +135,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                         //back button
                         context,
                         MaterialPageRoute(
-                          builder: (context) => editAnnouncement(
+                          builder: (context) => EditAnnouncement(
                             announcementID: widget.announcementID,
                             itemName: widget.itemName,
                             announcementType: widget.announcementType,
@@ -160,8 +152,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           ),
                         ));
                   },
-                  icon: Icon(Icons.edit))
-              : Text('')
+                  icon: const Icon(Icons.edit))
+              : const Text('')
         ],
       ),
       body: SingleChildScrollView(
@@ -169,7 +161,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
+              child: SizedBox(
                   height: 300,
                   width: double.infinity,
                   child: widget.announcementImg != ""
@@ -177,9 +169,13 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           widget.announcementImg,
                         )
                       : Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue, width: 3),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
+                            children: const [
                               Icon(
                                 Icons.image,
                                 size: 120,
@@ -191,57 +187,58 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                               )
                             ],
                           ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue, width: 3),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
                         )),
             ),
-            SizedBox(
+            const SizedBox(
               height: 14,
             ),
-            sameUser() == false?
-                GestureDetector(
-                  onTap: (){
-                    createChatRoomAndSendUserToConvScreen();
-                  },
-                  child: Center(
-                    child: Container(
-                      width: 130,
-                      decoration: BoxDecoration(
-                        color: Constants.darkBlue,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding:EdgeInsets.symmetric(horizontal: 16,vertical: 16) ,
-                      child: Row(
-                        children: [
-                          Text("Message", style: TextStyle(color: Colors.white, fontSize: 16),textAlign: TextAlign.center,),
-                          SizedBox(width: 8),
-                          Icon(Icons.chat,color: Colors.white,),
-                        ],
-
+            sameUser() == false
+                ? GestureDetector(
+                    onTap: () {
+                      createChatRoomAndSendUserToConvScreen();
+                    },
+                    child: Center(
+                      child: Container(
+                        width: 130,
+                        decoration: BoxDecoration(
+                          color: Constants.darkBlue,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: Row(
+                          children: const [
+                            Text(
+                              "Message",
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(width: 8),
+                            Icon(
+                              Icons.chat,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                )
-            :
-                Text(""),
-
+                  )
+                : const Text(""),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                decoration: BoxDecoration(color: Colors.blue[400], borderRadius: BorderRadius.circular(20)),
+                decoration:
+                    BoxDecoration(color: Colors.blue[400], borderRadius: BorderRadius.circular(20)),
                 width: double.infinity,
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
                     //announcement type
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       alignment: Alignment.topLeft,
                       child: Text(
                         'Announcement type:  ${widget.announcementType}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -251,11 +248,11 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     ),
                     //item name
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       alignment: Alignment.topLeft,
                       child: Text(
                         'Item name:  ${widget.itemName}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -265,11 +262,11 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     ),
                     //item category
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       alignment: Alignment.topLeft,
                       child: Text(
                         'Item category:  ${widget.itemCategory}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -279,11 +276,11 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     ),
                     //building name
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       alignment: Alignment.topLeft,
                       child: Text(
                         'Location:\n   Building: ${widget.buildingName}\n   Floor: ${widget.floorNumber}\n   Room: ${widget.roomNumber}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -293,9 +290,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     ),
                     //description
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       alignment: Alignment.topLeft,
-                      child: Text(
+                      child: const Text(
                         'Description: ',
                         style: TextStyle(
                           fontSize: 16,
@@ -308,9 +305,10 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                        decoration: BoxDecoration(
+                            color: Colors.white, borderRadius: BorderRadius.circular(16)),
                         width: double.infinity,
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         child: Text(
                           widget.announcementDes,
                           textAlign: TextAlign.start,
@@ -325,11 +323,11 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     ),
                     //publisher Name
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                       alignment: Alignment.topLeft,
                       child: Text(
                         'Published by:  ${widget.publishedBy}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -340,11 +338,11 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     //another contact channel based on the user's choice
                     widget.contactChannel == "Phone Number"
                         ? Container(
-                            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             alignment: Alignment.topLeft,
                             child: Text(
                               'Phone number:  ${widget.theChannel} ',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -353,11 +351,11 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                             ),
                           )
                         : Container(
-                            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             alignment: Alignment.topLeft,
                             child: Text(
                               'Email:  ${widget.theChannel}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -375,220 +373,197 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     );
   }
 
-
   Future<void> _delete(context) async {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.delete,
-                    size: 30,
-                    color: Constants.darkBlue,
-                  ),
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          titlePadding: const EdgeInsets.all(24.0),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.delete,
+                size: 30,
+                color: Constants.darkBlue,
+              ),
+              const SizedBox(width: 8.0),
+              Flexible(
+                child: Text(
+                  "Delete Announcement",
+                  style: TextStyle(
+                      color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Delete Announcement",
-                    style: TextStyle(color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-
-            //Log out confirmation message
-            content: Text(
-              "Are you sure you want to delete " + widget.itemName + " ?",
-              maxLines: 2,
-              style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-            ),
-            actions: [
-              //Cancel button > back to the drawer
-              TextButton(
-                  onPressed: () {
-                    Navigator.canPop(context) ? Navigator.pop(context) : null;
-                  },
-                  child: Text("Cancel")),
-              TextButton(
-                  onPressed: () async {
-                    //if the user click "OK" she will be logged out and redirected to log in screen
-                    if (widget.announcementType == 'lost') {
-                      await FirebaseFirestore.instance.collection('lostItem').doc(widget.announcementID).delete();
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.update_sharp,
-                                      size: 30,
-                                      color: Constants.darkBlue,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "Update Status",
-                                      style: TextStyle(
-                                          color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              //Log out confirmation message
-                              content: Text(
-                                "Did you find " + widget.itemName + ' ?',
-                                maxLines: 2,
-                                style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-                              ),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                          //back button
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => UserDashboardScreen(userID: widget.publishedBy),
-                                          ));
-                                      Fluttertoast.showToast(
-                                        msg: "Announcement has been deleted successfully!",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        backgroundColor: Colors.blueGrey,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0,
-                                      );
-                                    },
-                                    child: Text('Yes')),
-                                TextButton(
-                                    onPressed: () async {
-                                      Navigator.pushReplacement(
-                                          //back button
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => UserDashboardScreen(userID: widget.publishedBy),
-                                          ));
-
-                                      Fluttertoast.showToast(
-                                        msg: "Announcement has been deleted successfully!",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        backgroundColor: Colors.blueGrey,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0,
-                                      );
-                                      //if the user click "OK" she will be logged out and redurected to log in screen
-                                    },
-                                    child: Text(
-                                      "NO",
-                                      style: TextStyle(color: Colors.blue),
-                                    ))
-                              ],
-                            );
-                          });
-                    } else {
-                      await FirebaseFirestore.instance.collection('foundItem').doc(widget.announcementID).delete();
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.update_sharp,
-                                      size: 30,
-                                      color: Constants.darkBlue,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "Update States",
-                                      style: TextStyle(
-                                          color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              //Log out confirmation message
-                              content: Text(
-                                "Do you returened " + widget.itemName + " to her owner ?",
-                                maxLines: 2,
-                                style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-                              ),
-
-                              actions: [
-                                //Cancel button > back to the drawer
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                          //back button
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => UserDashboardScreen(userID: widget.publishedBy),
-                                          ));
-
-                                      Fluttertoast.showToast(
-                                        msg: "Announcement has been deleted successfully!",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        backgroundColor: Colors.blueGrey,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0,
-                                      );
-                                    },
-                                    child: Text('Yes')),
-                                TextButton(
-                                    onPressed: () async {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => UserDashboardScreen(userID: widget.publishedBy),
-                                          ));
-
-                                      Fluttertoast.showToast(
-                                        msg: "Announcement has been deleted successfully!",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        backgroundColor: Colors.blueGrey,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0,
-                                      );
-                                    },
-                                    child: Text(
-                                      "NO",
-                                      style: TextStyle(color: Colors.blue),
-                                    ))
-                              ],
-                            );
-                          });
-                    }
-                  },
-                  child: Text(
-                    "OK",
-                    style: TextStyle(color: Colors.red),
-                  ))
+              ),
             ],
-          );
-        });
+          ),
+          //Log out confirmation message
+          content: Text(
+            "Are you sure you want to delete ${widget.itemName} ?",
+            maxLines: 2,
+            style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
+          ),
+          actions: [
+            //Cancel button > back to the drawer
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                if (widget.announcementType == 'lost') {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.update_sharp,
+                                size: 30,
+                                color: Constants.darkBlue,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Update Status",
+                                style: TextStyle(
+                                    color: Constants.darkBlue,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          "Did you find ${widget.itemName}?",
+                          maxLines: 2,
+                          style: TextStyle(
+                            color: Constants.darkBlue,
+                            fontSize: 20,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () async {
+                              await GlobalMethods.incrementDeleteItemCount();
+                              await deletedDbAnnouncement("lostItem");
+                            },
+                            child: const Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await deletedDbAnnouncement("lostItem");
+                            },
+                            child: const Text(
+                              "NO",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(
+                                Icons.update_sharp,
+                                size: 30,
+                                color: Constants.darkBlue,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Update States",
+                                style: TextStyle(
+                                    color: Constants.darkBlue,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          "Did you return ${widget.itemName} to her owner?",
+                          maxLines: 2,
+                          style: TextStyle(
+                            color: Constants.darkBlue,
+                            fontSize: 20,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () async {
+                              await GlobalMethods.incrementDeleteItemCount();
+                              await deletedDbAnnouncement("foundItem");
+                            },
+                            child: const Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await deletedDbAnnouncement("foundItem");
+                            },
+                            child: const Text(
+                              "NO",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          )
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: const Text(
+                "OK",
+                style: TextStyle(color: Colors.red),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
+
+  Future<void> deletedDbAnnouncement(String collection) async {
+    await FirebaseFirestore.instance.collection(collection).doc(widget.announcementID).delete();
+
+    if (!mounted) return;
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Fluttertoast.showToast(
+      msg: "Announcement has been deleted successfully!",
+      toastLength: Toast.LENGTH_SHORT,
+      backgroundColor: Colors.blueGrey,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
   Future<void> report() async {
     //print(count);
-    if(widget.reported!=true) {
-      var count=widget.reportCount;
+    if (widget.reported != true) {
+      var count = widget.reportCount;
       count++;
-      print(count);
+      debugPrint(count.toString());
       if (widget.reportCount == 2) {
-        await FirebaseFirestore.instance.collection('reportedItem').doc(
-            widget.announcementID).set({
+        await FirebaseFirestore.instance.collection('reportedItem').doc(widget.announcementID).set({
           'announcementID': widget.announcementID,
           'publishedBy': widget.publishedBy,
           'itemName': widget.itemName,
@@ -604,31 +579,38 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           'reported': true,
           'reportCount': count,
         });
-        if(widget.announcementType=='lost'){await FirebaseFirestore.instance.collection('lostItem').doc(
-            widget.announcementID).update({'reported': true,'reportCount': count,});}
-        else{await FirebaseFirestore.instance.collection('foundItem').doc(
-            widget.announcementID).update({'reported': true,'reportCount': count,});}
-
+        if (widget.announcementType == 'lost') {
+          await FirebaseFirestore.instance
+              .collection('lostItem')
+              .doc(widget.announcementID)
+              .update({
+            'reported': true,
+            'reportCount': count,
+          });
+        } else {
+          await FirebaseFirestore.instance
+              .collection('foundItem')
+              .doc(widget.announcementID)
+              .update({
+            'reported': true,
+            'reportCount': count,
+          });
+        }
+      } else {
+        if (widget.announcementType == 'lost') {
+          await FirebaseFirestore.instance
+              .collection('lostItem')
+              .doc(widget.announcementID)
+              .update({'reportCount': count++});
+        } else {
+          await FirebaseFirestore.instance
+              .collection('foundItem')
+              .doc(widget.announcementID)
+              .update({'reportCount': count++});
+        }
       }
-      else{
-        if(widget.announcementType=='lost'){await FirebaseFirestore.instance.collection('lostItem').doc(
-            widget.announcementID).update({'reportCount':count++});}
-        else{await FirebaseFirestore.instance.collection('foundItem').doc(
-            widget.announcementID).update({'reportCount':count++});}
-
-
-
-
-      }
-
     }
-    // Navigator.canPop(context)?
-    Navigator.pop(context);
-    // Navigator.pushReplacement(
-    //     context, MaterialPageRoute(
-    //   builder: (context)=>UserDashboardScreen(userID: widget.publishedBy)
-    //   ,)
-    // );
+    if (mounted) Navigator.pop(context);
 
 //A confirmation message when the announcement is added
     Fluttertoast.showToast(
@@ -637,7 +619,6 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       backgroundColor: Colors.blueGrey,
       textColor: Colors.white,
       fontSize: 16.0,
-
     );
   }
 }

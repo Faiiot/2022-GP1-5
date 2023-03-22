@@ -1,16 +1,18 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
+import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:findly_app/screens/add_announcement.dart';
-import 'package:findly_app/screens/chatbot.dart';
+import 'package:findly_app/screens/dialogflow_chatbot_screen.dart';
 import 'package:findly_app/screens/found_items_screen.dart';
 import 'package:findly_app/screens/lost_items_screen.dart';
+import 'package:findly_app/screens/notifications.dart';
 import 'package:findly_app/screens/private_chat/user_chat_history_screen.dart';
 import 'package:findly_app/screens/user_announcements_screen.dart';
-import 'package:findly_app/screens/user_profile_page.dart';
-import 'package:findly_app/user_state.dart';
+import 'package:findly_app/services/push_notifications_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   final String userID;
@@ -25,11 +27,11 @@ class UserDashboardScreen extends StatefulWidget {
 }
 
 class _UserDashboardScreenState extends State<UserDashboardScreen> {
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
   String firstName = "";
   String userCount = '';
   String lostCount = '';
   String foundCount = '';
+  String returnedCount = "";
   int returnedItems = 0;
   String type = '';
   String test = '';
@@ -41,6 +43,25 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     getUsersCount();
     getLostItemsCount();
     getFoundItemsCount();
+    getReturnedItemsCount();
+    updateFCM();
+  }
+
+  updateFCM() async {
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      log("Updated FCM: ${PushNotificationController.fcm}");
+      var cu = FirebaseAuth.instance.currentUser;
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(cu!.uid)
+          .update({"fcm": PushNotificationController.fcm});
+      log("Updated FCM: ${PushNotificationController.fcm}");
+    } catch (e) {
+      debugPrint(
+        e.toString(),
+      );
+    }
   }
 
   void getUserName() async {
@@ -56,7 +77,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       setState(() {
         firstName = userDoc.get('firstName');
       });
-
     } catch (error) {
       debugPrint(error.toString());
     } finally {
@@ -74,6 +94,28 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       });
     } catch (e) {
       debugPrint(e.toString());
+    }
+  }
+
+  getReturnedItemsCount() async {
+    try {
+      //Here we will fetch the returned or found items counter from the DB
+      final DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('deletedAnnouncements')
+          .doc(
+            'foundOrReturned',
+          )
+          .get();
+
+      setState(() {
+        returnedItems = doc.get('count');
+      });
+    } catch (error) {
+      debugPrint(error.toString());
+    } finally {
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -109,360 +151,171 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        centerTitle: true,
-        title: const Text(
-          'Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      appBar: CurvedAppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: Icon(Icons.menu),
+        ),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Text(
+            "Hello $firstName!",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text(
-                  'Results',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 16.0,
+              right: 15.0,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationScreen(),
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
+                );
+              },
+              child: const Icon(
+                Icons.notifications_none,
+                size: 32,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15.0,
+          vertical: 20.0,
+        ),
+        children: [
+          const Text(
+            'Today',
+            style: TextStyle(
+              color: primaryColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Container(
+            height: 150,
+            margin: const EdgeInsets.symmetric(
+              horizontal: 0.0,
+              vertical: 16.0,
+            ),
+            padding: const EdgeInsets.only(
+              top: 12.0,
+              bottom: 12.0,
+            ),
+            decoration: BoxDecoration(
+              color: primaryColor,
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: ListView.builder(
+              itemCount: 5,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      flex: 6,
-                      child: InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            elevation: 7,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xffc2deff),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Current User',
-                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 14),
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      userCount,
-                                      style: const TextStyle(
-                                          color: Colors.black, fontWeight: FontWeight.w400, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                    if (index == 0) const SizedBox(width: 16.0),
+                    Container(
+                      width: size.width / 2.5,
+                      margin: const EdgeInsets.only(right: 16.0),
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Image.asset(
+                              "assets/Image_not_available.png",
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 20,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            elevation: 7,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15), color: const Color(
-                                  0xffc2deff)),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Returned items',
-                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 14),
-                                    ),
-                                    const Spacer(),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          returnedItems.toString(),
-                                          style: const TextStyle(
-                                              color: Colors.black, fontWeight: FontWeight.w400, fontSize: 16),
-                                        ),
-                                        // SizedBox(width: 50,),
-                                        // Icon(Icons.assignment_returned_outlined,size: 30,color: Colors.blue,),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
+                          const Text(
+                            "Testing",
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Divider(thickness: 3,),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LostItemsScreen(userID: widget.userID),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            elevation: 7,
-                            color: const Color(0xfff8f8f8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Lost',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  lostCount,
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                );
+              },
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: dashboardButton(
+                  iconName: "lost_item",
+                  label: "Lost",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LostItemsScreen(userID: widget.userID),
                       ),
-                    ),
-                    const Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 20,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FoundItemsScreen(userID: widget.userID),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            elevation: 7,
-                            color: const Color(0xfff8f8f8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Found',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  foundCount,
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => UserProfilePage(userID: widget.userID),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            elevation: 7,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xfff8f8f8),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: const [
-                                    Icon(
-                                      Icons.person,
-                                      color: Colors.blue,
-                                      size: 35,
-                                    ),
-                                    SizedBox(
-                                      height: 8,
-                                    ),
-                                    Text(
-                                      'Profile',
-                                      style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w900, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+              ),
+              const SizedBox(
+                width: 16.0,
+              ),
+              Expanded(
+                child: dashboardButton(
+                  iconName: "found_item",
+                  label: "Found",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FoundItemsScreen(userID: widget.userID),
                       ),
-                    ),
-                    const Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 20,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatBot(
-                                userName: firstName,
-                              ),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            elevation: 7,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15), color: const Color(0xfff8f8f8)),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: const [
-                                    Icon(
-                                      Icons.adb,
-                                      color: Colors.blue,
-                                      size: 35,
-                                    ),
-                                    SizedBox(
-                                      height: 8,
-                                    ),
-                                    Text(
-                                      'ChatBot',
-                                      style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w900, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-                const SizedBox(
-                  height: 15,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 16.0,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: dashboardButton(
+                  iconName: "add",
+                  label: "New Announcement",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddAnnouncementScreen(),
+                      ),
+                    );
+                  },
                 ),
-                InkWell(
+              ),
+              const SizedBox(
+                width: 16.0,
+              ),
+              Expanded(
+                child: dashboardButton(
+                  iconName: "found_item",
+                  label: "My Announcement",
                   onTap: () {
                     Navigator.push(
                       context,
@@ -473,43 +326,19 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       ),
                     );
                   },
-                  child: Card(
-                    elevation: 7,
-                    color: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                      height: 70,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xfff8f8f8),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'My Announcements',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Icon(
-                            Icons.post_add_rounded,
-                            size: 35,
-                            color: Colors.blue,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
-                const SizedBox(height: 15,),
-                InkWell(
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 16.0,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: dashboardButton(
+                  iconName: "chat",
+                  label: "My Chats",
                   onTap: () {
                     Navigator.push(
                       context,
@@ -520,209 +349,80 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       ),
                     );
                   },
-                  child: Card(
-                    elevation: 7,
-                    color: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                      height: 70,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xfff8f8f8),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Chat History',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Icon(
-                            Icons.chat,
-                            size: 35,
-                            color: Colors.blue,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
-                InkWell(
+              ),
+              const SizedBox(
+                width: 16.0,
+              ),
+              Expanded(
+                child: dashboardButton(
+                  iconName: "chatbot",
+                  label: "Need help?",
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AddAnnouncementScreen(),
+                        builder: (context) => const DialogflowChatBotScreen(),
                       ),
                     );
                   },
-                  child: Card(
-                    elevation: 7,
-                    color: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                      height: 70,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xfff8f8f8),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Add Announcements',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Icon(
-                            Icons.add_circle_outline_rounded,
-                            size: 35,
-                            color: Colors.blue,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                InkWell(
-                  onTap: () => _logout(context),
-                  child: Card(
-                    elevation: 7,
-                    color: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Container(
-                      height: 70,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'Logout',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Icon(
-                              Icons.logout_outlined,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _logout(BuildContext context) {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.logout_outlined,
-                  size: 30,
-                  color: Constants.darkBlue,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Log out",
-                  style: TextStyle(
-                    color: Constants.darkBlue,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
                 ),
               ),
             ],
           ),
-          //Log out confirmation message
-          content: Text(
-            "Are you sure you want to log out?",
-            maxLines: 2,
-            style: TextStyle(
-              color: Constants.darkBlue,
-              fontSize: 20,
-              fontStyle: FontStyle.italic,
-            ),
+          const SizedBox(
+            height: 15,
           ),
-          actions: [
-            //Cancel button > back to the drawer
-            TextButton(
-                onPressed: () {
-                  Navigator.canPop(context) ? Navigator.pop(context) : null;
-                },
-                child: const Text("Cancel")),
-            TextButton(
-              onPressed: () async {
-                //if the user click "OK" she will be logged out and redirected to log in screen
-                await auth.signOut();
-                if (!mounted) return;
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const UserState(),
-                  ),
-                );
-                Fluttertoast.showToast(
-                  msg: "You have been logged out successfully!",
-                  toastLength: Toast.LENGTH_SHORT,
-                  backgroundColor: Colors.blueGrey,
-                  textColor: Colors.white,
-                  fontSize: 16.0,
-                );
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(color: Colors.red),
+        ],
+      ),
+    );
+  }
+
+  Widget dashboardButton({
+    required String iconName,
+    required String label,
+    required Function() onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 7,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        child: Container(
+          height: 100,
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.0),
+            gradient: kSecondaryLinearGradient,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Image.asset(
+                  "assets/$iconName.png",
+                  fit: BoxFit.fill,
+                  color: primaryColor,
+                ),
               ),
-            )
-          ],
-        );
-      },
+              const SizedBox(
+                height: 8,
+              ),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

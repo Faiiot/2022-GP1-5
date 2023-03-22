@@ -1,0 +1,100 @@
+import 'package:findly_app/constants/constants.dart';
+import 'package:findly_app/constants/curved_app_bar.dart';
+import 'package:findly_app/screens/auth_home_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:intro_slider/intro_slider.dart';
+
+class OnBoardingScreen extends StatelessWidget {
+  const OnBoardingScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 0,
+            ),
+            child: IntroSlider(
+              isShowSkipBtn: true,
+              isScrollable: false,
+              indicatorConfig: const IndicatorConfig(
+                sizeIndicator: 16,
+                colorIndicator: Colors.grey,
+                colorActiveIndicator: primaryColor,
+              ),
+              skipButtonStyle: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(
+                  primaryColor,
+                ),
+              ),
+              nextButtonStyle: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(
+                  primaryColor,
+                ),
+              ),
+              doneButtonStyle: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(
+                  Colors.white,
+                ),
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  primaryColor,
+                ),
+              ),
+              listContentConfig: [
+                buildContentConfig(
+                  image: "ksu_black_logo.png",
+                  text: "Have you ever\nlost or found an item on KSU\ncampus?",
+                ),
+                buildContentConfig(
+                  image: "ksu_black_logo.jpeg",
+                  text: "Have you ever\nlost or found an item on KSU\ncampus?",
+                ),
+                buildContentConfig(
+                  image: "FindlyC.png",
+                  text: "Find your lost item,\nor help others do!",
+                ),
+              ],
+              onSkipPress: () => navigate(context),
+              onDonePress: () => navigate(context),
+            ),
+          ),
+          SizedBox(
+            height: kToolbarHeight + (WidgetsBinding.instance.window.physicalSize.height * 0.025),
+            child: const CurvedAppBar(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ContentConfig buildContentConfig({
+    required String image,
+    required String text,
+  }) {
+    return ContentConfig(
+      pathImage: "assets/$image",
+      widgetDescription: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: primaryColor,
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  void navigate(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AuthHomeScreen(),
+      ),
+      (route) => false,
+    );
+  }
+}

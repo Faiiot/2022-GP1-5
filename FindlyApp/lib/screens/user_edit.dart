@@ -23,21 +23,6 @@ class UserEditState extends State<UserEdit> {
   String dropDownValue = "";
   final editFormKey = GlobalKey<FormState>();
 
-  //This commented code is useless
-  // @override
-  // void cat(){
-  //   Navigator.pushReplacement(
-  //       context, MaterialPageRoute(
-  //       builder: (context)=>userEdit(userID: widget.userID)
-  //   ));
-  // }
-  // void building(){
-  //   Navigator.pushReplacement(
-  //       context, MaterialPageRoute(
-  //       builder: (context)=>userEdit(userID: widget.userID)
-  //   ));
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +41,8 @@ class UserEditState extends State<UserEdit> {
                 Navigator.pushReplacement(
                     //back button
                     context,
-                    MaterialPageRoute(builder: (context) => UserProfilePage(userID: widget.userID)));
+                    MaterialPageRoute(
+                        builder: (context) => UserProfilePage(userID: widget.userID)));
               },
               icon: const Icon(Icons.arrow_back_ios)),
         ),
@@ -162,7 +148,7 @@ class UserEditState extends State<UserEdit> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ForgotPasswordScreen(),
+                        builder: (context) => const ForgotPasswordScreen(),
                       ));
                 },
                 child: SizedBox(

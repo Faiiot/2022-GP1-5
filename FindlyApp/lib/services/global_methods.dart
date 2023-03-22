@@ -1,12 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/dates.dart';
+import '../constants/reference_data.dart';
 
-//Dart file with global methods user in the project
+//Dart file with global methods used in the project
 class GlobalMethods {
-  // static int userCount = 11;
-
   //If the user taps anywhere on the screen, the keyboard will be dismissed through this function
   static void unFocus() {
     WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
@@ -64,14 +65,6 @@ class GlobalMethods {
     );
   }
 
-  // static void addUser() {
-  //   userCount = userCount + 1;
-  // }
-  //
-  // static int returnUserCount() {
-  //   return userCount;
-  // }
-
   static List applyFilters(
     List data,
     DateTime? selectedDate,
@@ -96,5 +89,50 @@ class GlobalMethods {
       );
     }
     return data;
+  }
+
+  static Future<void> incrementDeleteItemCount() async {
+    FirebaseFirestore.instance
+        .collection(
+          "deletedAnnouncements",
+        )
+        .doc("foundOrReturned")
+        .update(
+      {
+        "count": FieldValue.increment(1),
+      },
+    );
+    //Resetting the value before assigning it a new one
+    ReferenceData.instance.returnedItems = 0;
+
+    QuerySnapshot lostItemSnapshot = await FirebaseFirestore.instance.collection('lostItem').get();
+    ReferenceData.instance.returnedItems += lostItemSnapshot.docs
+        .where(
+          (e) => (e.data() as Map)["found"] == true,
+        )
+        .length;
+    QuerySnapshot foundItemsSnapshot =
+        await FirebaseFirestore.instance.collection('foundItem').get();
+    ReferenceData.instance.returnedItems += foundItemsSnapshot.docs
+        .where(
+          (e) => (e.data() as Map)["returned"] == true,
+        )
+        .length;
+    final data = await FirebaseFirestore.instance
+        .collection('deletedAnnouncements')
+        .doc("foundOrReturned")
+        .get();
+    int count = (data.data() as Map)["count"];
+    ReferenceData.instance.returnedItems += count;
+  }
+
+  static Future<bool> onboardUser() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? onboardUser = prefs.getBool('onboardUser');
+    if (onboardUser == null) {
+      await prefs.setBool('onboardUser', false);
+      onboardUser = true;
+    }
+    return onboardUser;
   }
 }

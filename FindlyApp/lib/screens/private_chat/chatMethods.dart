@@ -1,66 +1,99 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 //to insert the chatroom info into the collection to create it
-class ChatMethods{
-  createChatRoom(String chatroomID, chatroomMap){
-    FirebaseFirestore.instance.collection("chatRooms")
-        .doc(chatroomID).set(chatroomMap).catchError((e){
-          print(e.toString());
+class ChatMethods {
+  createChatRoom(String chatroomID, chatroomMap) {
+    FirebaseFirestore.instance
+        .collection("chatRooms")
+        .doc(chatroomID)
+        .set(chatroomMap)
+        .catchError((e) {
+      print(e.toString());
     });
   }
 
   // to generate the same chatroom id for the to users always to avid duplicate rooms for the same users
-  String generateChatroomId(userID, peerID){
+  String generateChatroomId(userID, peerID) {
     String chatID;
-    if(userID.compareTo(peerID)>0)
-    {
+    if (userID.compareTo(peerID) > 0) {
       chatID = "$userID-$peerID";
-    }else{
+    } else {
       chatID = "$peerID-$userID";
     }
     return chatID;
   }
 
-
-  addChatMessages(String chatroomID, messageMap){
-    FirebaseFirestore.instance.collection("chatRooms")
+  addChatMessages(String chatroomID, messageMap) {
+    FirebaseFirestore.instance
+        .collection("chatRooms")
         .doc(chatroomID)
         .collection("messages")
-        .add(messageMap).catchError((e){print(e.toString());});
+        .add(messageMap)
+        .catchError((e) {
+      print(e.toString());
+    });
   }
 
-  getChatMessages(String chatroomID) async{
-    return await FirebaseFirestore.instance.collection("chatRooms")
+  addChatImageMessages(String chatroomID, String imageID, messageMap) {
+    FirebaseFirestore.instance
+        .collection("chatRooms")
         .doc(chatroomID)
         .collection("messages")
-        .orderBy("time", descending: false)
-        .snapshots();
+        .doc(imageID)
+        .set(messageMap)
+        .catchError((e) {
+      print(e.toString());
+    });
   }
 
-  getChatRooms(String userID) async{
-    return await FirebaseFirestore.instance
+  updateChatImageMessageField(String chatroomID, String imageID, String imageUrl) {
+    FirebaseFirestore.instance
+        .collection("chatRooms")
+        .doc(chatroomID)
+        .collection("messages")
+        .doc(imageID)
+        .update({"message": imageUrl});
+  }
+
+  Stream<dynamic> getChatMessages(String chatroomID) {
+    return FirebaseFirestore.instance
+        .collection("chatRooms")
+        .doc(chatroomID)
+        .collection("messages")
+        .orderBy("time", descending: true)
+        .get()
+        .asStream();
+  }
+
+  Stream<dynamic> getChatRooms(String userID) {
+    return FirebaseFirestore.instance
         .collection("chatRooms")
         .where("users", arrayContains: userID)
-        .snapshots();
+        .get()
+        .asStream();
   }
 
-   getUsername(String userID) async {
+  getUsername(String userID) async {
     try {
-      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userID) // widget.userID is used because the var is defined outside the state class but under statefulwidget class
-          .get();
+      final DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(userID).get();
 
       String firstName = userDoc.get('firstName');
       String lastName = userDoc.get('LastName');
       String fullName = '$firstName $lastName';
 
-      print(userID+" "+fullName);
+      print(userID + " " + fullName);
       return fullName;
     } catch (error) {
       print(error.toString());
+    }
   }
+
+  updateLastMessageOfChatroom(String message, String chatroomID) {
+    FirebaseFirestore.instance.collection("chatRooms").doc(chatroomID).update(
+      {
+        "lastMessage": message,
+      },
+    );
   }
 }

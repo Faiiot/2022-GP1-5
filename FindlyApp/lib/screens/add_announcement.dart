@@ -1,10 +1,12 @@
 import 'dart:core';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/services/global_methods.dart';
+import 'package:findly_app/services/push_notifications_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +27,6 @@ class AddAnnouncementScreen extends StatefulWidget {
 class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   //Create a Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   late String annDesc;
   late String annType;
   late String itemName;
@@ -51,13 +52,11 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   final FocusNode _annCategoryFocusNode = FocusNode();
   final FocusNode _floorNumberFocusNode = FocusNode();
   final FocusNode _roomNumberFocusNode = FocusNode();
-
   final _addFormKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     //dispose from device memory so its performance isn't affected
-
     _itemName.dispose();
     _annDesc.dispose();
     _itemNameFocusNode.dispose();
@@ -75,7 +74,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   //Method for picking announcement image using camera
   void _pickImageUsingCamera() async {
-    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -84,7 +84,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   //Method for picking announcement image using gallery
   void _pickImageUsingGallery() async {
-    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -109,8 +110,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
     if (isValid) {
       final announcementID = const Uuid().v4();
-      setState(() {
-      });
+      setState(() {});
       try {
         if (annType == 'lost') {
           await FirebaseFirestore.instance.collection('lostItem').doc(announcementID).set({
@@ -129,6 +129,50 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'reported': false,
             'found': false
           });
+          try {
+            QuerySnapshot snapshot = await FirebaseFirestore.instance
+                .collection('foundItem')
+                .where("itemCategory", isEqualTo: annCategory)
+                .get();
+            if (snapshot.docs.isNotEmpty) {
+              var snapData = snapshot.docs.map((e) {
+                var data = (e.data() as Map<String, dynamic>)['publishedBy'];
+                log(data);
+                return data;
+              });
+              var a = snapData.toList().toSet().toList();
+              log("aaaaaaaaaaaaaa${a.toString()}");
+              List<String> fcms = [];
+              a.map((element) async {
+                DocumentSnapshot sna =
+                    await FirebaseFirestore.instance.collection("users").doc(element).get();
+                if (sna.exists) {
+                  await InAppNotifications.sendInAppNotification(
+                      Timestamp.now().toString(),
+                      InAppNotifications.buildInAppNotification(
+                          " Hi, I lost $itemName in $annCategory",
+                          element,
+                          "Item Lost",
+                          uid,
+                          announcementID));
+                  // final Map<String, dynamic> doc = sna.data as Map<String, dynamic>;
+                  var a = sna.data() as Map;
+                  log(sna.data().toString());
+                  if (a.isNotEmpty) {
+                    fcms.add(a['fcm'] ?? "");
+                  }
+                }
+              });
+              log("All FCMs: ${fcms.length}");
+              await Future.delayed(const Duration(seconds: 5));
+              if (a.isNotEmpty) {
+                PushNotificationController.sendPushNotification(
+                    fcms, "Item Lost", "Hi, I Lost $itemName in $annCategory");
+              }
+            }
+          } catch (e) {
+            log("message${e.toString()}");
+          }
         } else {
           await FirebaseFirestore.instance.collection('foundItem').doc(announcementID).set({
             'announcementID': announcementID,
@@ -146,6 +190,51 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'reported': false,
             'returned': false
           });
+        }
+
+        try {
+          QuerySnapshot snapshot = await FirebaseFirestore.instance
+              .collection('lostItem')
+              .where("itemCategory", isEqualTo: annCategory)
+              .get();
+          if (snapshot.docs.isNotEmpty) {
+            var snapData = snapshot.docs.map((e) {
+              var data = (e.data() as Map<String, dynamic>)['publishedBy'];
+              log(data);
+              return data;
+            });
+            var a = snapData.toList().toSet().toList();
+            log("aaaaaaaaaaaaaa${a.toString()}");
+            List<String> fcms = [];
+            a.map((element) async {
+              DocumentSnapshot sna =
+                  await FirebaseFirestore.instance.collection("users").doc(element).get();
+              if (sna.exists) {
+                await InAppNotifications.sendInAppNotification(
+                    Timestamp.now().toString(),
+                    InAppNotifications.buildInAppNotification(
+                        " Hi, I have found $itemName in $annCategory",
+                        element,
+                        "Item Found",
+                        uid,
+                        announcementID));
+                // final Map<String, dynamic> doc = sna.data as Map<String, dynamic>;
+                var a = sna.data() as Map;
+                log(sna.data().toString());
+                if (a.isNotEmpty) {
+                  fcms.add(a['fcm'] ?? "");
+                }
+              }
+            });
+            log("sssseeeeeee${fcms.length}");
+            await Future.delayed(const Duration(seconds: 5));
+            if (a.isNotEmpty) {
+              PushNotificationController.sendPushNotification(
+                  fcms, "Item Found", " Hi, I have found $itemName in $annCategory");
+            }
+          }
+        } catch (e) {
+          log("message${e.toString()}");
         }
         await FirebaseFirestore.instance.collection('users').doc(uid).update({
           "userAnnouncement": FieldValue.arrayUnion([announcementID])
@@ -169,8 +258,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           fontSize: 16.0,
         );
       } catch (error) {
-        setState(() {
-        });
+        setState(() {});
         //if an error occurs a pop-up message
         GlobalMethods.showErrorDialog(error: error.toString(), context: context);
         debugPrint("error occurred $error");
@@ -178,14 +266,14 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     } else {
       debugPrint("form not valid!");
     }
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Add Announcement Form',
         ),
@@ -313,8 +401,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               const SizedBox(
                 height: 20,
               ),
-
-              // Categury
+              // Category
               const Text(
                 'Item category *',
                 style: TextStyle(
@@ -347,11 +434,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           ),
                         )
                         .toList(),
-                    // DropdownMenuItem<String>(child: Text('Electronic devices'), value: 'Electronic devices'),
-                    // DropdownMenuItem<String>(child: Text('Electronic accessories'), value: 'Electronic accessories'),
-                    // DropdownMenuItem<String>(child: Text('Jewelry'), value: 'Jewelry'),
-                    // DropdownMenuItem<String>(child: Text('Medical equipments'), value: 'Medical equipments'),
-                    // DropdownMenuItem<String>(child: Text('Personal accessories'), value: 'Personal accessories'),
                     const DropdownMenuItem<String>(
                       value: 'Others',
                       child: Text('Others'),
@@ -374,7 +456,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               const SizedBox(
                 height: 20,
               ),
-
               //Building name
               const Text(
                 'Building name',
@@ -386,21 +467,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               const SizedBox(
                 height: 8.0,
               ),
-              // StreamBuilder<QuerySnapshot>(
-              //     stream:FirebaseFirestore.instance.collection('location').snapshots(),
-              //     builder: (context,snapshot){
-              //       if(!snapshot.hasData){Text('Loading!');}
-              //       else {
-              //
-              //         List<DropdownMenuItem> buildingNames=[];
-              //         for(int i=0;i<snapshot.data!.docs.length;i++){
-              //           DocumentSnapshot snap= snapshot.data!.docs[i];
-              //           buildingNames.add(DropdownMenuItem(child: Text(snapshot.data!.docs[i]['buildingName'],),value: "${snapshot.data!.docs[i]['buildingName']}",));
-              //         }
-              //
-              //       }
-              //     }
-              // ),
               DropdownButtonFormField(
                   focusNode: _buildingNameFocusNode,
                   isExpanded: true,
@@ -569,7 +635,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               ),
               TextFormField(
                 focusNode: _annDesFocusNode,
-                onEditingComplete: () => FocusScope.of(context).requestFocus(_contactChannelFocusNode),
+                onEditingComplete: () =>
+                    FocusScope.of(context).requestFocus(_contactChannelFocusNode),
                 controller: _annDesc,
                 minLines: 2,
                 maxLines: 5,
@@ -623,7 +690,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               const SizedBox(
                 height: 20.0,
               ),
-
               //Contact channel
               const Text(
                 'Another contact channel you prefer *',

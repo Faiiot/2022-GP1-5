@@ -1,12 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/private_chat/chatMethods.dart';
 import 'package:findly_app/screens/private_chat/private_chat_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class UserChatHistoryScreen extends StatefulWidget {
-  // const UserChatHistoryScreen({Key? key}) : super(key: key);
   final String userID;
+
   const UserChatHistoryScreen({
     super.key,
     required this.userID,
@@ -17,100 +15,108 @@ class UserChatHistoryScreen extends StatefulWidget {
 }
 
 class _UserChatHistoryScreenState extends State<UserChatHistoryScreen> {
-  ChatMethods chatMethods = new ChatMethods();
-  late Stream chatRoomsStream;
-  String myName ="";
+  ChatMethods chatMethods = ChatMethods();
+  String myName = "";
 
-  Widget ChatRoomsList(){
+  Widget chatRoomsList() {
     return StreamBuilder(
-        stream:chatRoomsStream,
-        builder: (context, snapshot){
-          return snapshot.hasData?
-          ListView.builder(
-            itemCount: snapshot.data.docs.length,
-              itemBuilder: (context,index){
-              return ChatRoomsTile(
-                snapshot.data.docs[index]["usersNames"]
-              .toString().replaceAll("_", "")
-              .replaceAll(myName, ""),
-                snapshot.data.docs[index]["chatroomID"]
-              );
-              }
-          )
-          :
-          Center(child: CircularProgressIndicator(),);
+        stream: chatMethods.getChatRooms(widget.userID),
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  itemCount: snapshot.data.docs.length,
+                  itemBuilder: (context, index) {
+                    return ChatRoomsTile(
+                        snapshot.data.docs[index]["usersNames"]
+                            .toString()
+                            .replaceAll("_", "")
+                            .replaceAll(myName, ""),
+                        snapshot.data.docs[index]["chatroomID"],
+                        (snapshot.data.docs[index]['users'] as List)
+                            .where((element) => element != widget.userID)
+                            .first);
+                  })
+              : const Center(
+                  child: CircularProgressIndicator(),
+                );
         });
   }
+
   @override
   void initState() {
-    chatMethods.getChatRooms(widget.userID).then((value){
-      setState(() {
-        chatRoomsStream = value;
-      });
-    });
-    chatMethods.getUsername(widget.userID).then((value){
-      setState(() {
-        myName = value;
-      });
-      print(myName);
-    });
     super.initState();
+    init();
   }
+
+  void init() async {
+    myName = await chatMethods.getUsername(widget.userID);
+    debugPrint(myName);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat History"),
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios),onPressed:()=> Navigator.pop(context),),
+        title: const Text("Chat History"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: ChatRoomsList(),
+      body: chatRoomsList(),
     );
   }
-
 }
 
 class ChatRoomsTile extends StatelessWidget {
   final String peerName;
   final String chatroomID;
-  const ChatRoomsTile(this.peerName,this.chatroomID);
+  final String peerId;
+
+  const ChatRoomsTile(this.peerName, this.chatroomID, this.peerId, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         Navigator.push(
             context,
-            MaterialPageRoute(builder: (context)=>PrivateChatScreen(chatroomID)));
+            MaterialPageRoute(
+                builder: (context) => PrivateChatScreen(
+                      chatroomID,
+                      peerId: peerId,
+                    )));
       },
       child: Container(
         color: Colors.blueGrey[200],
-        padding: EdgeInsets.symmetric(horizontal: 24,vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Row(
           children: [
             Container(
               height: 40,
               width: 40,
-              alignment:Alignment.center ,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: Colors.black45,
                 borderRadius: BorderRadius.circular(40),
               ),
-              child: Text("${peerName.substring(0,1).toUpperCase()}",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-              ),),
+              child: Text(
+                peerName.substring(0, 1).toUpperCase(),
+                style:
+                    const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
             ),
-            SizedBox(width: 8,),
-            Text(peerName, style: TextStyle(
-              color: Colors.black,
-              fontSize: 17
-            ),),
+            const SizedBox(
+              width: 8,
+            ),
+            Text(
+              peerName,
+              style: const TextStyle(color: Colors.black, fontSize: 17),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

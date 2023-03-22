@@ -5,7 +5,7 @@ import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 
 class EditPhone extends StatefulWidget {
-  //A constructor tat requires the user ID to return to each user her home screen
+  //A constructor that requires the user ID to return to each user her home screen
   const EditPhone({
     super.key,
     required this.userID,
@@ -31,10 +31,6 @@ class EditPhoneState extends State<EditPhone> {
   final FocusNode _phoneNoFocusNode = FocusNode();
   final TextEditingController _phoneNoController = TextEditingController(text: '');
   final TextEditingController _emailTextController = TextEditingController(text: '');
-
-  // RegExp ksuEmailRegEx = RegExp(r'^([a-z\d\._]+)@ksu.edu.sa$', multiLine: false, caseSensitive: false);
-  // RegExp ksuStudentEmail = RegExp(r'^4[\d]{8}@student.ksu.edu.sa$', multiLine: false, caseSensitive: false);
-  // RegExp studentID = RegExp(r'^4([\d]){9}$');
 
   @override
   void dispose() {
@@ -138,7 +134,6 @@ class EditPhoneState extends State<EditPhone> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                       //Announcement type
-
                       const Text(
                         ' Phone Number *',
                         style: TextStyle(
@@ -193,7 +188,8 @@ class EditPhoneState extends State<EditPhone> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10),
                               )),
-                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                          errorBorder:
+                              OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                         ),
                       ),
                       const SizedBox(

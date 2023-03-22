@@ -33,10 +33,6 @@ class EditEmailState extends State<EditEmail> {
   final TextEditingController _phoneNoController = TextEditingController(text: '');
   final TextEditingController _emailTextController = TextEditingController(text: '');
 
-  RegExp ksuEmailRegEx = RegExp(r'^([a-z\d\._]+)@ksu.edu.sa$', multiLine: false, caseSensitive: false);
-  RegExp ksuStudentEmail = RegExp(r'^4[\d]{8}@student.ksu.edu.sa$', multiLine: false, caseSensitive: false);
-  RegExp studentID = RegExp(r'^4([\d]){9}$');
-
   @override
   void dispose() {
     //dispose from device memory so its performance isn't affected
@@ -100,8 +96,6 @@ class EditEmailState extends State<EditEmail> {
         );
       } catch (error) {
         setState(() {});
-        //if an error occurs a pop-up message
-        //GlobalMethods.showErrorDialog(error: error.toString(), context: context);
         debugPrint("error occurred $error");
       }
     } else {
@@ -137,7 +131,6 @@ class EditEmailState extends State<EditEmail> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                       //Announcement type
-
                       const Text(
                         ' Email *',
                         style: TextStyle(
@@ -155,7 +148,8 @@ class EditEmailState extends State<EditEmail> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return "Please enter an Email!";
-                          } else if (GlobalMethods.validateEmail(email: _emailTextController) == false) {
+                          } else if (GlobalMethods.validateEmail(email: _emailTextController) ==
+                              false) {
                             return "Please enter a valid Email!";
                           }
                           return null;
@@ -192,7 +186,8 @@ class EditEmailState extends State<EditEmail> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10),
                               )),
-                          errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                          errorBorder:
+                              OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                         ),
                       ),
                       const SizedBox(

@@ -2,16 +2,14 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:findly_app/screens/user_announcements_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/services/global_methods.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
-class editAnnouncement extends StatefulWidget {
+class EditAnnouncement extends StatefulWidget {
   final String announcementID;
   final String itemName;
   final String announcementType;
@@ -27,29 +25,29 @@ class editAnnouncement extends StatefulWidget {
   final String floorNumber;
 
   //constructor to require the announcement's information
-  const editAnnouncement(
-      {required this.announcementID,
-      required this.itemName,
-      required this.announcementType,
-      required this.itemCategory,
-      required this.postDate,
-      required this.announcementImg,
-      required this.buildingName,
-      required this.contactChannel,
-      required this.theChannel,
-      required this.publishedBy,
-      required this.announcementDes,
-      required this.roomNumber,
-      required this.floorNumber});
+  const EditAnnouncement({
+    super.key,
+    required this.announcementID,
+    required this.itemName,
+    required this.announcementType,
+    required this.itemCategory,
+    required this.postDate,
+    required this.announcementImg,
+    required this.buildingName,
+    required this.contactChannel,
+    required this.theChannel,
+    required this.publishedBy,
+    required this.announcementDes,
+    required this.roomNumber,
+    required this.floorNumber,
+  });
 
   @override
-  State<editAnnouncement> createState() => _editAnnouncement();
+  State<EditAnnouncement> createState() => _EditAnnouncement();
 }
 
-class _editAnnouncement extends State<editAnnouncement> {
-  //Creat a Firebase Authentication instance
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+class _EditAnnouncement extends State<EditAnnouncement> {
+  //Create a Firebase Authentication instance
 
   late String itemName = widget.itemName;
   late String buildingName = widget.buildingName;
@@ -61,34 +59,29 @@ class _editAnnouncement extends State<editAnnouncement> {
   late String floorNumber = widget.floorNumber;
   late String roomNumber = widget.roomNumber;
 
-  late TextEditingController _itemName = TextEditingController(text: widget.itemName);
-  late TextEditingController _annDesc = TextEditingController(text: widget.announcementDes);
-  late TextEditingController _floorNumber = TextEditingController(text: widget.floorNumber);
-  late TextEditingController _roomNumber = TextEditingController(text: widget.roomNumber);
+  late final TextEditingController _itemName = TextEditingController(text: widget.itemName);
+  late final TextEditingController _annDesc = TextEditingController(text: widget.announcementDes);
+  late final TextEditingController _floorNumber = TextEditingController(text: widget.floorNumber);
+  late final TextEditingController _roomNumber = TextEditingController(text: widget.roomNumber);
 
   File? imgFile;
 
-  FocusNode _ItemNameFocusNode = FocusNode();
-  FocusNode _buildingNameFocusNode = FocusNode();
-  FocusNode _annTypeFocusNode = FocusNode();
-  FocusNode _contactChannelFocusNode = FocusNode();
-  FocusNode _annDesFocusNode = FocusNode();
-  FocusNode _annCategoryFocusNode = FocusNode();
-  FocusNode _floorNumberFocusNode = FocusNode();
-  FocusNode _roomNumberFocusNode = FocusNode();
-//
-// Map <String,String> dataUpdate={};
-
+  final FocusNode _itemNameFocusNode = FocusNode();
+  final FocusNode _buildingNameFocusNode = FocusNode();
+  final FocusNode _annTypeFocusNode = FocusNode();
+  final FocusNode _contactChannelFocusNode = FocusNode();
+  final FocusNode _annDesFocusNode = FocusNode();
+  final FocusNode _annCategoryFocusNode = FocusNode();
+  final FocusNode _floorNumberFocusNode = FocusNode();
+  final FocusNode _roomNumberFocusNode = FocusNode();
   final _addFormKey = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   @override
   void dispose() {
     //dispose from device memory so its performance isn't affected
-
     _itemName.dispose();
     _annDesc.dispose();
-    _ItemNameFocusNode.dispose();
+    _itemNameFocusNode.dispose();
     _buildingNameFocusNode.dispose();
     _annTypeFocusNode.dispose();
     _contactChannelFocusNode.dispose();
@@ -103,7 +96,8 @@ class _editAnnouncement extends State<editAnnouncement> {
 
   //Method for picking announcement image using camera
   void _pickImageUsingCamera() async {
-    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -112,7 +106,8 @@ class _editAnnouncement extends State<editAnnouncement> {
 
   //Method for picking announcement image using gallery
   void _pickImageUsingGallery() async {
-    XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -121,26 +116,25 @@ class _editAnnouncement extends State<editAnnouncement> {
 
   //Method to add the announcement to the database
   void submitFormOnAdd() async {
-    final User? user = _auth.currentUser;
-    final String _uid = user!.uid;
     final String uniqueImgID = DateTime.now().millisecondsSinceEpoch.toString();
     if (imgFile != null) {
-      final ref = FirebaseStorage.instance.ref().child('images').child(uniqueImgID.toString() + '.jpg');
+      final ref = FirebaseStorage.instance.ref().child('images').child('$uniqueImgID.jpg');
       await ref.putFile(imgFile!);
       imageUrl = await ref.getDownloadURL();
     } else {
       imageUrl = "";
     }
     final isValid = _addFormKey.currentState!.validate();
-    FocusScope.of(context).unfocus();
+    if (mounted) FocusScope.of(context).unfocus();
 
     if (isValid) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() {});
       try {
         if (annType == 'lost') {
-          await FirebaseFirestore.instance.collection('lostItem').doc(widget.announcementID).update({
+          await FirebaseFirestore.instance
+              .collection('lostItem')
+              .doc(widget.announcementID)
+              .update({
             'itemName': itemName,
             'itemCategory': annCategory,
             'announcementDes': annDesc,
@@ -152,7 +146,10 @@ class _editAnnouncement extends State<editAnnouncement> {
             'floornumber': floorNumber
           });
         } else {
-          await FirebaseFirestore.instance.collection('foundItem').doc(widget.announcementID).update({
+          await FirebaseFirestore.instance
+              .collection('foundItem')
+              .doc(widget.announcementID)
+              .update({
             'itemName': itemName,
             'itemCategory': annCategory,
             'announcementDes': annDesc,
@@ -164,16 +161,7 @@ class _editAnnouncement extends State<editAnnouncement> {
             'floornumber': floorNumber
           });
         }
-
-        Navigator.canPop(context) ? Navigator.pop(context) : null;
-        // Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(
-        //       builder: (context) => UserAnnouncementsScreen(
-        //         userID: _uid,
-        //       ),
-        //     ));
-
+        if (mounted) Navigator.canPop(context) ? Navigator.pop(context) : null;
         //A confirmation message when the announcement is added
         Fluttertoast.showToast(
           msg: "Announcement has been updated successfully!",
@@ -183,28 +171,22 @@ class _editAnnouncement extends State<editAnnouncement> {
           fontSize: 16.0,
         );
       } catch (error) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() {});
         //if an error occurs a pop-up message
         GlobalMethods.showErrorDialog(error: error.toString(), context: context);
-        print("error occurred $error");
+        debugPrint("error occurred $error");
       }
     } else {
-      print("form not valid!");
+      debugPrint("form not valid!");
     }
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    var dropsownValue = "";
-    var droptype = widget.announcementType;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Update Announcement Form',
         ),
         centerTitle: true,
@@ -221,102 +203,36 @@ class _editAnnouncement extends State<editAnnouncement> {
               //Announcement type
               Text(
                 'Announcement type is ${widget.announcementType} announcement',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
               ),
-              SizedBox(
-                height: 8.0,
-              ),
-              // DropdownButtonFormField(
-              //
-              //     isExpanded: true,
-              //     decoration: InputDecoration(
-              //       contentPadding: EdgeInsets.symmetric(
-              //         vertical: 10,
-              //         horizontal: 20,
-              //       ),
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(
-              //             Radius.circular(10),
-              //           )),
-              //       enabledBorder: OutlineInputBorder(
-              //           borderSide: BorderSide(
-              //             color: Colors.black,
-              //             width: 2,
-              //           ),
-              //           borderRadius: BorderRadius.all(
-              //             Radius.circular(10),
-              //           )),
-              //       focusedBorder: OutlineInputBorder(
-              //           borderSide: BorderSide(
-              //             color: Colors.blueAccent,
-              //             width: 2,
-              //           ),
-              //           borderRadius: BorderRadius.all(
-              //             Radius.circular(10),
-              //           )),
-              //       errorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(
-              //             Radius.circular(10),
-              //           ),
-              //           borderSide: BorderSide(color: Colors.red)),
-              //     ),
-              //     items: const [
-              //       DropdownMenuItem<String>(
-              //           child: Text(
-              //             'Choose Announcment type',
-              //             style: TextStyle(color: Colors.grey),
-              //           ),
-              //           value: ''),
-              //       DropdownMenuItem<String>(
-              //           child: Text('Lost announcement'), value: 'lost'),
-              //       DropdownMenuItem<String>(
-              //           child: Text('Found announcement'), value: 'found')
-              //     ],
-              //
-              //
-              //     onChanged: (value) {
-              //       annType = value.toString();//check iff it works
-              //       setState(() {
-              //         annType = value.toString();//check iff it works
-              //       }
-              //       );
-              //       FocusScope.of(context).requestFocus(_ItemNameFocusNode);
-              //       print(widget.announcementImg);
-              //     },
-              //     validator: (value) {
-              //       if (value == '') {
-              //         return 'You must choose';
-              //       }
-              //       return null;
-              //     },
-              //     value: droptype),
-              SizedBox(
-                height: 20,
+              const SizedBox(
+                height: 28,
               ),
               //Item name
-              Text(
+              const Text(
                 'Item name *',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               TextFormField(
-                focusNode: _ItemNameFocusNode,
+                focusNode: _itemNameFocusNode,
                 onEditingComplete: () => FocusScope.of(context).requestFocus(_annCategoryFocusNode),
                 maxLength: 50,
                 controller: _itemName,
                 onFieldSubmitted: (String value) {
-                  print(value);
+                  debugPrint(value);
                 },
                 onChanged: (value) {
                   itemName = value;
-                  print(value);
+                  debugPrint(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Enter Item name ",
                   hintStyle: TextStyle(color: Colors.grey),
                   contentPadding: EdgeInsets.symmetric(
@@ -356,117 +272,105 @@ class _editAnnouncement extends State<editAnnouncement> {
                   return null;
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
-
-              // Categury
-              Text(
+              // Category
+              const Text(
                 'Item category *',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8.0,
               ),
               DropdownButtonFormField(
-                  focusNode: _annCategoryFocusNode,
-                  isExpanded: true,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 20,
-                    ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                      Radius.circular(10),
-                    )),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        )),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.blueAccent,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        )),
-                    errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                        borderSide: BorderSide(color: Colors.red)),
+                focusNode: _annCategoryFocusNode,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
                   ),
-                  items: const [
-                    DropdownMenuItem<String>(
-                        child: Text(
-                          'Choose Item category',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        value: ''),
-                    DropdownMenuItem<String>(child: Text('Electronic devices'), value: 'Electronic devices'),
-                    DropdownMenuItem<String>(child: Text('Electronic accessories'), value: 'Electronic accessories'),
-                    DropdownMenuItem<String>(child: Text('Jewelry'), value: 'Jewelry'),
-                    DropdownMenuItem<String>(child: Text('Medical equipments'), value: 'Medical equipments'),
-                    DropdownMenuItem<String>(child: Text('Personal accessories'), value: 'Personal accessories'),
-                    DropdownMenuItem<String>(child: Text('Others'), value: 'Others'),
-                  ],
-                  onChanged: (value) {
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                    Radius.circular(10),
+                  )),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      )),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.blueAccent,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      )),
+                  errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      borderSide: BorderSide(color: Colors.red)),
+                ),
+                items: const [
+                  DropdownMenuItem<String>(
+                      value: '',
+                      child: Text(
+                        'Choose Item category',
+                        style: TextStyle(color: Colors.grey),
+                      )),
+                  DropdownMenuItem<String>(
+                      value: 'Electronic devices', child: Text('Electronic devices')),
+                  DropdownMenuItem<String>(
+                      value: 'Electronic accessories', child: Text('Electronic accessories')),
+                  DropdownMenuItem<String>(value: 'Jewelry', child: Text('Jewelry')),
+                  DropdownMenuItem<String>(
+                      value: 'Medical equipments', child: Text('Medical equipments')),
+                  DropdownMenuItem<String>(
+                      value: 'Personal accessories', child: Text('Personal accessories')),
+                  DropdownMenuItem<String>(value: 'Others', child: Text('Others')),
+                ],
+                onChanged: (value) {
+                  annCategory = value.toString();
+                  setState(() {
                     annCategory = value.toString();
-                    setState(() {
-                      annCategory = value.toString();
-                    });
-                    FocusScope.of(context).requestFocus(_buildingNameFocusNode);
-                  },
-                  validator: (value) {
-                    if (value == '') {
-                      return 'You must choose';
-                    }
-                    //return null;
-                  },
-                  value: widget.itemCategory),
-              SizedBox(
+                  });
+                  FocusScope.of(context).requestFocus(_buildingNameFocusNode);
+                },
+                validator: (value) {
+                  if (value == '') {
+                    return 'You must choose';
+                  }
+                  return null;
+                },
+                value: widget.itemCategory,
+              ),
+              const SizedBox(
                 height: 20,
               ),
-
               //Building name
-              Text(
+              const Text(
                 'Bullding name',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8.0,
               ),
-              // StreamBuilder<QuerySnapshot>(
-              //     stream:FirebaseFirestore.instance.collection('location').snapshots(),
-              //     builder: (context,snapshot){
-              //       if(!snapshot.hasData){Text('Loading!');}
-              //       else {
-              //
-              //         List<DropdownMenuItem> buildingNames=[];
-              //         for(int i=0;i<snapshot.data!.docs.length;i++){
-              //           DocumentSnapshot snap= snapshot.data!.docs[i];
-              //           buildingNames.add(DropdownMenuItem(child: Text(snapshot.data!.docs[i]['buildingName'],),value: "${snapshot.data!.docs[i]['buildingName']}",));
-              //         }
-              //
-              //       }
-              //     }
-              // ),
               DropdownButtonFormField(
                   focusNode: _buildingNameFocusNode,
                   isExpanded: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 20,
@@ -499,100 +403,117 @@ class _editAnnouncement extends State<editAnnouncement> {
                   ),
                   items: const [
                     DropdownMenuItem<String>(
+                        value: '',
                         child: Text(
                           'Choose Bullding name',
                           style: TextStyle(color: Colors.grey),
-                        ),
-                        value: ''),
+                        )),
                     DropdownMenuItem<String>(
+                        value: 'College of Education',
                         child: Text(
                           'College of Education',
                           maxLines: 3,
-                        ),
-                        value: 'College of Education'),
-                    DropdownMenuItem<String>(child: Text('College of Arts', maxLines: 3), value: 'College of Arts'),
+                        )),
                     DropdownMenuItem<String>(
-                        child: Text('College of Tourism & Cultural Heritage', maxLines: 3),
-                        value: 'College of Tourism & Cultural Heritage'),
+                        value: 'College of Arts', child: Text('College of Arts', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Languages & Translation', maxLines: 3),
-                        value: 'College of Languages & Translation'),
+                        value: 'College of Tourism & Cultural Heritage',
+                        child: Text('College of Tourism & Cultural Heritage', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Law & Political Science', maxLines: 3),
-                        value: 'College of Law & Political Science'),
+                        value: 'College of Languages & Translation',
+                        child: Text('College of Languages & Translation', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Business Administration', maxLines: 3),
-                        value: 'College of Business Administration'),
+                        value: 'College of Law & Political Science',
+                        child: Text('College of Law & Political Science', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Nursing', maxLines: 3), value: 'College of Nursing'),
+                        value: 'College of Business Administration',
+                        child: Text('College of Business Administration', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Pharmacy', maxLines: 3), value: 'College of Pharmacy'),
+                        value: 'College of Nursing',
+                        child: Text('College of Nursing', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Medicine', maxLines: 3), value: 'College of Medicine'),
+                        value: 'College of Pharmacy',
+                        child: Text('College of Pharmacy', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Applied Medical Sciences', maxLines: 3),
-                        value: 'College of Applied Medical Sciences'),
+                        value: 'College of Medicine',
+                        child: Text('College of Medicine', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Dentistry', maxLines: 3), value: 'College of Dentistry'),
+                        value: 'College of Applied Medical Sciences',
+                        child: Text('College of Applied Medical Sciences', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of science', maxLines: 3), value: 'College of science'),
+                        value: 'College of Dentistry',
+                        child: Text('College of Dentistry', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Agricultural and Food Scinces', maxLines: 3),
-                        value: 'College of Agricultural and Food Scinces'),
+                        value: 'College of science',
+                        child: Text('College of science', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Computer & Information Scinces', maxLines: 3),
-                        value: 'College of Computer & Information Scinces'),
+                        value: 'College of Agricultural and Food Scinces',
+                        child: Text('College of Agricultural and Food Scinces', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Sport Scinces & Physical Activity', maxLines: 3),
-                        value: 'College of Sport Scinces & Physical Activity'),
+                        value: 'College of Computer & Information Scinces',
+                        child: Text('College of Computer & Information Scinces', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('College of Architecture & Planning', maxLines: 3),
-                        value: 'ACollege of Architecture & PlanningP'),
-                    DropdownMenuItem<String>(child: Text('Gate#1', maxLines: 3), value: 'Gate#1'),
-                    DropdownMenuItem<String>(child: Text('Gate#2', maxLines: 3), value: 'Gate#2'),
-                    DropdownMenuItem<String>(child: Text('Gate#3', maxLines: 3), value: 'Gate#3'),
-                    DropdownMenuItem<String>(child: Text('Gate#4', maxLines: 3), value: 'Gate#4'),
+                        value: 'College of Sport Scinces & Physical Activity',
+                        child: Text('College of Sport Scinces & Physical Activity', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Kindergarten for Scientific Departments', maxLines: 3),
-                        value: 'Kindergarten for Scientific Departments'),
+                        value: 'ACollege of Architecture & PlanningP',
+                        child: Text('College of Architecture & Planning', maxLines: 3)),
+                    DropdownMenuItem<String>(value: 'Gate#1', child: Text('Gate#1', maxLines: 3)),
+                    DropdownMenuItem<String>(value: 'Gate#2', child: Text('Gate#2', maxLines: 3)),
+                    DropdownMenuItem<String>(value: 'Gate#3', child: Text('Gate#3', maxLines: 3)),
+                    DropdownMenuItem<String>(value: 'Gate#4', child: Text('Gate#4', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Kindergarten for Human Departments', maxLines: 3),
-                        value: 'Kindergarten for Human Departments'),
+                        value: 'Kindergarten for Scientific Departments',
+                        child: Text('Kindergarten for Scientific Departments', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Festival Hall & Exhibition Building', maxLines: 3),
-                        value: 'Festival Hall & Exhibition Building'),
+                        value: 'Kindergarten for Human Departments',
+                        child: Text('Kindergarten for Human Departments', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Research Center & Common Halls', maxLines: 3),
-                        value: 'Research Center & Common Halls'),
+                        value: 'Festival Hall & Exhibition Building',
+                        child: Text('Festival Hall & Exhibition Building', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Prince Naif Research Center', maxLines: 3), value: 'Prince Naif Research Center'),
+                        value: 'Research Center & Common Halls',
+                        child: Text('Research Center & Common Halls', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Princess Sara Bint Abdullah Bin Faisal AlSaud Libraru', maxLines: 3),
-                        value: 'Princess Sara Bint Abdullah Bin Faisal AlSaud Libraru'),
+                        value: 'Prince Naif Research Center',
+                        child: Text('Prince Naif Research Center', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Special Needs Center', maxLines: 3), value: 'Special Needs Center'),
+                        value: 'Princess Sara Bint Abdullah Bin Faisal AlSaud Libraru',
+                        child: Text('Princess Sara Bint Abdullah Bin Faisal AlSaud Libraru',
+                            maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Accommodation of Faculty Members', maxLines: 3),
-                        value: 'Accommodation of Faculty Members'),
+                        value: 'Special Needs Center',
+                        child: Text('Special Needs Center', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Female Student Housing', maxLines: 3), value: 'Female Student Housing'),
+                        value: 'Accommodation of Faculty Members',
+                        child: Text('Accommodation of Faculty Members', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Female Student Housing Services Building', maxLines: 3),
-                        value: 'Female Student Housing Services Building'),
-                    DropdownMenuItem<String>(child: Text('Sport Club', maxLines: 3), value: 'Sport Club'),
+                        value: 'Female Student Housing',
+                        child: Text('Female Student Housing', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Foyer & Central Plaza', maxLines: 3), value: 'Foyer & Central Plaza'),
+                        value: 'Female Student Housing Services Building',
+                        child: Text('Female Student Housing Services Building', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Administration Building & Supporting Deanships', maxLines: 3),
-                        value: 'Administration Building & Supporting Deanships'),
-                    DropdownMenuItem<String>(child: Text('Student Clubs', maxLines: 3), value: 'Student Clubs'),
-                    DropdownMenuItem<String>(child: Text('Main Restaurant', maxLines: 3), value: 'Main Restaurant'),
+                        value: 'Sport Club', child: Text('Sport Club', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Admission & Registration', maxLines: 3), value: 'Admission & Registration'),
+                        value: 'Foyer & Central Plaza',
+                        child: Text('Foyer & Central Plaza', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Student Services Center', maxLines: 3), value: 'Student Services Center'),
+                        value: 'Administration Building & Supporting Deanships',
+                        child: Text('Administration Building & Supporting Deanships', maxLines: 3)),
                     DropdownMenuItem<String>(
-                        child: Text('Operational ِAffairs', maxLines: 3), value: 'Operational ِAffairs'),
+                        value: 'Student Clubs', child: Text('Student Clubs', maxLines: 3)),
+                    DropdownMenuItem<String>(
+                        value: 'Main Restaurant', child: Text('Main Restaurant', maxLines: 3)),
+                    DropdownMenuItem<String>(
+                        value: 'Admission & Registration',
+                        child: Text('Admission & Registration', maxLines: 3)),
+                    DropdownMenuItem<String>(
+                        value: 'Student Services Center',
+                        child: Text('Student Services Center', maxLines: 3)),
+                    DropdownMenuItem<String>(
+                        value: 'Operational ِAffairs',
+                        child: Text('Operational ِAffairs', maxLines: 3)),
                   ],
                   value: widget.buildingName,
                   onChanged: (value) {
@@ -604,17 +525,17 @@ class _editAnnouncement extends State<editAnnouncement> {
                     FocusScope.of(context).requestFocus(_annDesFocusNode);
                   }),
 
-              SizedBox(
+              const SizedBox(
                 height: 20.0,
               ),
-              Text(
+              const Text(
                 'Floor number ',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               TextFormField(
@@ -623,13 +544,13 @@ class _editAnnouncement extends State<editAnnouncement> {
                 maxLength: 5,
                 controller: _floorNumber,
                 onFieldSubmitted: (String value) {
-                  print(value);
+                  debugPrint(value);
                 },
                 onChanged: (value) {
                   floorNumber = value;
-                  print(value);
+                  debugPrint(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Enter Floor number ",
                   hintStyle: TextStyle(color: Colors.grey),
                   contentPadding: EdgeInsets.symmetric(
@@ -663,17 +584,17 @@ class _editAnnouncement extends State<editAnnouncement> {
                       borderSide: BorderSide(color: Colors.red)),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
-              Text(
+              const Text(
                 'Room number ',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               TextFormField(
@@ -682,13 +603,13 @@ class _editAnnouncement extends State<editAnnouncement> {
                 maxLength: 5,
                 controller: _roomNumber,
                 onFieldSubmitted: (String value) {
-                  print(value);
+                  debugPrint(value);
                 },
                 onChanged: (value) {
                   roomNumber = value;
-                  print(value);
+                  debugPrint(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Enter Room number ",
                   hintStyle: TextStyle(color: Colors.grey),
                   contentPadding: EdgeInsets.symmetric(
@@ -722,29 +643,30 @@ class _editAnnouncement extends State<editAnnouncement> {
                       borderSide: BorderSide(color: Colors.red)),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               //Announcement description
-              Text(
+              const Text(
                 'Announcement description *',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               TextFormField(
                 focusNode: _annDesFocusNode,
-                onEditingComplete: () => FocusScope.of(context).requestFocus(_contactChannelFocusNode),
+                onEditingComplete: () =>
+                    FocusScope.of(context).requestFocus(_contactChannelFocusNode),
                 controller: _annDesc,
                 minLines: 2,
                 maxLines: 5,
                 maxLength: 256,
                 keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.description_outlined),
                   hintText: "Maximum 256 character",
                   hintStyle: TextStyle(color: Colors.grey),
@@ -785,27 +707,29 @@ class _editAnnouncement extends State<editAnnouncement> {
                   if (value!.isEmpty) {
                     return 'You must enter some description of the item ';
                   }
+                  return null;
                 },
-              ), // for description
-              SizedBox(
+              ),
+              // for description
+              const SizedBox(
                 height: 20.0,
               ),
 
               //Contact channel
-              Text(
+              const Text(
                 'Another contact channel you prefer *',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10.0,
               ),
               DropdownButtonFormField(
                   focusNode: _contactChannelFocusNode,
                   isExpanded: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 20,
@@ -838,13 +762,13 @@ class _editAnnouncement extends State<editAnnouncement> {
                   ),
                   items: const [
                     DropdownMenuItem<String>(
+                        value: '',
                         child: Text(
                           'Choose  a channel',
                           style: TextStyle(color: Colors.grey),
-                        ),
-                        value: ''),
-                    DropdownMenuItem<String>(child: Text('Phone Number'), value: 'Phone Number'),
-                    DropdownMenuItem<String>(child: Text('Email'), value: 'Email')
+                        )),
+                    DropdownMenuItem<String>(value: 'Phone Number', child: Text('Phone Number')),
+                    DropdownMenuItem<String>(value: 'Email', child: Text('Email'))
                   ],
                   onChanged: (value) {
                     contactChanel = value.toString();
@@ -856,19 +780,21 @@ class _editAnnouncement extends State<editAnnouncement> {
                     if (value == '') {
                       return 'You must choose';
                     }
+                    return null;
                   },
                   value: widget.contactChannel),
-              SizedBox(
+              const SizedBox(
                 height: 25.0,
               ),
 
               if (imageUrl == '' && imgFile == null)
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 3), borderRadius: BorderRadius.circular(20)),
+                      border: Border.all(color: Colors.blue, width: 3),
+                      borderRadius: BorderRadius.circular(20)),
                   height: 200,
                   width: 200,
-                  child: Icon(
+                  child: const Icon(
                     Icons.hide_image_outlined,
                     size: 100,
                     color: Colors.blueGrey,
@@ -915,14 +841,14 @@ class _editAnnouncement extends State<editAnnouncement> {
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'Gallery',
                                                 style: TextStyle(
                                                   fontSize: 22,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              Container(
+                                              SizedBox(
                                                 height: 100,
                                                 width: 100,
                                                 child: IconButton(
@@ -930,7 +856,7 @@ class _editAnnouncement extends State<editAnnouncement> {
                                                       //pick by gallery
                                                       _pickImageUsingGallery();
                                                     },
-                                                    icon: Container(
+                                                    icon: const SizedBox(
                                                       height: 100,
                                                       width: 100,
                                                       child: CircleAvatar(
@@ -948,14 +874,14 @@ class _editAnnouncement extends State<editAnnouncement> {
                                         Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Text(
+                                            const Text(
                                               'Camera',
                                               style: TextStyle(
                                                 fontSize: 22,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            Container(
+                                            SizedBox(
                                               height: 100,
                                               width: 100,
                                               child: IconButton(
@@ -963,7 +889,7 @@ class _editAnnouncement extends State<editAnnouncement> {
                                                     //pick by camera
                                                     _pickImageUsingCamera();
                                                   },
-                                                  icon: Container(
+                                                  icon: const SizedBox(
                                                     height: 100,
                                                     width: 100,
                                                     child: CircleAvatar(
@@ -1011,9 +937,6 @@ class _editAnnouncement extends State<editAnnouncement> {
                   color: Colors.blue[700]!,
                   title: "Cancel",
                   onPressed: () {
-                    User? user = _auth.currentUser;
-                    String _uid = user!.uid;
-
                     Navigator.pop(context);
                   }),
             ],

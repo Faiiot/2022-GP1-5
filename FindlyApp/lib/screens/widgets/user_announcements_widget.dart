@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/announcement_detail_screen.dart';
 import 'package:findly_app/services/global_methods.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 //Reusable announcement card widget code across the screens
@@ -26,6 +25,7 @@ class UserAnnouncement extends StatefulWidget {
 
   // a constructor to get each announcement info
   const UserAnnouncement({
+    super.key,
     required this.announcementID,
     required this.itemName,
     required this.announcementType,
@@ -48,15 +48,10 @@ class UserAnnouncement extends StatefulWidget {
 }
 
 class _UserAnnouncementState extends State<UserAnnouncement> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   String firstName = "";
   String lastName = "";
   String fullName = "";
   String theChannel = "";
-  bool _isLoading = false;
-
-// a function to retrieve the user's first an last name to form her full name
-// it also get the users phone number or email based on the contactChannel
 
   @override
   void initState() {
@@ -64,34 +59,28 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
     getNeededPublisherInfo();
   }
 
-  //Method to retrieve the puplisher info
+  //Method to retrieve the publisher info
   void getNeededPublisherInfo() async {
     try {
-      _isLoading = true;
-
       final DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget
-          .publisherID) // widget.publishedID is used because the var is defined outside the state class but under statefulwidget class
+              .publisherID) // widget.publishedID is used because the var is defined outside the state class but under statefulwidget class
           .get();
 
-      if (userDoc == null) {
-        return;
-      } else {
-        if (!mounted) return;
-        setState(() {
-          firstName = userDoc.get('firstName');
-          lastName = userDoc.get('LastName');
-          fullName = "$firstName $lastName";
-          if (widget.contactChannel == "Phone Number") {
-            theChannel = userDoc.get('phoneNo');
-          } else if (widget.contactChannel == "Email") {
-            theChannel = userDoc.get('Email');
-          }
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        firstName = userDoc.get('firstName');
+        lastName = userDoc.get('LastName');
+        fullName = "$firstName $lastName";
+        if (widget.contactChannel == "Phone Number") {
+          theChannel = userDoc.get('phoneNo');
+        } else if (widget.contactChannel == "Email") {
+          theChannel = userDoc.get('Email');
+        }
+      });
     } catch (error) {
-      print(error);
+      debugPrint(error.toString());
       GlobalMethods.showErrorDialog(error: error.toString(), context: context);
     }
   }
@@ -100,7 +89,7 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
         onTap: () {
           Navigator.push(
@@ -128,29 +117,30 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
                 ),
               ));
         },
-        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         leading: Container(
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
             right: 10,
           ),
-          decoration: BoxDecoration(border: Border(right: BorderSide(width: 2, color: Colors.grey))),
-          child: widget.announcementImg != ""
-              ? Image.network(
-            widget.announcementImg,
-            fit: BoxFit.fill,
-          )
-              : Icon(
-            Icons.image,
-            size: 50,
-          ),
+          decoration:
+              const BoxDecoration(border: Border(right: BorderSide(width: 2, color: Colors.grey))),
           width: 120,
           height: 120,
+          child: widget.announcementImg != ""
+              ? Image.network(
+                  widget.announcementImg,
+                  fit: BoxFit.fill,
+                )
+              : const Icon(
+                  Icons.image,
+                  size: 50,
+                ),
         ),
         title: Text(
           "Item: ${widget.itemName}",
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -160,33 +150,22 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
               Icons.linear_scale,
               color: Colors.blue.shade800,
             ),
-            // Text(
-            //   "Type: ${widget.announcementType}",
-            //   maxLines: 2,
-            //   overflow: TextOverflow.ellipsis,
-            //   style: TextStyle(
-            //     fontSize: 15,
-            //   ),
-            // ),
-            // SizedBox(
-            //   height: 8,
-            // ),
             Text(
               "Category: ${widget.itemCategory}",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
             Text(
               "Date: ${widget.postDate.toDate().day}/${widget.postDate.toDate().month}/${widget.postDate.toDate().year}",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 15,
               ),
             ),
@@ -201,4 +180,3 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
     );
   }
 }
-

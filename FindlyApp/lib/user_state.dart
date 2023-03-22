@@ -1,4 +1,4 @@
-import 'package:findly_app/screens/login_screen.dart';
+import 'package:findly_app/screens/auth_home_screen.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ class UserState extends StatelessWidget {
         builder: (context, userSnapshot) {
           //User is not logged in > redirected to log in screen
           if (userSnapshot.data == null) {
-            return LoginScreen();
+            return const AuthHomeScreen();
           } //If the user is logged in she will be redirected to her homepage
           else if (userSnapshot.hasData) {
             final FirebaseAuth auth = FirebaseAuth.instance;
