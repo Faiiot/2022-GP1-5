@@ -10,9 +10,12 @@ import 'package:findly_app/screens/lost_items_screen.dart';
 import 'package:findly_app/screens/notifications.dart';
 import 'package:findly_app/screens/private_chat/user_chat_history_screen.dart';
 import 'package:findly_app/screens/user_announcements_screen.dart';
+import 'package:findly_app/screens/widgets/drawer_widget.dart';
 import 'package:findly_app/services/push_notifications_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../constants/text_styles.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   final String userID;
@@ -149,25 +152,33 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     }
   }
 
+  final GlobalKey<ScaffoldState> key = GlobalKey(); // Create a key
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.white,
+      key: key,
+      backgroundColor: scaffoldColor,
+      drawerEnableOpenDragGesture: false,
+      drawer: DrawerWidget(
+        drawerKey: key,
+        userName: firstName,
+        userId: widget.userID,
+      ),
       appBar: CurvedAppBar(
-        leading: const Padding(
-          padding: EdgeInsets.only(top: 16.0),
-          child: Icon(Icons.menu),
+        leading: IconButton(
+          padding: const EdgeInsets.only(top: 16.0),
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            key.currentState?.openDrawer();
+          },
         ),
         title: Padding(
           padding: const EdgeInsets.only(top: 16.0),
           child: Text(
             "Hello $firstName!",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyles.appBarTitleStyle,
           ),
         ),
         actions: [

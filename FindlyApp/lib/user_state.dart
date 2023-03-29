@@ -3,6 +3,8 @@ import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'constants/constants.dart';
+
 // A file that checks the user's state
 class UserState extends StatelessWidget {
   static const String screenRoute = 'user_state_screen';
@@ -40,7 +42,7 @@ class UserState extends StatelessWidget {
             );
           }
           return const Scaffold(
-            // if something went wrong during the run
+            backgroundColor: scaffoldColor,
             body: Center(
               child: Text("Something went wrong",
                   style: TextStyle(

@@ -4,6 +4,8 @@ import 'package:findly_app/screens/user_profile_page.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
+
 class EditPhone extends StatefulWidget {
   //A constructor that requires the user ID to return to each user her home screen
   const EditPhone({
@@ -110,6 +112,7 @@ class EditPhoneState extends State<EditPhone> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: scaffoldColor,
         appBar: AppBar(
             centerTitle: true,
             title: const Text('Update Email'),

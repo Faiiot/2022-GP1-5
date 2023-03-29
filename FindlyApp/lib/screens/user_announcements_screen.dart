@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/widgets/user_announcements_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
+
 class UserAnnouncementsScreen extends StatefulWidget {
   final String userID;
 
@@ -20,7 +22,7 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE4ECF4),
+        backgroundColor: scaffoldColor,
         appBar: AppBar(
           backgroundColor: Colors.blue,
           leading: Builder(

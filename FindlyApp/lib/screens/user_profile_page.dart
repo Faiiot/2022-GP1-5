@@ -4,8 +4,11 @@ import 'package:findly_app/screens/edit_phone.dart';
 import 'package:findly_app/screens/forgot_password_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
+
 class UserProfilePage extends StatefulWidget {
   final String userID;
+
   //A constructor that requires the user ID to return to each user her home screen
   const UserProfilePage({
     super.key,
@@ -57,6 +60,7 @@ class UserProfileState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: scaffoldColor,
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {

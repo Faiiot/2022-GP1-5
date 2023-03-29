@@ -2,6 +2,8 @@ import 'package:dialog_flowtter/dialog_flowtter.dart';
 import 'package:findly_app/screens/messages.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
+
 class DialogflowChatBotScreen extends StatefulWidget {
   const DialogflowChatBotScreen({super.key});
 
@@ -25,6 +27,7 @@ class _DialogflowChatBotScreenState extends State<DialogflowChatBotScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
         title: const Text("Findly Chatbot"),
       ),

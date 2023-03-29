@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
+
 class ChatBot extends StatefulWidget {
   const ChatBot({
     Key? key,
@@ -22,6 +24,7 @@ class _ChatBotState extends State<ChatBot> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -38,7 +41,8 @@ class _ChatBotState extends State<ChatBot> {
               padding: const EdgeInsets.all(16.0),
               children: [
                 buildChatTile(
-                  message: "Hello ${widget.userName}! I'm Findly ChatBot and I'm here to help you!\n\n"
+                  message:
+                      "Hello ${widget.userName}! I'm Findly ChatBot and I'm here to help you!\n\n"
                       "What is the item you lost/found?\n"
                       "(E.g. Headphones, Bag, iPad, Phone etc)",
                 ),
@@ -104,7 +108,8 @@ class _ChatBotState extends State<ChatBot> {
                             setState(() {
                               itemName = controller.text;
                             });
-                            categoryName = await getItemCategory(itemName: controller.text.toLowerCase().trimRight());
+                            categoryName = await getItemCategory(
+                                itemName: controller.text.toLowerCase().trimRight());
                             if (mounted) setState(() {});
                           }
                         : null,
@@ -153,7 +158,8 @@ class _ChatBotState extends State<ChatBot> {
             ),
             child: RichText(
               text: TextSpan(
-                text: "${now.day}-${now.month}-${now.year}  ${now.hour}:${now.minute}:${now.second}",
+                text:
+                    "${now.day}-${now.month}-${now.year}  ${now.hour}:${now.minute}:${now.second}",
                 style: TextStyle(
                   fontSize: 12.0,
                   color: isChatBotMessage ? Colors.white : Colors.blue,
@@ -201,7 +207,8 @@ class _ChatBotState extends State<ChatBot> {
     required String itemName,
   }) async {
     try {
-      final QuerySnapshot data = await FirebaseFirestore.instance.collection("chatbotCategories").get();
+      final QuerySnapshot data =
+          await FirebaseFirestore.instance.collection("chatbotCategories").get();
       for (final category in data.docs) {
         final data = category.data() as Map;
         final items = data["items"] as List;

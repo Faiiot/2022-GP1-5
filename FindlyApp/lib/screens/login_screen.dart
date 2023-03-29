@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: scaffoldColor,
       body: Stack(
         alignment: Alignment.center,
         children: [

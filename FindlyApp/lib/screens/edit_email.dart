@@ -4,6 +4,7 @@ import 'package:findly_app/screens/user_profile_page.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
 import '../services/global_methods.dart';
 
 class EditEmail extends StatefulWidget {
@@ -107,6 +108,7 @@ class EditEmailState extends State<EditEmail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: scaffoldColor,
         appBar: AppBar(
             centerTitle: true,
             title: const Text('Update Email'),

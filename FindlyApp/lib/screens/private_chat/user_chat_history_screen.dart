@@ -2,6 +2,8 @@ import 'package:findly_app/screens/private_chat/chatMethods.dart';
 import 'package:findly_app/screens/private_chat/private_chat_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../../constants/constants.dart';
+
 class UserChatHistoryScreen extends StatefulWidget {
   final String userID;
 
@@ -57,6 +59,7 @@ class _UserChatHistoryScreenState extends State<UserChatHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
         title: const Text("Chat History"),
         leading: IconButton(

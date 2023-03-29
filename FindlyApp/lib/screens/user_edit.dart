@@ -2,6 +2,7 @@ import 'package:findly_app/screens/forgot_password_screen.dart';
 import 'package:findly_app/screens/user_profile_page.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/constants.dart';
 import 'edit_email.dart';
 import 'edit_phone.dart';
 
@@ -26,6 +27,7 @@ class UserEditState extends State<UserEdit> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: scaffoldColor,
         appBar: AppBar(
           centerTitle: true,
           title: const Text(

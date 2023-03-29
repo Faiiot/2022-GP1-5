@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:findly_app/screens/announcement_detail_screen.dart';
+import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:flutter/material.dart';
+
+import '../announcement_detail_screen.dart';
 
 //Reusable announcement card widget code across the screens
 
@@ -18,8 +20,8 @@ class Announcement extends StatefulWidget {
   final String publisherID;
   final String announcementDes;
   final bool profile;
-  final String roomnumber;
-  final String floornumber;
+  final String roomNumber;
+  final String floorNumber;
   final bool reported;
   final int reportCount;
 
@@ -37,8 +39,8 @@ class Announcement extends StatefulWidget {
     required this.publisherID,
     required this.announcementDes,
     required this.profile,
-    required this.roomnumber,
-    required this.floornumber,
+    required this.roomNumber,
+    required this.floorNumber,
     required this.reported,
     required this.reportCount,
   });
@@ -51,7 +53,8 @@ class _AnnouncementState extends State<Announcement> {
   String firstName = "";
   String lastName = "";
   String fullName = "";
-  String theChannel = "";
+  String phoneNumber = "";
+  String email = "";
 
   @override
   void initState() {
@@ -64,8 +67,8 @@ class _AnnouncementState extends State<Announcement> {
     try {
       final DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget
-              .publisherID) // widget.publishedID is used because the var is defined outside the state class but under statefulwidget class
+          .doc(widget.publisherID)
+          // widget.publishedID is used because the var is defined outside the state class but under statefulWidget class
           .get();
 
       if (!mounted) return;
@@ -73,11 +76,8 @@ class _AnnouncementState extends State<Announcement> {
         firstName = userDoc.get('firstName');
         lastName = userDoc.get('LastName');
         fullName = "$firstName $lastName";
-        if (widget.contactChannel == "Phone Number") {
-          theChannel = userDoc.get('phoneNo');
-        } else if (widget.contactChannel == "Email") {
-          theChannel = userDoc.get('Email');
-        }
+        phoneNumber = userDoc.get('phoneNo');
+        email = userDoc.get('Email');
       });
     } catch (error) {
       debugPrint(error.toString());
@@ -87,99 +87,99 @@ class _AnnouncementState extends State<Announcement> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 8,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: ListTile(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                //send this announcement info to the details screen
-                builder: (context) => AnnouncementDetailsScreen(
-                  announcementID: widget.announcementID,
-                  publisherID: widget.publisherID,
-                  itemName: widget.itemName,
-                  announcementType: widget.announcementType,
-                  itemCategory: widget.itemCategory,
-                  postDate: widget.postDate,
-                  announcementImg: widget.announcementImg,
-                  buildingName: widget.buildingName,
-                  contactChannel: widget.contactChannel,
-                  publishedBy: fullName,
-                  announcementDes: widget.announcementDes,
-                  theChannel: theChannel,
-                  profile: false,
-                  reported: widget.reported,
-                  reportCount: widget.reportCount,
-                  roomNumber: widget.roomnumber,
-                  floorNumber: widget.floornumber,
-                ),
-              ));
-        },
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        leading: Container(
-          padding: const EdgeInsets.only(
-            right: 10,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            //send this announcement info to the details screen
+            builder: (context) => AnnouncementDetailsScreen(
+              announcementID: widget.announcementID,
+              publisherID: widget.publisherID,
+              announcementType: widget.announcementType,
+              publishedBy: fullName,
+              phoneNumber: phoneNumber,
+              email: email,
+              profile: false,
+              reported: widget.reported,
+              reportCount: widget.reportCount,
+            ),
           ),
-          decoration:
-              const BoxDecoration(border: Border(right: BorderSide(width: 2, color: Colors.grey))),
-          width: 120,
-          height: 120,
-          child: widget.announcementImg != ""
-              ? Image.network(
-                  widget.announcementImg,
-                  fit: BoxFit.fill,
-                )
-              : const FittedBox(
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 8.0,
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: FittedBox(
                   fit: BoxFit.cover,
-                  child: Icon(
-                    Icons.image,
+                  child: widget.announcementImg != ""
+                      ? Image.network(
+                          widget.announcementImg,
+                        )
+                      : const Icon(
+                          Icons.image,
+                        ),
+                ),
+              ),
+              const SizedBox(
+                height: 2.0,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.itemName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: primaryColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-        ),
-        title: Text(
-          "Item: ${widget.itemName}",
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              Icons.linear_scale,
-              color: Colors.blue.shade800,
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(
-              "Category: ${widget.itemCategory}",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13,
               ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(
-              "Date: ${widget.postDate.toDate().day}/${widget.postDate.toDate().month}/${widget.postDate.toDate().year}",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 15,
+              const SizedBox(
+                height: 1.0,
               ),
-            ),
-          ],
-        ),
-        trailing: Icon(
-          Icons.keyboard_arrow_right,
-          size: 30,
-          color: Colors.blue.shade800,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.itemCategory,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: primaryColor.withOpacity(0.9),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 1.0,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "${widget.postDate.toDate().day}/${widget.postDate.toDate().month}/${widget.postDate.toDate().year}",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

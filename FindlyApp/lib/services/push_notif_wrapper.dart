@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
+import '../constants/constants.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -70,6 +72,7 @@ void showFlutterNotification(RemoteMessage message) {
 
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 int _messageCount = 0;
+
 String constructFCMPayload(String? token) {
   _messageCount++;
   return jsonEncode({
@@ -88,7 +91,9 @@ String constructFCMPayload(String? token) {
 // ignore: must_be_immutable
 class PushApplication extends StatefulWidget {
   Widget child;
+
   PushApplication({super.key, required this.child});
+
   @override
   State<StatefulWidget> createState() => _Application();
 }
@@ -160,6 +165,9 @@ class _Application extends State<PushApplication> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: widget.child);
+    return Scaffold(
+      backgroundColor: scaffoldColor,
+      body: widget.child,
+    );
   }
 }

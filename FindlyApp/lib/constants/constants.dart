@@ -15,7 +15,7 @@ const kInputDecoration = InputDecoration(
   ),
   border: OutlineInputBorder(
       borderRadius: BorderRadius.all(
-    Radius.circular(10),
+    Radius.circular(16),
   )),
   enabledBorder: OutlineInputBorder(
       borderSide: BorderSide(
@@ -23,19 +23,19 @@ const kInputDecoration = InputDecoration(
         width: 2,
       ),
       borderRadius: BorderRadius.all(
-        Radius.circular(10),
+        Radius.circular(16),
       )),
   focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(
-        color: Colors.blueAccent,
+        color: primaryColor,
         width: 2,
       ),
       borderRadius: BorderRadius.all(
-        Radius.circular(10),
+        Radius.circular(16),
       )),
   errorBorder: OutlineInputBorder(
     borderRadius: BorderRadius.all(
-      Radius.circular(10),
+      Radius.circular(16),
     ),
     borderSide: BorderSide(color: Colors.red),
   ),
@@ -59,7 +59,7 @@ const kSecondaryLinearGradient = LinearGradient(
 );
 
 const Color primaryColor = Color(0xFF035AA6);
+const Color scaffoldColor = Color(0xFFDFECF7);
 const Color secondaryColor = Color(0xFF60A5FA);
-
 const Color color1 = Color(0xFF8EC7ED);
 const Color color2 = Color(0x86CDEEFF);

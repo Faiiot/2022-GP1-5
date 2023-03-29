@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../constants/constants.dart';
+
 class PrivateChatScreen extends StatefulWidget {
   final String chatroomID;
   final String peerId;
@@ -166,6 +168,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
         title: const Text(
           "chat screen",

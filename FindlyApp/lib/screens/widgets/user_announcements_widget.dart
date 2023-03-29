@@ -51,7 +51,8 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
   String firstName = "";
   String lastName = "";
   String fullName = "";
-  String theChannel = "";
+  String phoneNumber = "";
+  String email = "";
 
   @override
   void initState() {
@@ -73,11 +74,8 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
         firstName = userDoc.get('firstName');
         lastName = userDoc.get('LastName');
         fullName = "$firstName $lastName";
-        if (widget.contactChannel == "Phone Number") {
-          theChannel = userDoc.get('phoneNo');
-        } else if (widget.contactChannel == "Email") {
-          theChannel = userDoc.get('Email');
-        }
+        phoneNumber = userDoc.get('phoneNo');
+        email = userDoc.get('Email');
       });
     } catch (error) {
       debugPrint(error.toString());
@@ -99,21 +97,13 @@ class _UserAnnouncementState extends State<UserAnnouncement> {
                 builder: (context) => AnnouncementDetailsScreen(
                   announcementID: widget.announcementID,
                   publisherID: widget.publisherID,
-                  itemName: widget.itemName,
                   announcementType: widget.announcementType,
-                  itemCategory: widget.itemCategory,
-                  postDate: widget.postDate,
-                  announcementImg: widget.announcementImg,
-                  buildingName: widget.buildingName,
-                  contactChannel: widget.contactChannel,
                   publishedBy: fullName,
-                  announcementDes: widget.announcementDes,
-                  theChannel: theChannel,
+                  phoneNumber: phoneNumber,
+                  email: email,
                   profile: true,
                   reported: widget.reported,
                   reportCount: widget.reportCount,
-                  roomNumber: widget.roomNumber,
-                  floorNumber: widget.floorNumber,
                 ),
               ));
         },

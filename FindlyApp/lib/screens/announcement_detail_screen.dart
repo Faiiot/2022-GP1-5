@@ -3,27 +3,24 @@ import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/editAnnouncement.dart';
 import 'package:findly_app/screens/private_chat/chatMethods.dart';
 import 'package:findly_app/screens/private_chat/private_chat_screen.dart';
+import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../constants/dates.dart';
+import '../constants/global_colors.dart';
+import '../constants/text_styles.dart';
+
 class AnnouncementDetailsScreen extends StatefulWidget {
   final String announcementID;
   final String publisherID;
-  final String itemName;
   final String announcementType;
-  final String itemCategory;
-  final Timestamp postDate;
-  final String announcementImg;
-  final String buildingName;
-  final String contactChannel;
-  final String theChannel;
+  final String phoneNumber;
+  final String email;
   final String publishedBy;
-  final String announcementDes;
   final bool profile;
-  final String roomNumber;
-  final String floorNumber;
   final bool reported;
   final int reportCount;
 
@@ -32,21 +29,13 @@ class AnnouncementDetailsScreen extends StatefulWidget {
     super.key,
     required this.announcementID,
     required this.publisherID,
-    required this.itemName,
     required this.announcementType,
-    required this.itemCategory,
-    required this.postDate,
-    required this.announcementImg,
-    required this.buildingName,
-    required this.contactChannel,
-    required this.theChannel,
+    required this.phoneNumber,
+    required this.email,
     required this.publishedBy,
-    required this.announcementDes,
     required this.profile,
     required this.reportCount,
     required this.reported,
-    required this.roomNumber,
-    required this.floorNumber,
   });
 
   @override
@@ -54,6 +43,19 @@ class AnnouncementDetailsScreen extends StatefulWidget {
 }
 
 class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
+  String itemName = "";
+  String announcementType = "";
+  String itemCategory = "";
+  Timestamp postDate = Timestamp.fromDate(DateTime.now());
+  String announcementImg = "";
+  String buildingName = "";
+  String contactChannel = "";
+  String theChannel = "";
+  String announcementDes = "";
+  String roomNumber = "";
+  String floorNumber = "";
+  bool fetchingData = true;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   ChatMethods chatMethods = ChatMethods();
 
@@ -64,15 +66,48 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     return false;
   }
 
+  void fetchAnnouncementDetails() async {
+    final String collection = announcementType == "lost" ? "lostItem" : "foundItem";
+    final doc = await FirebaseFirestore.instance
+        .collection(collection)
+        .where(
+          "announcementID",
+          isEqualTo: widget.announcementID,
+        )
+        .get();
+    final announcement = doc.docs.first.data();
+    itemName = announcement["itemName"];
+    announcementType = announcement["announcementType"];
+    itemCategory = announcement["itemCategory"];
+    postDate = announcement["annoucementDate"];
+    announcementImg = announcement["url"];
+    buildingName = announcement['buildingName'];
+    contactChannel = announcement['contact'];
+    theChannel = contactChannel == "Phone Number" ? widget.phoneNumber : widget.email;
+    announcementDes = announcement["announcementDes"];
+    roomNumber = announcement["roomnumber"];
+    floorNumber = announcement["floornumber"];
+    setState(() {
+      fetchingData = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    announcementType = widget.announcementType;
+    fetchAnnouncementDetails();
+  }
+
   //create chat room, then send the user to the conversation or chat screen to exchange messages
-  void createChatRoomAndSendUserToConvScreen() {
+  void createChatRoomAndSendUserToConvScreen() async {
     //get the current user id
     User? user = _auth.currentUser;
     String uid = user!.uid.toString();
     //users id list in the form of String
     List<String> users = [uid, widget.publisherID];
     //users names
-    String myName = chatMethods.getUsername(uid);
+    String myName = await chatMethods.getUsername(uid);
     String peerName = widget.publishedBy;
     String usersNames = "${myName}_$peerName";
     //generating the chatroom id
@@ -85,6 +120,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       "lastMessage": "",
     };
     chatMethods.createChatRoom(chatroomID, chatroomMap);
+    if (!mounted) return;
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -94,20 +130,22 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-            onPressed: () {
-              if (widget.profile) {
-                Navigator.pop(context);
-              } else if (widget.announcementType == 'lost') {
-                Navigator.pop(context);
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            icon: const Icon(Icons.arrow_back_ios)),
-        title: const Text(
-          'Announcement Details',
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: primaryColor,
+          ),
+        ),
+        title: Text(
+          "Announcement Details",
+          style: TextStyles.appBarTitleStyle.copyWith(color: primaryColor),
         ),
         actions: [
           if (widget.profile)
@@ -117,259 +155,325 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                 },
                 icon: const Icon(
                   Icons.delete_forever,
-                  size: 30,
+                  color: Colors.red,
                 )),
           if (!sameUser())
-            IconButton(
-                onPressed: () {
-                  report();
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: GestureDetector(
+                onTap: () async {
+                  await report();
                 },
-                icon: const Icon(
-                  Icons.report,
-                  size: 30,
-                )),
+                child: CircleAvatar(
+                  backgroundColor: Colors.red.shade100,
+                  radius: 18,
+                  foregroundImage: const AssetImage(
+                    "assets/report.png",
+                  ),
+                ),
+              ),
+            ),
           widget.profile
               ? IconButton(
                   onPressed: () {
                     Navigator.push(
-                        //back button
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditAnnouncement(
-                            announcementID: widget.announcementID,
-                            itemName: widget.itemName,
-                            announcementType: widget.announcementType,
-                            itemCategory: widget.itemCategory,
-                            postDate: widget.postDate,
-                            announcementImg: widget.announcementImg,
-                            buildingName: widget.buildingName,
-                            contactChannel: widget.contactChannel,
-                            theChannel: widget.theChannel,
-                            publishedBy: widget.publishedBy,
-                            announcementDes: widget.announcementDes,
-                            roomNumber: widget.roomNumber,
-                            floorNumber: widget.floorNumber,
-                          ),
-                        ));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditAnnouncement(
+                          announcementID: widget.announcementID,
+                          itemName: itemName,
+                          announcementType: announcementType,
+                          itemCategory: itemCategory,
+                          postDate: postDate,
+                          announcementImg: announcementImg,
+                          buildingName: buildingName,
+                          contactChannel: contactChannel,
+                          theChannel: theChannel,
+                          publishedBy: widget.publishedBy,
+                          announcementDes: announcementDes,
+                          roomNumber: roomNumber,
+                          floorNumber: floorNumber,
+                        ),
+                      ),
+                    ).then((value) => fetchAnnouncementDetails());
                   },
-                  icon: const Icon(Icons.edit))
-              : const Text('')
+                  icon: const Icon(
+                    Icons.edit,
+                    color: primaryColor,
+                  ),
+                )
+              : const SizedBox.shrink()
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: 300,
-                  width: double.infinity,
-                  child: widget.announcementImg != ""
-                      ? Image.network(
-                          widget.announcementImg,
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue, width: 3),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.image,
-                                size: 120,
-                                color: Colors.grey,
+      body: fetchingData
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 300,
+                      width: double.infinity,
+                      child: announcementImg != ""
+                          ? Image.network(
+                              announcementImg,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.blue, width: 3),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              Text(
-                                "No image was uploaded",
-                                style: TextStyle(fontSize: 18),
-                              )
-                            ],
-                          ),
-                        )),
-            ),
-            const SizedBox(
-              height: 14,
-            ),
-            sameUser() == false
-                ? GestureDetector(
-                    onTap: () {
-                      createChatRoomAndSendUserToConvScreen();
-                    },
-                    child: Center(
-                      child: Container(
-                        width: 130,
-                        decoration: BoxDecoration(
-                          color: Constants.darkBlue,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        child: Row(
-                          children: const [
-                            Text(
-                              "Message",
-                              style: TextStyle(color: Colors.white, fontSize: 16),
-                              textAlign: TextAlign.center,
+                              padding: const EdgeInsets.all(4.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Expanded(
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: Icon(
+                                        Icons.image,
+                                        size: 120,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "No image was uploaded",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black54,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 8),
-                            Icon(
-                              Icons.chat,
-                              color: Colors.white,
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: GlobalColors.extraColor,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${announcementType.toUpperCase()} ITEM",
+                              style: TextStyles.alertDialogueMainButtonTextStyle,
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
                       ),
                     ),
-                  )
-                : const Text(""),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration:
-                    BoxDecoration(color: Colors.blue[400], borderRadius: BorderRadius.circular(20)),
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    //announcement type
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Announcement type:  ${widget.announcementType}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 16.0,
                       ),
-                    ),
-                    //item name
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
                       child: Text(
-                        'Item name:  ${widget.itemName}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                    //item category
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Item category:  ${widget.itemCategory}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                    //building name
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Location:\n   Building: ${widget.buildingName}\n   Floor: ${widget.floorNumber}\n   Room: ${widget.roomNumber}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                    //description
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: const Text(
-                        'Description: ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
+                        itemName,
+                        style: TextStyles.secondButtonTextStyle,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                          widget.announcementDes,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Constants.darkBlue,
-                            fontStyle: FontStyle.italic,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 0,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.category_outlined,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    itemCategory,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                    ),
-                    //publisher Name
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Published by:  ${widget.publishedBy}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                    //another contact channel based on the user's choice
-                    widget.contactChannel == "Phone Number"
-                        ? Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'Phone number:  ${widget.theChannel} ',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    "$buildingName, $floorNumber, $roomNumber",
+                                    maxLines: 2,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.date_range_outlined,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    Dates.parsedDate(postDate).toString().substring(0, 10),
+                                    maxLines: 2,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.account_box,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    widget.publishedBy,
+                                    maxLines: 2,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                contactChannel == "Phone Number" ? Icons.phone : Icons.email,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    theChannel,
+                                    maxLines: 2,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Card(
+                            margin: const EdgeInsets.only(top: 16, bottom: 16),
+                            elevation: 7,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: GlobalColors.mainColor,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(12.0),
+                                    child: Text(
+                                      "Description:",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      announcementDes,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          )
-                        : Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'Email:  ${widget.theChannel}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    if (!sameUser()) ...[
+                      Center(
+                        child: WideButton(
+                          choice: 1,
+                          title: "Chat!",
+                          onPressed: () {
+                            createChatRoomAndSendUserToConvScreen();
+                          },
+                        ),
+                      ),
+                      Center(
+                        child: WideButton(
+                          choice: 2,
+                          title: contactChannel == "Phone Number" ? "Call Now" : "Send an Email",
+                          onPressed: () {
+                            contactChannel == "Phone Number"
+                                ? GlobalMethods.makePhoneCall(theChannel)
+                                : GlobalMethods.sendEmail(theChannel);
+                          },
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -399,7 +503,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           ),
           //Log out confirmation message
           content: Text(
-            "Are you sure you want to delete ${widget.itemName} ?",
+            "Are you sure you want to delete ${itemName} ?",
             maxLines: 2,
             style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
           ),
@@ -414,7 +518,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
-                if (widget.announcementType == 'lost') {
+                if (announcementType == 'lost') {
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -442,7 +546,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           ],
                         ),
                         content: Text(
-                          "Did you find ${widget.itemName}?",
+                          "Did you find $itemName?",
                           maxLines: 2,
                           style: TextStyle(
                             color: Constants.darkBlue,
@@ -499,7 +603,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           ],
                         ),
                         content: Text(
-                          "Did you return ${widget.itemName} to her owner?",
+                          "Did you return $itemName to her owner?",
                           maxLines: 2,
                           style: TextStyle(
                             color: Constants.darkBlue,
@@ -566,20 +670,20 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         await FirebaseFirestore.instance.collection('reportedItem').doc(widget.announcementID).set({
           'announcementID': widget.announcementID,
           'publishedBy': widget.publishedBy,
-          'itemName': widget.itemName,
-          'itemCategory': widget.itemCategory,
-          'announcementDes': widget.announcementDes,
-          'announcementType': widget.announcementType,
-          'contact': widget.theChannel,
-          'url': widget.announcementImg,
-          'buildingName': widget.buildingName,
-          'annoucementDate': widget.postDate,
-          'roomnumber': widget.roomNumber,
-          'floornumber': widget.floorNumber,
+          'itemName': itemName,
+          'itemCategory': itemCategory,
+          'announcementDes': announcementDes,
+          'announcementType': announcementType,
+          'contact': theChannel,
+          'url': announcementImg,
+          'buildingName': buildingName,
+          'annoucementDate': postDate,
+          'roomnumber': roomNumber,
+          'floornumber': floorNumber,
           'reported': true,
           'reportCount': count,
         });
-        if (widget.announcementType == 'lost') {
+        if (announcementType == 'lost') {
           await FirebaseFirestore.instance
               .collection('lostItem')
               .doc(widget.announcementID)
@@ -597,7 +701,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           });
         }
       } else {
-        if (widget.announcementType == 'lost') {
+        if (announcementType == 'lost') {
           await FirebaseFirestore.instance
               .collection('lostItem')
               .doc(widget.announcementID)

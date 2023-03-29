@@ -12,6 +12,7 @@ class AuthHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: const CurvedAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(24.0),

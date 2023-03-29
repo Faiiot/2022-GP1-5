@@ -73,7 +73,7 @@ class ChatMethods {
         .asStream();
   }
 
-  getUsername(String userID) async {
+  Future<String> getUsername(String userID) async {
     try {
       final DocumentSnapshot userDoc =
           await FirebaseFirestore.instance.collection('users').doc(userID).get();
@@ -86,6 +86,7 @@ class ChatMethods {
       return fullName;
     } catch (error) {
       print(error.toString());
+      throw Exception(error.toString());
     }
   }
 

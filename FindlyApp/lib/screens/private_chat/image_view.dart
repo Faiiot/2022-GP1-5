@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
+import '../../constants/constants.dart';
+
 class ImageViewScreen extends StatefulWidget {
   const ImageViewScreen({
     Key? key,
@@ -16,6 +18,7 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       body: Center(
         child: PhotoView(
           imageProvider: NetworkImage(

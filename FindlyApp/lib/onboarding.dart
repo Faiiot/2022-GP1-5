@@ -10,6 +10,7 @@ class OnBoardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       body: Stack(
         children: [
           Padding(
@@ -45,16 +46,17 @@ class OnBoardingScreen extends StatelessWidget {
               ),
               listContentConfig: [
                 buildContentConfig(
-                  image: "ksu_black_logo.png",
+                  image: "lost_or_found.png",
                   text: "Have you ever\nlost or found an item on KSU\ncampus?",
                 ),
                 buildContentConfig(
-                  image: "ksu_black_logo.jpeg",
-                  text: "Have you ever\nlost or found an item on KSU\ncampus?",
+                  image: "communicate.png",
+                  text: "With Findly you can communicate easier through private chat.",
                 ),
                 buildContentConfig(
-                  image: "FindlyC.png",
-                  text: "Find your lost item,\nor help others do!",
+                  image: "notification_slide_screen.png",
+                  text:
+                      "You will be notified whenever someone announce in your items matching category.",
                 ),
               ],
               onSkipPress: () => navigate(context),
@@ -75,7 +77,9 @@ class OnBoardingScreen extends StatelessWidget {
     required String text,
   }) {
     return ContentConfig(
-      pathImage: "assets/$image",
+      centerWidget: Image.asset(
+        "assets/$image",
+      ),
       widgetDescription: Text(
         text,
         textAlign: TextAlign.center,
