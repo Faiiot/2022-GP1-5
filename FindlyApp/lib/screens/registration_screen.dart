@@ -6,7 +6,6 @@ import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const String screenRoute = 'registration_screen';
@@ -34,7 +33,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _obscureText = true;
   final _signUpFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  RegExp regexPassword = RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*+=%~]).{8,}$');
 
   @override
   void dispose() {
@@ -95,12 +93,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               builder: (context) => const LoginScreen(),
             ),
           );
-          Fluttertoast.showToast(
-            msg: "Account has been created successfully!",
-            toastLength: Toast.LENGTH_SHORT,
-            backgroundColor: Colors.blueGrey,
-            textColor: Colors.white,
-            fontSize: 16.0,
+          GlobalMethods.showToast(
+            "Account has been created successfully!",
           );
         }
       } catch (error) {
@@ -125,47 +119,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final doc = await firestore.collection('ksuMembers').doc(id).get();
     firestore.terminate();
     return doc.exists;
-  }
-
-  void showErrorDialog(error) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Row(
-              children: const [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.error),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text("Error occurred"),
-                ),
-              ],
-            ),
-            content: Text(
-              error,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 20,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.canPop(context) ? Navigator.pop(context) : null;
-                },
-                child: const Text(
-                  "OK",
-                  style: TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-              )
-            ],
-          );
-        });
   }
 
   @override

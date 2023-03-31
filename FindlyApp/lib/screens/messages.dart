@@ -41,7 +41,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   constraints: BoxConstraints(maxWidth: w * 2 / 3),
                   child: Text(
                     widget.messages[index]['message'].text.text[0],
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                    ),
                   )),
             ],
           ),

@@ -16,6 +16,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/text_styles.dart';
+import '../services/global_methods.dart';
+import 'announcement_detail_screen.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   final String userID;
@@ -232,36 +234,81 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               color: primaryColor,
               borderRadius: BorderRadius.circular(16.0),
             ),
-            child: ListView.builder(
-              itemCount: 5,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (index == 0) const SizedBox(width: 16.0),
-                    Container(
-                      width: size.width / 2.5,
-                      margin: const EdgeInsets.only(right: 16.0),
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Image.asset(
-                              "assets/Image_not_available.png",
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("foundItem")
+                  .limit(5)
+                  .snapshots()
+                  .asBroadcastStream(),
+              builder: (context, snapshot) {
+                final docs = snapshot.data?.docs;
+                return ListView.builder(
+                  itemCount: docs?.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (index == 0) const SizedBox(width: 16.0),
+                        GestureDetector(
+                          onTap: () async {
+                            final info = await getNeededPublisherInfo(docs?[index]["publishedBy"]);
+                            if (mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AnnouncementDetailsScreen(
+                                    announcementID: docs?[index]["announcementID"],
+                                    publisherID: docs?[index]["publishedBy"],
+                                    announcementType: docs?[index]["announcementType"],
+                                    publishedBy: info["name"],
+                                    phoneNumber: info["phone"],
+                                    email: info["email"],
+                                    profile: false,
+                                    reported: docs?[index]["reported"],
+                                    reportCount: docs?[index]["reportCount"],
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: size.width / 2.5,
+                            margin: const EdgeInsets.only(right: 16.0),
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Column(
+                              children: [
+                                docs != null && docs[index]["url"] != ""
+                                    ? Expanded(
+                                        child: Image.network(
+                                          docs[index]["url"],
+                                        ),
+                                      )
+                                    : Expanded(
+                                        child: Image.asset(
+                                          "assets/Image_not_available.png",
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
+                                Text(
+                                  docs != null ? docs[index]["itemName"] : "",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const Text(
-                            "Testing",
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
@@ -387,6 +434,27 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ],
       ),
     );
+  }
+
+  Future<Map<String, dynamic>> getNeededPublisherInfo(String id) async {
+    try {
+      Map<String, dynamic> map = {};
+      final DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(id).get();
+      map.addAll({
+        "name": "${userDoc.get('firstName')} ${userDoc.get('LastName')}",
+        "phone": userDoc.get('phoneNo'),
+        "email": userDoc.get('Email'),
+      });
+
+      return map;
+    } catch (error) {
+      GlobalMethods.showErrorDialog(
+        error: error.toString(),
+        context: context,
+      );
+      return <String, dynamic>{};
+    }
   }
 
   Widget dashboardButton({

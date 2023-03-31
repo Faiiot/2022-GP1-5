@@ -59,6 +59,7 @@ dependencies:
   photo_view: ^0.14.0
   intro_slider: ^4.2.0
   url_launcher: ^6.1.10
+  reactive_forms: ^14.2.0
 
 
 

@@ -1,4 +1,5 @@
 import 'package:dialog_flowtter/dialog_flowtter.dart';
+import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:findly_app/screens/messages.dart';
 import 'package:flutter/material.dart';
 
@@ -28,12 +29,48 @@ class _DialogflowChatBotScreenState extends State<DialogflowChatBotScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldColor,
-      appBar: AppBar(
+      appBar: CurvedAppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back_ios),
+        ),
         title: const Text("Findly Chatbot"),
       ),
       body: Column(
         children: [
-          Expanded(child: MessagesScreen(messages: messages)),
+          if (messages.isEmpty)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Image.asset(
+                        "assets/chatbot.png",
+                      ),
+                    ),
+                    const Flexible(
+                      child: Text(
+                        "Welcome!\nHow may I help you?",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            Expanded(
+              child: MessagesScreen(messages: messages),
+            ),
           Container(
             color: const Color(0x95C7FFFF),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -42,11 +79,16 @@ class _DialogflowChatBotScreenState extends State<DialogflowChatBotScreen> {
                 Expanded(
                     child: TextField(
                   controller: _controller,
-                  style: TextStyle(color: Colors.blue[700]),
-                  decoration: InputDecoration(
-                      hintText: "Talk about your item!",
-                      hintStyle: TextStyle(color: Colors.blue[700]),
-                      border: InputBorder.none),
+                  style: const TextStyle(
+                    color: primaryColor,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: "Talk about your item!",
+                    hintStyle: TextStyle(
+                      color: primaryColor,
+                    ),
+                    border: InputBorder.none,
+                  ),
                 )),
                 GestureDetector(
                   onTap: () {
@@ -56,14 +98,8 @@ class _DialogflowChatBotScreenState extends State<DialogflowChatBotScreen> {
                   child: Container(
                     height: 40,
                     width: 40,
-                    decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [
-                          Color(0x36FFFFFF),
-                          Color(0x0FFFFFFF),
-                        ]),
-                        borderRadius: BorderRadius.circular(40)),
                     padding: const EdgeInsets.all(12),
-                    child: Image.asset("assets/send_message.png"),
+                    child: Image.asset("assets/send.png"),
                   ),
                 ),
               ],

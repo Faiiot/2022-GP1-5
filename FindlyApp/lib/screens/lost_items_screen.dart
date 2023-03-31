@@ -162,7 +162,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                                     ),
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
-                                      Radius.circular(10),
+                                      Radius.circular(16),
                                     )),
                                     enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -170,19 +170,19 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                                           width: 2,
                                         ),
                                         borderRadius: BorderRadius.all(
-                                          Radius.circular(10),
+                                          Radius.circular(16),
                                         )),
                                     focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                          color: Colors.blueAccent,
+                                          color: primaryColor,
                                           width: 2,
                                         ),
                                         borderRadius: BorderRadius.all(
-                                          Radius.circular(10),
+                                          Radius.circular(16),
                                         )),
                                     errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
+                                        Radius.circular(16),
                                       ),
                                       borderSide: BorderSide(color: Colors.red),
                                     ),
@@ -194,7 +194,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                                   popupShape: const RoundedRectangleBorder(),
                                   showSearchBox: true,
                                   searchFieldProps: const TextFieldProps(
-                                    cursorColor: Colors.blue,
+                                    cursorColor: primaryColor,
                                     decoration: kInputDecoration,
                                   ),
                                 ),
@@ -355,7 +355,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
       child: Text(
         label,
         style: TextStyle(
-          color: activeColor ? Colors.blue : Colors.grey,
+          color: activeColor ? primaryColor : Colors.grey,
         ),
       ),
     );

@@ -7,9 +7,7 @@ class ChatMethods {
         .collection("chatRooms")
         .doc(chatroomID)
         .set(chatroomMap)
-        .catchError((e) {
-      print(e.toString());
-    });
+        .catchError((e) {});
   }
 
   // to generate the same chatroom id for the to users always to avid duplicate rooms for the same users
@@ -23,31 +21,35 @@ class ChatMethods {
     return chatID;
   }
 
-  addChatMessages(String chatroomID, messageMap) {
-    FirebaseFirestore.instance
+  Future<void> addChatMessages(String chatroomID, messageMap) async {
+    await FirebaseFirestore.instance
         .collection("chatRooms")
         .doc(chatroomID)
         .collection("messages")
         .add(messageMap)
-        .catchError((e) {
-      print(e.toString());
-    });
+        .catchError((e) {});
   }
 
-  addChatImageMessages(String chatroomID, String imageID, messageMap) {
-    FirebaseFirestore.instance
+  Future<void> addChatImageMessages(
+    String chatroomID,
+    String imageID,
+    messageMap,
+  ) async {
+    await FirebaseFirestore.instance
         .collection("chatRooms")
         .doc(chatroomID)
         .collection("messages")
         .doc(imageID)
         .set(messageMap)
-        .catchError((e) {
-      print(e.toString());
-    });
+        .catchError((e) {});
   }
 
-  updateChatImageMessageField(String chatroomID, String imageID, String imageUrl) {
-    FirebaseFirestore.instance
+  Future<void> updateChatImageMessageField(
+    String chatroomID,
+    String imageID,
+    String imageUrl,
+  ) async {
+    await FirebaseFirestore.instance
         .collection("chatRooms")
         .doc(chatroomID)
         .collection("messages")
@@ -61,16 +63,16 @@ class ChatMethods {
         .doc(chatroomID)
         .collection("messages")
         .orderBy("time", descending: true)
-        .get()
-        .asStream();
+        .snapshots()
+        .asBroadcastStream();
   }
 
   Stream<dynamic> getChatRooms(String userID) {
     return FirebaseFirestore.instance
         .collection("chatRooms")
         .where("users", arrayContains: userID)
-        .get()
-        .asStream();
+        .snapshots()
+        .asBroadcastStream();
   }
 
   Future<String> getUsername(String userID) async {
@@ -82,18 +84,17 @@ class ChatMethods {
       String lastName = userDoc.get('LastName');
       String fullName = '$firstName $lastName';
 
-      print(userID + " " + fullName);
       return fullName;
     } catch (error) {
-      print(error.toString());
       throw Exception(error.toString());
     }
   }
 
-  updateLastMessageOfChatroom(String message, String chatroomID) {
+  updateLastMessageOfChatroom(String message, String chatroomID, int time) {
     FirebaseFirestore.instance.collection("chatRooms").doc(chatroomID).update(
       {
         "lastMessage": message,
+        "lastMessageTime": time,
       },
     );
   }

@@ -1,9 +1,10 @@
+import 'package:findly_app/screens/auth_home_screen.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:findly_app/screens/user_profile_page.dart';
-import 'package:findly_app/user_state.dart';
+import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import '../../constants/constants.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -120,64 +121,31 @@ class DrawerWidget extends StatelessWidget {
 
   void _logout(context) {
     final FirebaseAuth auth = FirebaseAuth.instance;
-    showDialog(
+    GlobalMethods.showCustomizedDialogue(
+      title: "Log out",
+      message: "Are you sure you want to log out?",
+      mainAction: "Ok",
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.logout_outlined,
-                  size: 30,
-                  color: Constants.darkBlue,
-                ),
+      secondaryAction: "Cancel",
+      onPressedSecondary: () {
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
+      },
+      onPressedMain: () async {
+        //if the user click "OK" she will be logged out and redirected to log in screen
+        Navigator.pop(context);
+        await auth.signOut().then(
+          (value) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AuthHomeScreen(),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Log out",
-                  style: TextStyle(
-                      color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            "Are you sure you want to log out?",
-            maxLines: 2,
-            style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.canPop(context) ? Navigator.pop(context) : null;
-                },
-                child: const Text("Cancel")),
-            TextButton(
-                onPressed: () async {
-                  //if the user click "OK" she will be logged out and redirected to log in screen
-                  await auth.signOut().then(
-                    (value) {
-                      Navigator.canPop(context) ? Navigator.pop(context) : null;
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const UserState(),
-                      ));
-                    },
-                  );
-                  Fluttertoast.showToast(
-                      msg: "You have been logged out successfully!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      backgroundColor: Colors.blueGrey,
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                },
-                child: const Text(
-                  "OK",
-                  style: TextStyle(color: Colors.red),
-                ))
-          ],
+              (_) => false,
+            );
+          },
+        );
+        GlobalMethods.showToast(
+          "You have been logged out successfully!",
         );
       },
     );

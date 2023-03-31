@@ -1,4 +1,5 @@
 import 'package:findly_app/screens/widgets/my_button.dart';
+import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,12 +33,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
     Navigator.of(context).pop();
 
     //show a message when the email is sent
-    Fluttertoast.showToast(
-      msg: "An Email has been sent to you!",
-      toastLength: Toast.LENGTH_SHORT,
-      backgroundColor: Colors.blueGrey,
-      textColor: Colors.white,
-      fontSize: 16.0,
+    GlobalMethods.showToast(
+      "An Email has been sent to you!",
     );
   }
 
@@ -137,12 +134,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
                             _forgotPasswordFCT();
                           }),
                       MyButton(
-                          //Reset password by email button
-                          color: primaryColor,
-                          title: "Cancel",
-                          onPressed: () {
-                            Navigator.canPop(context) ? Navigator.pop(context) : null;
-                          }),
+                        //Reset password by email button
+                        color: primaryColor,
+                        title: "Cancel",
+                        onPressed: () {
+                          Navigator.canPop(context) ? Navigator.pop(context) : null;
+                        },
+                      ),
                     ],
                   ),
                 ),

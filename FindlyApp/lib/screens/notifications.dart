@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +17,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        centerTitle: true,
+      appBar: CurvedAppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+          ),
+        ),
         title: const Text(
           'Notification',
           style: TextStyle(
@@ -55,7 +62,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   (index) => Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: ListTile(
-                      tileColor: Colors.purpleAccent.shade100.withOpacity(0.3),
+                      tileColor: primaryColor.withOpacity(0.25),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       leading: const Icon(
                         Icons.notifications_none,

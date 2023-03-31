@@ -6,7 +6,7 @@ import '../../constants/text_styles.dart';
 class WideButton extends StatelessWidget {
   final int choice;
   final String title;
-  final VoidCallback onPressed;
+  final Function()? onPressed;
   final double? width;
 
   const WideButton({

@@ -7,10 +7,12 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.title,
     this.actions,
+    this.bottom,
   });
 
   final Widget? leading, title;
   final List<Widget>? actions;
+  final PreferredSizeWidget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
         painter: _AppBarPainter(),
         // child: child,
       ),
+      bottom: bottom,
     );
   }
 

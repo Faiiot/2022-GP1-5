@@ -7,7 +7,6 @@ import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../constants/dates.dart';
 import '../constants/global_colors.dart';
@@ -122,9 +121,15 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     chatMethods.createChatRoom(chatroomID, chatroomMap);
     if (!mounted) return;
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PrivateChatScreen(chatroomID, peerId: widget.publisherID)));
+      context,
+      MaterialPageRoute(
+        builder: (context) => PrivateChatScreen(
+          widget.publishedBy,
+          chatroomID,
+          peerId: widget.publisherID,
+        ),
+      ),
+    );
   }
 
   @override
@@ -176,6 +181,17 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           widget.profile
               ? IconButton(
                   onPressed: () {
+                    print(itemName);
+                    print(announcementType);
+                    print(itemCategory);
+                    // print(postDate.toString());
+                    print(buildingName);
+                    print(contactChannel);
+                    print(theChannel);
+                    print(widget.publishedBy);
+                    print(announcementDes);
+                    print(roomNumber);
+                    print(floorNumber);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -452,6 +468,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                       Center(
                         child: WideButton(
                           choice: 1,
+                          width: double.infinity,
                           title: "Chat!",
                           onPressed: () {
                             createChatRoomAndSendUserToConvScreen();
@@ -461,6 +478,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                       Center(
                         child: WideButton(
                           choice: 2,
+                          width: double.infinity,
                           title: contactChannel == "Phone Number" ? "Call Now" : "Send an Email",
                           onPressed: () {
                             contactChannel == "Phone Number"
@@ -478,185 +496,59 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   }
 
   Future<void> _delete(context) async {
-    showDialog(
+    GlobalMethods.showCustomizedDialogue(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          titlePadding: const EdgeInsets.all(24.0),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.delete,
-                size: 30,
-                color: Constants.darkBlue,
-              ),
-              const SizedBox(width: 8.0),
-              Flexible(
-                child: Text(
-                  "Delete Announcement",
-                  style: TextStyle(
-                      color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          //Log out confirmation message
-          content: Text(
-            "Are you sure you want to delete ${itemName} ?",
-            maxLines: 2,
-            style: TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-          ),
-          actions: [
-            //Cancel button > back to the drawer
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                if (announcementType == 'lost') {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.update_sharp,
-                                size: 30,
-                                color: Constants.darkBlue,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "Update Status",
-                                style: TextStyle(
-                                    color: Constants.darkBlue,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                        content: Text(
-                          "Did you find $itemName?",
-                          maxLines: 2,
-                          style: TextStyle(
-                            color: Constants.darkBlue,
-                            fontSize: 20,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () async {
-                              await GlobalMethods.incrementDeleteItemCount();
-                              await deletedDbAnnouncement("lostItem");
-                            },
-                            child: const Text('Yes'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              await deletedDbAnnouncement("lostItem");
-                            },
-                            child: const Text(
-                              "NO",
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.update_sharp,
-                                size: 30,
-                                color: Constants.darkBlue,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "Update States",
-                                style: TextStyle(
-                                    color: Constants.darkBlue,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                        content: Text(
-                          "Did you return $itemName to her owner?",
-                          maxLines: 2,
-                          style: TextStyle(
-                            color: Constants.darkBlue,
-                            fontSize: 20,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () async {
-                              await GlobalMethods.incrementDeleteItemCount();
-                              await deletedDbAnnouncement("foundItem");
-                            },
-                            child: const Text('Yes'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              await deletedDbAnnouncement("foundItem");
-                            },
-                            child: const Text(
-                              "NO",
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                          )
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(color: Colors.red),
-              ),
-            )
-          ],
-        );
+      title: "Delete Announcement",
+      message: "Are you sure you want to delete $itemName?",
+      mainAction: "OK",
+      secondaryAction: "Cancel",
+      onPressedMain: () async {
+        Navigator.pop(context);
+        if (announcementType == 'lost') {
+          GlobalMethods.showCustomizedDialogue(
+            context: context,
+            title: "Update Status",
+            message: "Did you find $itemName?",
+            mainAction: "Yes",
+            secondaryAction: "No",
+            onPressedMain: () async {
+              await GlobalMethods.incrementDeleteItemCount();
+              await deletedDbAnnouncement("lostItem");
+            },
+            onPressedSecondary: () async {
+              await deletedDbAnnouncement("lostItem");
+            },
+          );
+        } else {
+          GlobalMethods.showCustomizedDialogue(
+            context: context,
+            title: "Update States",
+            message: "Did you return $itemName to her owner?",
+            mainAction: "Yes",
+            secondaryAction: "No",
+            onPressedMain: () async {
+              await GlobalMethods.incrementDeleteItemCount();
+              await deletedDbAnnouncement("foundItem");
+            },
+            onPressedSecondary: () async {
+              await deletedDbAnnouncement("foundItem");
+            },
+          );
+        }
+      },
+      onPressedSecondary: () {
+        Navigator.pop(context);
       },
     );
   }
 
   Future<void> deletedDbAnnouncement(String collection) async {
     await FirebaseFirestore.instance.collection(collection).doc(widget.announcementID).delete();
-
     if (!mounted) return;
     Navigator.pop(context);
     Navigator.pop(context);
-    Fluttertoast.showToast(
-      msg: "Announcement has been deleted successfully!",
-      toastLength: Toast.LENGTH_SHORT,
-      backgroundColor: Colors.blueGrey,
-      textColor: Colors.white,
-      fontSize: 16.0,
+    GlobalMethods.showToast(
+      "Announcement has been deleted successfully!",
     );
   }
 
@@ -717,12 +609,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     if (mounted) Navigator.pop(context);
 
 //A confirmation message when the announcement is added
-    Fluttertoast.showToast(
-      msg: "Announcement has been reported successfully!\nFindly team thanks you!",
-      toastLength: Toast.LENGTH_LONG,
-      backgroundColor: Colors.blueGrey,
-      textColor: Colors.white,
-      fontSize: 16.0,
+    GlobalMethods.showToast(
+      "Announcement has been reported successfully!\nFindly team thanks you!",
     );
   }
 }

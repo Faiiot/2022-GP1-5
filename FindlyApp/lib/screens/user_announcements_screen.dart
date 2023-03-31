@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:findly_app/screens/widgets/user_announcements_widget.dart';
+import 'package:findly_app/constants/curved_app_bar.dart';
+import 'package:findly_app/screens/widgets/announcements_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/constants.dart';
@@ -23,55 +24,56 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
       length: 2,
       child: Scaffold(
         backgroundColor: scaffoldColor,
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          leading: Builder(
-            builder: (ctx) {
-              return IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              );
+        appBar: CurvedAppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-          title: const Center(
-            child: Text('My announcements'),
-          ),
+          title: const Text('My announcements'),
           actions: [
             IconButton(
               icon: const Icon(Icons.filter_alt_rounded),
               onPressed: () {},
             ),
           ],
-          bottom: TabBar(
-            tabs: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Lost",
-                  style: Theme.of(context).appBarTheme.titleTextStyle,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Found",
-                  style: Theme.of(context).appBarTheme.titleTextStyle,
-                ),
-              ),
-            ],
-          ),
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            _StreamBuilderWidget(
-              userID: widget.userID,
-              type: "lostItem",
+            const SizedBox(height: 4.0),
+            TabBar(
+              labelColor: primaryColor,
+              tabs: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Lost",
+                    style: Theme.of(context).appBarTheme.titleTextStyle,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Found",
+                    style: Theme.of(context).appBarTheme.titleTextStyle,
+                  ),
+                ),
+              ],
             ),
-            _StreamBuilderWidget(
-              userID: widget.userID,
-              type: "foundItem",
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _StreamBuilderWidget(
+                    userID: widget.userID,
+                    type: "lostItem",
+                  ),
+                  _StreamBuilderWidget(
+                    userID: widget.userID,
+                    type: "foundItem",
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -110,27 +112,34 @@ class _StreamBuilderWidget extends StatelessWidget {
         } else if (snapshot.connectionState == ConnectionState.active) {
           //if the collection snapshot is empty
           if (snapshot.data!.docs.isNotEmpty) {
-            return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
+            final data = snapshot.data!.docs;
+            return GridView.builder(
+              itemCount: data.length,
+              padding: const EdgeInsets.all(
+                8.0,
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
               itemBuilder: (BuildContext context, int index) {
-                return UserAnnouncement(
+                return Announcement(
                   //snapshot.data!.docs is a list of the announcements
                   //by pointing to the index of a specific announcement and fetching info
-                  announcementID: snapshot.data!.docs[index]['announcementID'],
-                  itemName: snapshot.data!.docs[index]['itemName'],
-                  announcementType: snapshot.data!.docs[index]['announcementType'],
-                  itemCategory: snapshot.data!.docs[index]['itemCategory'],
-                  postDate: snapshot.data!.docs[index]['annoucementDate'],
-                  announcementImg: snapshot.data!.docs[index]['url'],
-                  buildingName: snapshot.data!.docs[index]['buildingName'],
-                  contactChannel: snapshot.data!.docs[index]['contact'],
-                  publisherID: snapshot.data!.docs[index]['publishedBy'],
-                  announcementDes: snapshot.data!.docs[index]['announcementDes'],
+                  announcementID: data[index]['announcementID'],
+                  itemName: data[index]['itemName'],
+                  announcementType: data[index]['announcementType'],
+                  itemCategory: data[index]['itemCategory'],
+                  postDate: data[index]['annoucementDate'],
+                  announcementImg: data[index]['url'],
+                  buildingName: data[index]['buildingName'],
+                  contactChannel: data[index]['contact'],
+                  publisherID: data[index]['publishedBy'],
+                  announcementDes: data[index]['announcementDes'],
                   profile: true,
-                  reportCount: snapshot.data!.docs[index]['reportCount'],
-                  reported: snapshot.data!.docs[index]['reported'],
-                  roomNumber: snapshot.data!.docs[index]['roomnumber'],
-                  floorNumber: snapshot.data!.docs[index]['floornumber'],
+                  reported: data[index]['reported'],
+                  reportCount: data[index]['reportCount'],
+                  roomNumber: data[index]['roomnumber'],
+                  floorNumber: data[index]['floornumber'],
                 );
               },
             );

@@ -100,7 +100,7 @@ class _AnnouncementState extends State<Announcement> {
               publishedBy: fullName,
               phoneNumber: phoneNumber,
               email: email,
-              profile: false,
+              profile: widget.profile,
               reported: widget.reported,
               reportCount: widget.reportCount,
             ),

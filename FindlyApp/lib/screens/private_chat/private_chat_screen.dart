@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:findly_app/screens/private_chat/chatMethods.dart';
 import 'package:findly_app/screens/private_chat/image_view.dart';
 import 'package:findly_app/services/push_notifications_service.dart';
@@ -10,12 +11,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../constants/constants.dart';
+import '../../constants/global_colors.dart';
 
 class PrivateChatScreen extends StatefulWidget {
+  final String peerName;
   final String chatroomID;
   final String peerId;
 
   const PrivateChatScreen(
+    this.peerName,
     this.chatroomID, {
     super.key,
     required this.peerId,
@@ -32,25 +36,30 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
   File? imageFile;
 
   sendMessage() {
+    final message = msgController.text.trim();
+    final time = DateTime.now().millisecondsSinceEpoch;
     if (msgController.text.isNotEmpty) {
       Map<String, dynamic> msg = {
-        "message": msgController.text.trim(),
+        "message": message,
         "sender": _auth.currentUser!.uid.toString(),
-        "time": DateTime.now().millisecondsSinceEpoch,
+        "time": time,
         // this will be more helpful for ordering the messages
         "date": DateTime.now(), // to be used for UI details
         "type": "text",
       };
       chatMethods.addChatMessages(widget.chatroomID, msg).then((value) {
-        chatMethods.updateLastMessageOfChatroom(msgController.text.trim(), widget.chatroomID);
+        chatMethods.updateLastMessageOfChatroom(
+          message,
+          widget.chatroomID,
+          time,
+        );
       });
-      chatMethods.updateLastMessageOfChatroom(msgController.text.trim(), widget.chatroomID);
       PushNotificationController.getUserAndSendPush(msgController.text, widget.peerId);
       msgController.clear();
     }
   }
 
-  Widget chatMessagesList() {
+  StreamBuilder<dynamic> chatMessagesList() {
     String uid = _auth.currentUser!.uid.toString();
     return StreamBuilder(
         stream: chatMethods.getChatMessages(widget.chatroomID),
@@ -63,9 +72,13 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                       itemCount: snapshot.data.docs.length,
                       itemBuilder: (context, index) {
                         return MessageTile(
-                            snapshot.data.docs[index]["message"],
-                            snapshot.data.docs[index]["sender"] == uid,
-                            snapshot.data.docs[index]["type"]);
+                          snapshot.data.docs[index]["message"],
+                          snapshot.data.docs[index]["sender"] == uid,
+                          snapshot.data.docs[index]["type"],
+                          DateTime.fromMillisecondsSinceEpoch(
+                            snapshot.data.docs[index]["time"],
+                          ),
+                        );
                       }),
                 )
               : const Center(child: CircularProgressIndicator());
@@ -150,11 +163,11 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
       "date": DateTime.now(), // to be used for UI details
       "type": "img",
     };
-    chatMethods.addChatImageMessages(widget.chatroomID, fileName, msg);
+    await chatMethods.addChatImageMessages(widget.chatroomID, fileName, msg);
 
     var ref = FirebaseStorage.instance.ref().child("images").child("$fileName.jpg");
     var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
-      chatMethods.addChatImageMessages(widget.chatroomID, fileName, msg).delete();
+      // chatMethods.addChatImageMessages(widget.chatroomID, fileName, msg);
       status = 0;
     });
 
@@ -169,13 +182,22 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldColor,
-      appBar: AppBar(
-        title: const Text(
-          "chat screen",
+      extendBodyBehindAppBar: true,
+      appBar: CurvedAppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+          ),
+        ),
+        title: Text(
+          widget.peerName,
         ),
       ),
       body: Container(
-        color: Colors.lightBlue[50],
+        color: scaffoldColor,
         child: Stack(
           children: [
             chatMessagesList(),
@@ -187,12 +209,17 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                        child: TextField(
-                      controller: msgController,
-                      style: TextStyle(color: Colors.blue[700]),
-                      decoration: InputDecoration(
+                      child: TextField(
+                        controller: msgController,
+                        style: const TextStyle(
+                          color: primaryColor,
+                        ),
+                        decoration: InputDecoration(
                           suffixIcon: IconButton(
-                              icon: const Icon(Icons.photo),
+                              icon: const Icon(
+                                Icons.photo,
+                                color: primaryColor,
+                              ),
                               onPressed: () {
                                 showModalBottomSheet<void>(
                                   context: context,
@@ -254,21 +281,22 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                                                   height: 100,
                                                   width: 100,
                                                   child: IconButton(
-                                                      onPressed: () {
-                                                        String source = "camera";
-                                                        pickImage(source);
-                                                      },
-                                                      icon: const SizedBox(
-                                                        height: 100,
-                                                        width: 100,
-                                                        child: CircleAvatar(
-                                                          child: Icon(
-                                                            Icons.camera_alt_outlined,
-                                                            color: Colors.white,
-                                                            size: 50,
-                                                          ),
+                                                    onPressed: () {
+                                                      String source = "camera";
+                                                      pickImage(source);
+                                                    },
+                                                    icon: const SizedBox(
+                                                      height: 100,
+                                                      width: 100,
+                                                      child: CircleAvatar(
+                                                        child: Icon(
+                                                          Icons.camera_alt_outlined,
+                                                          color: Colors.white,
+                                                          size: 50,
                                                         ),
-                                                      )),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -280,9 +308,11 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                                 );
                               }),
                           hintText: "Send a message",
-                          hintStyle: TextStyle(color: Colors.blue[700]),
-                          border: InputBorder.none),
-                    )),
+                          hintStyle: const TextStyle(color: primaryColor),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
                     GestureDetector(
                       onTap: () {
                         sendMessage();
@@ -290,14 +320,8 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                       child: Container(
                         height: 40,
                         width: 40,
-                        decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [
-                              Color(0x36FFFFFF),
-                              Color(0x0FFFFFFF),
-                            ]),
-                            borderRadius: BorderRadius.circular(40)),
                         padding: const EdgeInsets.all(12),
-                        child: Image.asset("assets/send_message.png"),
+                        child: Image.asset("assets/send.png"),
                       ),
                     ),
                   ],
@@ -315,8 +339,15 @@ class MessageTile extends StatelessWidget {
   final String message;
   final bool isSentByMe;
   final String type;
+  final DateTime time;
 
-  const MessageTile(this.message, this.isSentByMe, this.type, {super.key});
+  const MessageTile(
+    this.message,
+    this.isSentByMe,
+    this.type,
+    this.time, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -326,73 +357,110 @@ class MessageTile extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 8),
             width: MediaQuery.of(context).size.width,
             alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: isSentByMe
-                          ? [const Color(0xff007EF4), const Color(0xff2A75BC)]
-                          : [const Color(0xff424248), const Color(0xff393a3d)]),
-                  borderRadius: isSentByMe
-                      ? const BorderRadius.only(
-                          topLeft: Radius.circular(23),
-                          topRight: Radius.circular(23),
-                          bottomLeft: Radius.circular(23),
-                        )
-                      : const BorderRadius.only(
-                          topLeft: Radius.circular(23),
-                          topRight: Radius.circular(23),
-                          bottomRight: Radius.circular(23),
-                        )),
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
+            child: Column(
+              crossAxisAlignment: isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isSentByMe
+                            ? [
+                                GlobalColors.mainColor,
+                                Colors.blue,
+                              ]
+                            : [
+                                const Color(0xff424248),
+                                const Color(0xff393a3d),
+                              ],
+                      ),
+                      borderRadius: isSentByMe
+                          ? const BorderRadius.only(
+                              topLeft: Radius.circular(23),
+                              topRight: Radius.circular(23),
+                              bottomLeft: Radius.circular(23),
+                            )
+                          : const BorderRadius.only(
+                              topLeft: Radius.circular(23),
+                              topRight: Radius.circular(23),
+                              bottomRight: Radius.circular(23),
+                            )),
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(
+                  height: 4.0,
+                ),
+                Text(
+                  "${time.hour}:${time.minute} ${time.day}/${time.month}/${time.year}",
+                  style: const TextStyle(
+                    fontSize: 10.0,
+                    color: primaryColor,
+                  ),
+                ),
+              ],
             ),
           )
         : Container(
-            height: MediaQuery.of(context).size.height / 2.5,
+            // height: MediaQuery.of(context).size.height / 2.5,
             padding: EdgeInsets.only(left: isSentByMe ? 0 : 18, right: isSentByMe ? 18 : 0),
             margin: const EdgeInsets.symmetric(vertical: 8),
             width: MediaQuery.of(context).size.width,
             alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: isSentByMe
-                            ? [const Color(0xff007EF4), const Color(0xff2A75BC)]
-                            : [const Color(0xff424248), const Color(0xff393a3d)]),
-                    borderRadius: isSentByMe
-                        ? const BorderRadius.only(
-                            topLeft: Radius.circular(23),
-                            topRight: Radius.circular(23),
-                            bottomLeft: Radius.circular(23),
-                          )
-                        : const BorderRadius.only(
-                            topLeft: Radius.circular(23),
-                            topRight: Radius.circular(23),
-                            bottomRight: Radius.circular(23),
-                          )),
-                alignment: Alignment.center,
-                height: MediaQuery.of(context).size.height / 2.5,
-                width: MediaQuery.of(context).size.width / 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GestureDetector(
-                    child: Image.network(message),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ImageViewScreen(
-                                    imageUrl: message,
-                                  )));
-                    },
+            child: Column(
+              crossAxisAlignment: isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: isSentByMe
+                                ? [const Color(0xff007EF4), const Color(0xff2A75BC)]
+                                : [const Color(0xff424248), const Color(0xff393a3d)]),
+                        borderRadius: isSentByMe
+                            ? const BorderRadius.only(
+                                topLeft: Radius.circular(23),
+                                topRight: Radius.circular(23),
+                                bottomLeft: Radius.circular(23),
+                              )
+                            : const BorderRadius.only(
+                                topLeft: Radius.circular(23),
+                                topRight: Radius.circular(23),
+                                bottomRight: Radius.circular(23),
+                              )),
+                    alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height / 2.5,
+                    width: MediaQuery.of(context).size.width / 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        child: Image.network(message),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ImageViewScreen(
+                                        imageUrl: message,
+                                      )));
+                        },
+                      ),
+                    )),
+                const SizedBox(
+                  height: 4.0,
+                ),
+                Text(
+                  "${time.hour}:${time.minute} ${time.day}/${time.month}/${time.year}",
+                  style: const TextStyle(
+                    fontSize: 10.0,
+                    color: primaryColor,
                   ),
-                )),
+                ),
+              ],
+            ),
           );
   }
 }

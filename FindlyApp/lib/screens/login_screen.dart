@@ -6,7 +6,6 @@ import 'package:findly_app/services/global_methods.dart';
 import 'package:findly_app/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../constants/constants.dart';
 
@@ -57,7 +56,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             .get();
         //call the method to log in
         await _auth.signInWithEmailAndPassword(
-            email: snap.docs[0]['Email'], password: _passwordTextController.text.trim());
+          email: snap.docs[0]['Email'],
+          password: _passwordTextController.text.trim(),
+        );
         //pop the page to have a better device performance, then go to UserState service to check on user state (logged in , not logged in)
         if (!mounted) return;
         Navigator.canPop(context) ? Navigator.pop(context) : null;
@@ -66,12 +67,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ));
 
         //Show a message indicating that user is logged in successfully
-        Fluttertoast.showToast(
-          msg: "You have been logged in successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          backgroundColor: Colors.blueGrey,
-          textColor: Colors.white,
-          fontSize: 16.0,
+        GlobalMethods.showToast(
+          "You have been logged in successfully!",
         );
       } // if any errors occur a pop-up message will appear
       catch (error) {

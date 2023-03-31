@@ -2,11 +2,11 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:findly_app/constants/reference_data.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../constants/constants.dart';
@@ -79,6 +79,7 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   final FocusNode _floorNumberFocusNode = FocusNode();
   final FocusNode _roomNumberFocusNode = FocusNode();
   final _editFormKey = GlobalKey<FormState>();
+  String dropDownValue = '';
 
   @override
   void dispose() {
@@ -166,13 +167,9 @@ class _EditAnnouncement extends State<EditAnnouncement> {
           });
         }
         if (mounted) Navigator.canPop(context) ? Navigator.pop(context) : null;
-        //A confirmation message when the announcement is added
-        Fluttertoast.showToast(
-          msg: "Announcement has been updated successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          backgroundColor: Colors.blueGrey,
-          textColor: Colors.white,
-          fontSize: 16.0,
+        //A confirmation message when the announcement is updated
+        GlobalMethods.showToast(
+          "Announcement has been updated successfully!",
         );
       } catch (error) {
         setState(() {});
@@ -362,79 +359,52 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                           height: 8.0,
                         ),
                         DropdownButtonFormField(
-                          focusNode: _annCategoryFocusNode,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 20,
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                              Radius.circular(16),
-                            )),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.black,
-                                  width: 2,
+                            focusNode: _annCategoryFocusNode,
+                            isExpanded: true,
+                            decoration: kInputDecoration,
+                            items: [
+                              const DropdownMenuItem<String>(
+                                  value: '',
+                                  child: Text(
+                                    'Choose Item category',
+                                    style: TextStyle(color: Colors.grey),
+                                  )),
+                              ...ReferenceData.instance.categories
+                                  .map(
+                                    (categoryName) => DropdownMenuItem<String>(
+                                  value: categoryName,
+                                  child: Text(
+                                    categoryName,
+                                    maxLines: 3,
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(16),
-                                )),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: primaryColor,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(16),
-                                )),
-                            errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(16),
-                                ),
-                                borderSide: BorderSide(color: Colors.red)),
-                          ),
-                          items: const [
-                            DropdownMenuItem<String>(
-                                value: '',
-                                child: Text(
-                                  'Choose Item category',
-                                  style: TextStyle(color: Colors.grey),
-                                )),
-                            DropdownMenuItem<String>(
-                                value: 'Electronic devices', child: Text('Electronic devices')),
-                            DropdownMenuItem<String>(
-                                value: 'Electronic accessories',
-                                child: Text('Electronic accessories')),
-                            DropdownMenuItem<String>(value: 'Jewelry', child: Text('Jewelry')),
-                            DropdownMenuItem<String>(
-                                value: 'Medical equipments', child: Text('Medical equipments')),
-                            DropdownMenuItem<String>(
-                                value: 'Personal accessories', child: Text('Personal accessories')),
-                            DropdownMenuItem<String>(value: 'Others', child: Text('Others')),
-                          ],
-                          onChanged: (value) {
-                            annCategory = value.toString();
-                            setState(() {
+                              )
+                                  .toList(),
+                              // const DropdownMenuItem<String>(
+                              //   value: 'Others',
+                              //   child: Text('Others'),
+                              // ),
+                            ],
+                            onChanged: (value) {
                               annCategory = value.toString();
-                            });
-                            FocusScope.of(context).requestFocus(_buildingNameFocusNode);
-                          },
-                          validator: (value) {
-                            if (value == '') {
-                              return 'You must choose';
-                            }
-                            return null;
-                          },
-                          value: widget.itemCategory,
-                        ),
+                              setState(() {
+                                annCategory = value.toString();
+                              });
+                              FocusScope.of(context).requestFocus(_buildingNameFocusNode);
+                            },
+                            validator: (value) {
+                              if (value == '') {
+                                return 'You must choose';
+                              }
+                              return null;
+                            },
+                            value: widget.itemCategory),
                         const SizedBox(
                           height: 20,
                         ),
                         //Building name
                         const Text(
-                          'Bullding name',
+                          'Building name',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -444,177 +414,39 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                           height: 8.0,
                         ),
                         DropdownButtonFormField(
-                            focusNode: _buildingNameFocusNode,
-                            isExpanded: true,
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
+                          focusNode: _buildingNameFocusNode,
+                          isExpanded: true,
+                          decoration: kInputDecoration,
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: '',
+                              child: Text(
+                                'Choose Building name',
+                                style: TextStyle(color: Colors.grey),
                               ),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                Radius.circular(16),
-                              )),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(16),
-                                  )),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: primaryColor,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(16),
-                                  )),
-                              errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(16),
-                                  ),
-                                  borderSide: BorderSide(color: Colors.red)),
                             ),
-                            items: const [
-                              DropdownMenuItem<String>(
-                                  value: '',
-                                  child: Text(
-                                    'Choose Bullding name',
-                                    style: TextStyle(color: Colors.grey),
-                                  )),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Education',
-                                  child: Text(
-                                    'College of Education',
-                                    maxLines: 3,
-                                  )),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Arts',
-                                  child: Text('College of Arts', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Tourism & Cultural Heritage',
-                                  child:
-                                      Text('College of Tourism & Cultural Heritage', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Languages & Translation',
-                                  child: Text('College of Languages & Translation', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Law & Political Science',
-                                  child: Text('College of Law & Political Science', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Business Administration',
-                                  child: Text('College of Business Administration', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Nursing',
-                                  child: Text('College of Nursing', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Pharmacy',
-                                  child: Text('College of Pharmacy', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Medicine',
-                                  child: Text('College of Medicine', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Applied Medical Sciences',
-                                  child: Text('College of Applied Medical Sciences', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Dentistry',
-                                  child: Text('College of Dentistry', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of science',
-                                  child: Text('College of science', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Agricultural and Food Scinces',
-                                  child: Text('College of Agricultural and Food Scinces',
-                                      maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Computer & Information Scinces',
-                                  child: Text('College of Computer & Information Scinces',
-                                      maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'College of Sport Scinces & Physical Activity',
-                                  child: Text('College of Sport Scinces & Physical Activity',
-                                      maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'ACollege of Architecture & PlanningP',
-                                  child: Text('College of Architecture & Planning', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Gate#1', child: Text('Gate#1', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Gate#2', child: Text('Gate#2', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Gate#3', child: Text('Gate#3', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Gate#4', child: Text('Gate#4', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Kindergarten for Scientific Departments',
-                                  child:
-                                      Text('Kindergarten for Scientific Departments', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Kindergarten for Human Departments',
-                                  child: Text('Kindergarten for Human Departments', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Festival Hall & Exhibition Building',
-                                  child: Text('Festival Hall & Exhibition Building', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Research Center & Common Halls',
-                                  child: Text('Research Center & Common Halls', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Prince Naif Research Center',
-                                  child: Text('Prince Naif Research Center', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Princess Sara Bint Abdullah Bin Faisal AlSaud Libraru',
-                                  child: Text(
-                                      'Princess Sara Bint Abdullah Bin Faisal AlSaud Libraru',
-                                      maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Special Needs Center',
-                                  child: Text('Special Needs Center', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Accommodation of Faculty Members',
-                                  child: Text('Accommodation of Faculty Members', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Female Student Housing',
-                                  child: Text('Female Student Housing', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Female Student Housing Services Building',
-                                  child: Text('Female Student Housing Services Building',
-                                      maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Sport Club', child: Text('Sport Club', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Foyer & Central Plaza',
-                                  child: Text('Foyer & Central Plaza', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Administration Building & Supporting Deanships',
-                                  child: Text('Administration Building & Supporting Deanships',
-                                      maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Student Clubs',
-                                  child: Text('Student Clubs', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Main Restaurant',
-                                  child: Text('Main Restaurant', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Admission & Registration',
-                                  child: Text('Admission & Registration', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Student Services Center',
-                                  child: Text('Student Services Center', maxLines: 3)),
-                              DropdownMenuItem<String>(
-                                  value: 'Operational ِAffairs',
-                                  child: Text('Operational ِAffairs', maxLines: 3)),
-                            ],
-                            value: widget.buildingName,
-                            onChanged: (value) {
+                            ...ReferenceData.instance.locations
+                                .map(
+                                  (buildingName) => DropdownMenuItem<String>(
+                                value: buildingName,
+                                child: Text(
+                                  buildingName,
+                                  maxLines: 3,
+                                ),
+                              ),
+                            )
+                                .toList(),
+                          ],
+                          value: widget.buildingName,
+                          onChanged: (value) {
+                            buildingName = value.toString();
+                            setState(() {
                               buildingName = value.toString();
-                              setState(() {
-                                buildingName = value.toString();
-                              });
+                            });
 
-                              FocusScope.of(context).requestFocus(_annDesFocusNode);
-                            }),
+                            FocusScope.of(context).requestFocus(_annDesFocusNode);
+                          },
+                        ),
 
                         const SizedBox(
                           height: 20.0,

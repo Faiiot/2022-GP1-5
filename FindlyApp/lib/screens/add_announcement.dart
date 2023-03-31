@@ -10,7 +10,6 @@ import 'package:findly_app/services/push_notifications_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -128,7 +127,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'roomnumber': roomNumber,
             'floornumber': floorNumber,
             'reported': false,
-            'found': false
+            'found': false,
+            'reportCount': 0
           });
           try {
             QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -189,7 +189,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'roomnumber': roomNumber,
             'floornumber': floorNumber,
             'reported': false,
-            'returned': false
+            'returned': false,
+            'reportCount': 0
           });
         }
 
@@ -251,12 +252,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           ),
         );
         //A confirmation message when the announcement is added
-        Fluttertoast.showToast(
-          msg: "Announcement has been added successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          backgroundColor: Colors.blueGrey,
-          textColor: Colors.white,
-          fontSize: 16.0,
+        GlobalMethods.showToast(
+          "Announcement has been added successfully!",
         );
       } catch (error) {
         setState(() {});
