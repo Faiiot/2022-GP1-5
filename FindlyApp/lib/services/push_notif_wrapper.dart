@@ -99,6 +99,7 @@ class PushApplication extends StatefulWidget {
 }
 
 class _Application extends State<PushApplication> {
+  //a Firebase cloud messaging token
   String? _token;
   String? initialMessage;
 

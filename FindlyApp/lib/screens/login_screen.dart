@@ -18,16 +18,21 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   //create text controllers to validate user input
-  late final TextEditingController _emailTextController = TextEditingController(text: '');
-  late final TextEditingController _memberIDController = TextEditingController(text: '');
-  late final TextEditingController _passwordTextController = TextEditingController(text: '');
+  late final TextEditingController _emailTextController =
+      TextEditingController(text: '');
+  late final TextEditingController _memberIDController =
+      TextEditingController(text: '');
+  late final TextEditingController _passwordTextController =
+      TextEditingController(text: '');
   final FocusNode _passwordFocusNode = FocusNode();
   bool _obscureText = true;
   final _loginFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
-
+  RegExp username = RegExp(r'^[A-Za-z][A-Za-z0-9_]{7,29}$');
+  RegExp studentID =  RegExp(r'^4\d{8}');
   //create a Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -76,7 +81,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           _isLoading = false;
         });
 
-        GlobalMethods.showErrorDialog(error: error.toString(), context: context);
+        GlobalMethods.showErrorDialog(
+          error: error.toString(),
+          context: context,
+        );
       }
     } else {
       debugPrint("form not valid!");
@@ -123,7 +131,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     right: 24.0,
                     bottom: 24.0,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 24.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24.0),
@@ -148,13 +157,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                         TextFormField(
                           textInputAction: TextInputAction.next,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).requestFocus(_passwordFocusNode),
+                          onEditingComplete: () => FocusScope.of(context)
+                              .requestFocus(_passwordFocusNode),
                           validator: (value) {
-                            //we need to edit this
+                            //working on it...
                             if (value!.isEmpty) {
                               return "ID is required!";
                             }
+                            else if( !studentID.hasMatch(value) && !username.hasMatch(value) == true){
+                              // print(studentID.hasMatch(value).toString()+' : '+username.hasMatch(value).toString());
+                              return "Wrong ID format";
+                            }
+
                             return null;
                           },
                           controller: _memberIDController,
@@ -189,8 +203,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 )),
-                            errorBorder:
-                                OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                            errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red)),
                           ),
                         ),
                         const SizedBox(
@@ -221,7 +235,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   _obscureText = !_obscureText;
                                 });
                               },
-                              child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                              child: Icon(_obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
                             ),
                             hintText: "Enter your Password",
                             labelText: "Password",
@@ -249,8 +265,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 )),
-                            errorBorder:
-                                const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                            errorBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.red)),
                           ),
                         ),
 

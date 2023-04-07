@@ -213,11 +213,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ),
         children: [
           const Text(
-            'Today',
+            'Items found today',
             style: TextStyle(
               color: primaryColor,
               fontSize: 20,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
             ),
           ),
           Container(
@@ -317,7 +317,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             children: [
               Expanded(
                 child: dashboardButton(
-                  iconName: "lost_item",
+                  iconName: "lost_icon_screen",
                   label: "Lost",
                   onTap: () {
                     Navigator.push(
@@ -372,7 +372,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ),
               Expanded(
                 child: dashboardButton(
-                  iconName: "found_item",
+                  iconName: "my_announcements2",
                   label: "My Announcement",
                   onTap: () {
                     Navigator.push(
@@ -395,7 +395,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             children: [
               Expanded(
                 child: dashboardButton(
-                  iconName: "chat",
+                  iconName: "dialog",
                   label: "My Chats",
                   onTap: () {
                     Navigator.push(
@@ -484,6 +484,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   "assets/$iconName.png",
                   fit: BoxFit.fill,
                   color: primaryColor,
+
                 ),
               ),
               const SizedBox(

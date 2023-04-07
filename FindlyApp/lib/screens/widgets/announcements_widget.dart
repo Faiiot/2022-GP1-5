@@ -158,7 +158,7 @@ class _AnnouncementState extends State<Announcement> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     color: primaryColor.withOpacity(0.9),
                   ),
                 ),

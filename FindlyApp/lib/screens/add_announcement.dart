@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:findly_app/screens/dialogflow_chatbot_screen.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
@@ -40,8 +41,10 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   late final TextEditingController _itemName = TextEditingController(text: '');
   late final TextEditingController _annDesc = TextEditingController(text: '');
-  late final TextEditingController _floorNumber = TextEditingController(text: '');
-  late final TextEditingController _roomNumber = TextEditingController(text: '');
+  late final TextEditingController _floorNumber =
+      TextEditingController(text: '');
+  late final TextEditingController _roomNumber =
+      TextEditingController(text: '');
   File? imgFile;
 
   final FocusNode _itemNameFocusNode = FocusNode();
@@ -53,6 +56,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   final FocusNode _floorNumberFocusNode = FocusNode();
   final FocusNode _roomNumberFocusNode = FocusNode();
   final _addFormKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -74,8 +78,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   //Method for picking announcement image using camera
   void _pickImageUsingCamera() async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile = await ImagePicker()
+        .pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -84,8 +88,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   //Method for picking announcement image using gallery
   void _pickImageUsingGallery() async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -98,7 +102,10 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
     final String uid = user!.uid;
     final String uniqueImgID = DateTime.now().millisecondsSinceEpoch.toString();
     if (imgFile != null) {
-      final ref = FirebaseStorage.instance.ref().child('images').child('$uniqueImgID.jpg');
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('images')
+          .child('$uniqueImgID.jpg');
       await ref.putFile(imgFile!);
       imageUrl = await ref.getDownloadURL();
     } else {
@@ -110,10 +117,15 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
     if (isValid) {
       final announcementID = const Uuid().v4();
-      setState(() {});
+      setState(() {
+        _isLoading = true;
+      });
       try {
         if (annType == 'lost') {
-          await FirebaseFirestore.instance.collection('lostItem').doc(announcementID).set({
+          await FirebaseFirestore.instance
+              .collection('lostItem')
+              .doc(announcementID)
+              .set({
             'announcementID': announcementID,
             'publishedBy': uid,
             'itemName': itemName,
@@ -127,7 +139,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'roomnumber': roomNumber,
             'floornumber': floorNumber,
             'reported': false,
-            'found': false,
             'reportCount': 0
           });
           try {
@@ -145,8 +156,10 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               log("aaaaaaaaaaaaaa${a.toString()}");
               List<String> fcms = [];
               a.map((element) async {
-                DocumentSnapshot sna =
-                    await FirebaseFirestore.instance.collection("users").doc(element).get();
+                DocumentSnapshot sna = await FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(element)
+                    .get();
                 if (sna.exists) {
                   await InAppNotifications.sendInAppNotification(
                       Timestamp.now().toString(),
@@ -175,7 +188,10 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             log("message${e.toString()}");
           }
         } else {
-          await FirebaseFirestore.instance.collection('foundItem').doc(announcementID).set({
+          await FirebaseFirestore.instance
+              .collection('foundItem')
+              .doc(announcementID)
+              .set({
             'announcementID': announcementID,
             'publishedBy': uid,
             'itemName': itemName,
@@ -189,7 +205,6 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'roomnumber': roomNumber,
             'floornumber': floorNumber,
             'reported': false,
-            'returned': false,
             'reportCount': 0
           });
         }
@@ -209,8 +224,10 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             log("aaaaaaaaaaaaaa${a.toString()}");
             List<String> fcms = [];
             a.map((element) async {
-              DocumentSnapshot sna =
-                  await FirebaseFirestore.instance.collection("users").doc(element).get();
+              DocumentSnapshot sna = await FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(element)
+                  .get();
               if (sna.exists) {
                 await InAppNotifications.sendInAppNotification(
                     Timestamp.now().toString(),
@@ -231,8 +248,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             log("sssseeeeeee${fcms.length}");
             await Future.delayed(const Duration(seconds: 5));
             if (a.isNotEmpty) {
-              PushNotificationController.sendPushNotification(
-                  fcms, "Item Found", " Hi, I have found $itemName in $annCategory");
+              PushNotificationController.sendPushNotification(fcms,
+                  "Item Found", " Hi, I have found $itemName in $annCategory");
             }
           }
         } catch (e) {
@@ -256,9 +273,12 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           "Announcement has been added successfully!",
         );
       } catch (error) {
-        setState(() {});
+        setState(() {
+          _isLoading = false;
+        });
         //if an error occurs a pop-up message
-        GlobalMethods.showErrorDialog(error: error.toString(), context: context);
+        GlobalMethods.showErrorDialog(
+            error: error.toString(), context: context);
         debugPrint("error occurred $error");
       }
     } else {
@@ -321,7 +341,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                     right: 24.0,
                     bottom: 24.0,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 24.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24.0),
@@ -367,9 +388,11 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                               onChanged: (value) {
                                 annType = value.toString(); //check iff it works
                                 setState(() {
-                                  annType = value.toString(); //check iff it works
+                                  annType =
+                                      value.toString(); //check iff it works
                                 });
-                                FocusScope.of(context).requestFocus(_itemNameFocusNode);
+                                FocusScope.of(context)
+                                    .requestFocus(_itemNameFocusNode);
                               },
                               validator: (value) {
                                 if (value == '') {
@@ -393,8 +416,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           ),
                           TextFormField(
                             focusNode: _itemNameFocusNode,
-                            onEditingComplete: () =>
-                                FocusScope.of(context).requestFocus(_annCategoryFocusNode),
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_annCategoryFocusNode),
                             maxLength: 50,
                             controller: _itemName,
                             onFieldSubmitted: (String value) {
@@ -436,7 +459,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(16),
                                   ),
-                                  borderSide: BorderSide(color: Colors.red)),
+                                  borderSide: BorderSide(color: Colors.redAccent)),
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -445,12 +468,29 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                               return null;
                             },
                           ),
-                          const Text(
-                            'Item category *',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children:  [
+                               const Text(
+                                'Item category *',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 4,),
+                              const Text(" Need help? "),
+                              InkWell(
+                                onTap: (){
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const DialogflowChatBotScreen(),
+                                    ),
+                                  );
+                                },
+                                child: AnimatedAlign(duration:const Duration(minutes: 2),curve:Curves.bounceIn,alignment:Alignment.centerLeft,child: Image.asset("assets/chatbot.png",width: MediaQuery.of(context).size.width*0.08,)),
+                              )
+                            ],
                           ),
                           const SizedBox(
                             height: 8.0,
@@ -468,7 +508,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                     )),
                                 ...ReferenceData.instance.categories
                                     .map(
-                                      (categoryName) => DropdownMenuItem<String>(
+                                      (categoryName) =>
+                                          DropdownMenuItem<String>(
                                         value: categoryName,
                                         child: Text(
                                           categoryName,
@@ -477,17 +518,18 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                       ),
                                     )
                                     .toList(),
-                                const DropdownMenuItem<String>(
-                                  value: 'Others',
-                                  child: Text('Others'),
-                                ),
+                                // const DropdownMenuItem<String>(
+                                //   value: 'Others',
+                                //   child: Text('Others'),
+                                // ),
                               ],
                               onChanged: (value) {
                                 annCategory = value.toString();
                                 setState(() {
                                   annCategory = value.toString();
                                 });
-                                FocusScope.of(context).requestFocus(_buildingNameFocusNode);
+                                FocusScope.of(context)
+                                    .requestFocus(_buildingNameFocusNode);
                               },
                               validator: (value) {
                                 if (value == '') {
@@ -541,7 +583,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                 buildingName = value.toString();
                               });
 
-                              FocusScope.of(context).requestFocus(_annDesFocusNode);
+                              FocusScope.of(context)
+                                  .requestFocus(_annDesFocusNode);
                             },
                           ),
 
@@ -560,8 +603,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           ),
                           TextFormField(
                             focusNode: _floorNumberFocusNode,
-                            onEditingComplete: () =>
-                                FocusScope.of(context).requestFocus(_roomNumberFocusNode),
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_roomNumberFocusNode),
                             maxLength: 5,
                             controller: _floorNumber,
                             onFieldSubmitted: (String value) {
@@ -602,7 +645,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(16),
                                   ),
-                                  borderSide: BorderSide(color: Colors.red)),
+                                  borderSide: BorderSide(color: Colors.redAccent)),
                             ),
                           ),
 
@@ -618,8 +661,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           ),
                           TextFormField(
                             focusNode: _roomNumberFocusNode,
-                            onEditingComplete: () =>
-                                FocusScope.of(context).requestFocus(_annCategoryFocusNode),
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_annCategoryFocusNode),
                             maxLength: 5,
                             controller: _roomNumber,
                             onFieldSubmitted: (String value) {
@@ -660,7 +703,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(16),
                                   ),
-                                  borderSide: BorderSide(color: Colors.red)),
+                                  borderSide: BorderSide(color: Colors.redAccent)),
                             ),
                           ),
 
@@ -676,8 +719,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           ),
                           TextFormField(
                             focusNode: _annDesFocusNode,
-                            onEditingComplete: () =>
-                                FocusScope.of(context).requestFocus(_contactChannelFocusNode),
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_contactChannelFocusNode),
                             controller: _annDesc,
                             minLines: 2,
                             maxLines: 5,
@@ -732,7 +775,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                             height: 8.0,
                           ),
                           const Text(
-                            'Another contact channel you prefer *',
+                            'Choose another channel along with private chat *',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -812,12 +855,14 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   child: Center(
                                     child: ElevatedButton(
                                       style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
                                           primaryColor.withOpacity(0.8),
                                         ),
                                         shape: MaterialStateProperty.all(
                                           RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                         ),
                                       ),
@@ -831,18 +876,26 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                               color: Colors.grey[200],
                                               child: Center(
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.all(9.0),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              9.0),
                                                       child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
                                                         children: [
                                                           const Text(
                                                             'Gallery',
                                                             style: TextStyle(
                                                               fontSize: 22,
-                                                              fontWeight: FontWeight.bold,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
                                                             ),
                                                           ),
                                                           SizedBox(
@@ -853,14 +906,17 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                                   //pick by gallery
                                                                   _pickImageUsingGallery();
                                                                 },
-                                                                icon: const SizedBox(
+                                                                icon:
+                                                                    const SizedBox(
                                                                   height: 100,
                                                                   width: 100,
-                                                                  child: CircleAvatar(
+                                                                  child:
+                                                                      CircleAvatar(
                                                                     child: Icon(
                                                                       Icons
                                                                           .photo_size_select_actual_outlined,
-                                                                      color: Colors.white,
+                                                                      color: Colors
+                                                                          .white,
                                                                       size: 50,
                                                                     ),
                                                                   ),
@@ -870,13 +926,16 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                       ),
                                                     ),
                                                     Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
                                                         const Text(
                                                           'Camera',
                                                           style: TextStyle(
                                                             fontSize: 22,
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
                                                         SizedBox(
@@ -887,13 +946,17 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                                 //pick by camera
                                                                 _pickImageUsingCamera();
                                                               },
-                                                              icon: const SizedBox(
+                                                              icon:
+                                                                  const SizedBox(
                                                                 height: 100,
                                                                 width: 100,
-                                                                child: CircleAvatar(
+                                                                child:
+                                                                    CircleAvatar(
                                                                   child: Icon(
-                                                                    Icons.camera_alt_outlined,
-                                                                    color: Colors.white,
+                                                                    Icons
+                                                                        .camera_alt_outlined,
+                                                                    color: Colors
+                                                                        .white,
                                                                     size: 50,
                                                                   ),
                                                                 ),
@@ -931,34 +994,80 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                   ),
                 ),
                 //Add announcement button
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                  ),
-                  child: WideButton(
-                    choice: 1,
-                    width: double.infinity,
-                    title: "Add announcement!",
-                    onPressed: () {
-                      submitFormOnAdd();
-                    },
-                  ),
-                ),
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: CircularProgressIndicator(
+                              backgroundColor: primaryColor,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                        ),
+                        child: WideButton(
+                          choice: 1,
+                          width: double.infinity,
+                          title: "Add announcement!",
+                          onPressed: () {
+                            if (annType == "found") {
+                              GlobalMethods.showCustomizedDialogue(
+                                  title:
+                                      "Are you sure you want to add this announcement?",
+                                  message: "If you proceed the addition, the item will be under your responsibility",
+                                  mainAction: "Yes",
+                                  context: context,
+                                  secondaryAction: "No",
+                                  onPressedMain: () {
+                                    submitFormOnAdd();
+                                    Navigator.pop(context);
+                                  },
+                                  onPressedSecondary: () {
+                                    Navigator.pop(context);
+                                  });
+                            } else {
+                              GlobalMethods.showCustomizedDialogue(
+                                  title:
+                                  "Are you sure you want to add this announcement?",
+                                  mainAction: "Yes",
+                                  context: context,
+                                  secondaryAction: "No",
+                                  onPressedMain: () {
+                                    submitFormOnAdd();
+                                    Navigator.pop(context);
+                                  },
+                                  onPressedSecondary: () {
+                                    Navigator.pop(context);
+                                  });
+
+                            }
+                          },
+                        ),
+                      ),
                 //Cancel button
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 0,
-                  ),
-                  child: WideButton(
-                    choice: 2,
-                    width: double.infinity,
-                    title: "Cancel",
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
+                _isLoading
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 0,
+                        ),
+                        child: WideButton(
+                          choice: 2,
+                          width: double.infinity,
+                          title: "Cancel",
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
               ],
             ),
           ),

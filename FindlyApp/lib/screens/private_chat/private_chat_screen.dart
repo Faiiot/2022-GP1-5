@@ -155,11 +155,11 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
   Future uploadImage() async {
     String fileName = const Uuid().v1();
     int status = 1;
+    final time = DateTime.now().millisecondsSinceEpoch;
     Map<String, dynamic> msg = {
-      "message": "",
+      "message": "Image",
       "sender": _auth.currentUser!.uid.toString(),
-      "time": DateTime.now()
-          .millisecondsSinceEpoch, // this will be more helpful for ordering the messages
+      "time": time, // this will be more helpful for ordering the messages
       "date": DateTime.now(), // to be used for UI details
       "type": "img",
     };
@@ -174,6 +174,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     if (status == 1) {
       String imageUrl = await uploadTask.ref.getDownloadURL();
       chatMethods.updateChatImageMessageField(widget.chatroomID, fileName, imageUrl);
+      chatMethods.updateLastMessageOfChatroom("Image", widget.chatroomID, time);
       debugPrint(imageUrl);
     }
   }

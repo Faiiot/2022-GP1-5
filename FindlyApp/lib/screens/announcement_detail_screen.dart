@@ -38,7 +38,8 @@ class AnnouncementDetailsScreen extends StatefulWidget {
   });
 
   @override
-  State<AnnouncementDetailsScreen> createState() => _AnnouncementDetailsScreenState();
+  State<AnnouncementDetailsScreen> createState() =>
+      _AnnouncementDetailsScreenState();
 }
 
 class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
@@ -66,7 +67,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   }
 
   void fetchAnnouncementDetails() async {
-    final String collection = announcementType == "lost" ? "lostItem" : "foundItem";
+    final String collection =
+        announcementType == "lost" ? "lostItem" : "foundItem";
     final doc = await FirebaseFirestore.instance
         .collection(collection)
         .where(
@@ -82,7 +84,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     announcementImg = announcement["url"];
     buildingName = announcement['buildingName'];
     contactChannel = announcement['contact'];
-    theChannel = contactChannel == "Phone Number" ? widget.phoneNumber : widget.email;
+    theChannel =
+        contactChannel == "Phone Number" ? widget.phoneNumber : widget.email;
     announcementDes = announcement["announcementDes"];
     roomNumber = announcement["roomnumber"];
     floorNumber = announcement["floornumber"];
@@ -160,14 +163,25 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                 },
                 icon: const Icon(
                   Icons.delete_forever,
-                  color: Colors.red,
+                  color: Colors.redAccent,
                 )),
           if (!sameUser())
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: GestureDetector(
                 onTap: () async {
-                  await report();
+                  GlobalMethods.showCustomizedDialogue(
+                      title:
+                          "Are you sure you want to report this item announcement?",
+                      mainAction: "Yes",
+                      context: context,
+                      secondaryAction: "No",
+                      onPressedMain: () async {
+                        await report();
+                      },
+                      onPressedSecondary: () {
+                        Navigator.pop(context);
+                      });
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.red.shade100,
@@ -181,17 +195,6 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
           widget.profile
               ? IconButton(
                   onPressed: () {
-                    print(itemName);
-                    print(announcementType);
-                    print(itemCategory);
-                    // print(postDate.toString());
-                    print(buildingName);
-                    print(contactChannel);
-                    print(theChannel);
-                    print(widget.publishedBy);
-                    print(announcementDes);
-                    print(roomNumber);
-                    print(floorNumber);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -223,7 +226,10 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       ),
       body: fetchingData
           ? const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                backgroundColor: primaryColor,
+                color: Colors.white,
+              ),
             )
           : SingleChildScrollView(
               child: Padding(
@@ -241,7 +247,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                             )
                           : Container(
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.blue, width: 3),
+                                border:
+                                    Border.all(color: Colors.blue, width: 3),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               padding: const EdgeInsets.all(4.0),
@@ -291,7 +298,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           children: [
                             Text(
                               "${announcementType.toUpperCase()} ITEM",
-                              style: TextStyles.alertDialogueMainButtonTextStyle,
+                              style:
+                                  TextStyles.alertDialogueMainButtonTextStyle,
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -327,7 +335,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Text(
                                     itemCategory,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -349,7 +358,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                   child: Text(
                                     "$buildingName, $floorNumber, $roomNumber",
                                     maxLines: 2,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -369,9 +379,12 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Text(
-                                    Dates.parsedDate(postDate).toString().substring(0, 10),
+                                    Dates.parsedDate(postDate)
+                                        .toString()
+                                        .substring(0, 10),
                                     maxLines: 2,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -393,7 +406,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                   child: Text(
                                     widget.publishedBy,
                                     maxLines: 2,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -405,7 +419,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           Row(
                             children: [
                               Icon(
-                                contactChannel == "Phone Number" ? Icons.phone : Icons.email,
+                                contactChannel == "Phone Number"
+                                    ? Icons.phone
+                                    : Icons.email,
                                 color: GlobalColors.mainColor,
                               ),
                               const SizedBox(width: 8.0),
@@ -415,7 +431,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                   child: Text(
                                     theChannel,
                                     maxLines: 2,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -424,7 +441,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           Card(
                             margin: const EdgeInsets.only(top: 16, bottom: 16),
                             elevation: 7,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
@@ -479,7 +497,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                         child: WideButton(
                           choice: 2,
                           width: double.infinity,
-                          title: contactChannel == "Phone Number" ? "Call Now" : "Send an Email",
+                          title: contactChannel == "Phone Number"
+                              ? "Call Now"
+                              : "Send an Email",
                           onPressed: () {
                             contactChannel == "Phone Number"
                                 ? GlobalMethods.makePhoneCall(theChannel)
@@ -543,7 +563,10 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   }
 
   Future<void> deletedDbAnnouncement(String collection) async {
-    await FirebaseFirestore.instance.collection(collection).doc(widget.announcementID).delete();
+    await FirebaseFirestore.instance
+        .collection(collection)
+        .doc(widget.announcementID)
+        .delete();
     if (!mounted) return;
     Navigator.pop(context);
     Navigator.pop(context);
@@ -553,28 +576,27 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   }
 
   Future<void> report() async {
-    //print(count);
     if (widget.reported != true) {
       var count = widget.reportCount;
       count++;
       debugPrint(count.toString());
       if (widget.reportCount == 2) {
-        await FirebaseFirestore.instance.collection('reportedItem').doc(widget.announcementID).set({
-          'announcementID': widget.announcementID,
-          'publishedBy': widget.publishedBy,
-          'itemName': itemName,
-          'itemCategory': itemCategory,
-          'announcementDes': announcementDes,
-          'announcementType': announcementType,
-          'contact': theChannel,
-          'url': announcementImg,
-          'buildingName': buildingName,
-          'annoucementDate': postDate,
-          'roomnumber': roomNumber,
-          'floornumber': floorNumber,
-          'reported': true,
-          'reportCount': count,
-        });
+        // await FirebaseFirestore.instance.collection('reportedItem').doc(widget.announcementID).set({
+        //   'announcementID': widget.announcementID,
+        //   'publishedBy': widget.publishedBy,
+        //   'itemName': itemName,
+        //   'itemCategory': itemCategory,
+        //   'announcementDes': announcementDes,
+        //   'announcementType': announcementType,
+        //   'contact': theChannel,
+        //   'url': announcementImg,
+        //   'buildingName': buildingName,
+        //   'annoucementDate': postDate,
+        //   'roomnumber': roomNumber,
+        //   'floornumber': floorNumber,
+        //   'reported': true,
+        //   'reportCount': count,
+        // });
         if (announcementType == 'lost') {
           await FirebaseFirestore.instance
               .collection('lostItem')

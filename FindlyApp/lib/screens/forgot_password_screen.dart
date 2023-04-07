@@ -2,7 +2,7 @@ import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 
 import '../constants/constants.dart';
 

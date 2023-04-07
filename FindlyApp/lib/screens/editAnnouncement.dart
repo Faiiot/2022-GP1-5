@@ -1,6 +1,5 @@
 import 'dart:core';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/reference_data.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
@@ -8,7 +7,6 @@ import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../constants/constants.dart';
 import '../constants/global_colors.dart';
 import '../constants/text_styles.dart';
@@ -63,10 +61,14 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   late String floorNumber = widget.floorNumber;
   late String roomNumber = widget.roomNumber;
 
-  late final TextEditingController _itemName = TextEditingController(text: widget.itemName);
-  late final TextEditingController _annDesc = TextEditingController(text: widget.announcementDes);
-  late final TextEditingController _floorNumber = TextEditingController(text: widget.floorNumber);
-  late final TextEditingController _roomNumber = TextEditingController(text: widget.roomNumber);
+  late final TextEditingController _itemName =
+      TextEditingController(text: widget.itemName);
+  late final TextEditingController _annDesc =
+      TextEditingController(text: widget.announcementDes);
+  late final TextEditingController _floorNumber =
+      TextEditingController(text: widget.floorNumber);
+  late final TextEditingController _roomNumber =
+      TextEditingController(text: widget.roomNumber);
 
   File? imgFile;
 
@@ -79,6 +81,7 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   final FocusNode _floorNumberFocusNode = FocusNode();
   final FocusNode _roomNumberFocusNode = FocusNode();
   final _editFormKey = GlobalKey<FormState>();
+  bool _isLoading = false;
   String dropDownValue = '';
 
   @override
@@ -101,8 +104,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
 
   //Method for picking announcement image using camera
   void _pickImageUsingCamera() async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile = await ImagePicker()
+        .pickImage(source: ImageSource.camera, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -111,8 +114,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
 
   //Method for picking announcement image using gallery
   void _pickImageUsingGallery() async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
+    XFile? pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
     //to show the image to the user
     setState(() {
       imgFile = File(pickedFile!.path);
@@ -123,7 +126,10 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   void submitFormOnUpdate() async {
     final String uniqueImgID = DateTime.now().millisecondsSinceEpoch.toString();
     if (imgFile != null) {
-      final ref = FirebaseStorage.instance.ref().child('images').child('$uniqueImgID.jpg');
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('images')
+          .child('$uniqueImgID.jpg');
       await ref.putFile(imgFile!);
       imageUrl = await ref.getDownloadURL();
     } else {
@@ -133,7 +139,9 @@ class _EditAnnouncement extends State<EditAnnouncement> {
     if (mounted) FocusScope.of(context).unfocus();
 
     if (isValid) {
-      setState(() {});
+      setState(() {
+        _isLoading = true;
+      });
       try {
         if (annType == 'lost') {
           await FirebaseFirestore.instance
@@ -173,8 +181,12 @@ class _EditAnnouncement extends State<EditAnnouncement> {
         );
       } catch (error) {
         setState(() {});
+        setState(() {
+          _isLoading = false;
+        });
         //if an error occurs a pop-up message
-        GlobalMethods.showErrorDialog(error: error.toString(), context: context);
+        GlobalMethods.showErrorDialog(
+            error: error.toString(), context: context);
         debugPrint("error occurred $error");
       }
     } else {
@@ -237,7 +249,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                     right: 24.0,
                     bottom: 24.0,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 24.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24.0),
@@ -270,7 +283,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                               children: [
                                 Text(
                                   "${widget.announcementType.toUpperCase()} ITEM",
-                                  style: TextStyles.alertDialogueMainButtonTextStyle,
+                                  style: TextStyles
+                                      .alertDialogueMainButtonTextStyle,
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -293,8 +307,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                         ),
                         TextFormField(
                           focusNode: _itemNameFocusNode,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).requestFocus(_annCategoryFocusNode),
+                          onEditingComplete: () => FocusScope.of(context)
+                              .requestFocus(_annCategoryFocusNode),
                           maxLength: 50,
                           controller: _itemName,
                           onFieldSubmitted: (String value) {
@@ -372,13 +386,13 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                               ...ReferenceData.instance.categories
                                   .map(
                                     (categoryName) => DropdownMenuItem<String>(
-                                  value: categoryName,
-                                  child: Text(
-                                    categoryName,
-                                    maxLines: 3,
-                                  ),
-                                ),
-                              )
+                                      value: categoryName,
+                                      child: Text(
+                                        categoryName,
+                                        maxLines: 3,
+                                      ),
+                                    ),
+                                  )
                                   .toList(),
                               // const DropdownMenuItem<String>(
                               //   value: 'Others',
@@ -390,7 +404,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                               setState(() {
                                 annCategory = value.toString();
                               });
-                              FocusScope.of(context).requestFocus(_buildingNameFocusNode);
+                              FocusScope.of(context)
+                                  .requestFocus(_buildingNameFocusNode);
                             },
                             validator: (value) {
                               if (value == '') {
@@ -428,13 +443,13 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                             ...ReferenceData.instance.locations
                                 .map(
                                   (buildingName) => DropdownMenuItem<String>(
-                                value: buildingName,
-                                child: Text(
-                                  buildingName,
-                                  maxLines: 3,
-                                ),
-                              ),
-                            )
+                                    value: buildingName,
+                                    child: Text(
+                                      buildingName,
+                                      maxLines: 3,
+                                    ),
+                                  ),
+                                )
                                 .toList(),
                           ],
                           value: widget.buildingName,
@@ -444,7 +459,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                               buildingName = value.toString();
                             });
 
-                            FocusScope.of(context).requestFocus(_annDesFocusNode);
+                            FocusScope.of(context)
+                                .requestFocus(_annDesFocusNode);
                           },
                         ),
 
@@ -463,8 +479,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                         ),
                         TextFormField(
                           focusNode: _floorNumberFocusNode,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).requestFocus(_roomNumberFocusNode),
+                          onEditingComplete: () => FocusScope.of(context)
+                              .requestFocus(_roomNumberFocusNode),
                           maxLength: 5,
                           controller: _floorNumber,
                           onFieldSubmitted: (String value) {
@@ -523,8 +539,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                         ),
                         TextFormField(
                           focusNode: _roomNumberFocusNode,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).requestFocus(_annCategoryFocusNode),
+                          onEditingComplete: () => FocusScope.of(context)
+                              .requestFocus(_annCategoryFocusNode),
                           maxLength: 5,
                           controller: _roomNumber,
                           onFieldSubmitted: (String value) {
@@ -584,8 +600,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                         ),
                         TextFormField(
                           focusNode: _annDesFocusNode,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).requestFocus(_contactChannelFocusNode),
+                          onEditingComplete: () => FocusScope.of(context)
+                              .requestFocus(_contactChannelFocusNode),
                           controller: _annDesc,
                           minLines: 2,
                           maxLines: 5,
@@ -693,8 +709,10 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                     style: TextStyle(color: Colors.grey),
                                   )),
                               DropdownMenuItem<String>(
-                                  value: 'Phone Number', child: Text('Phone Number')),
-                              DropdownMenuItem<String>(value: 'Email', child: Text('Email'))
+                                  value: 'Phone Number',
+                                  child: Text('Phone Number')),
+                              DropdownMenuItem<String>(
+                                  value: 'Email', child: Text('Email'))
                             ],
                             onChanged: (value) {
                               contactChanel = value.toString();
@@ -764,18 +782,25 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                             color: Colors.grey[200],
                                             child: Center(
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
                                                 children: [
                                                   Padding(
-                                                    padding: const EdgeInsets.all(9.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            9.0),
                                                     child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
                                                         const Text(
                                                           'Gallery',
                                                           style: TextStyle(
                                                             fontSize: 22,
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
                                                         SizedBox(
@@ -786,14 +811,17 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                                                 //pick by gallery
                                                                 _pickImageUsingGallery();
                                                               },
-                                                              icon: const SizedBox(
+                                                              icon:
+                                                                  const SizedBox(
                                                                 height: 100,
                                                                 width: 100,
-                                                                child: CircleAvatar(
+                                                                child:
+                                                                    CircleAvatar(
                                                                   child: Icon(
                                                                     Icons
                                                                         .photo_size_select_actual_outlined,
-                                                                    color: Colors.white,
+                                                                    color: Colors
+                                                                        .white,
                                                                     size: 50,
                                                                   ),
                                                                 ),
@@ -803,13 +831,16 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                                     ),
                                                   ),
                                                   Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       const Text(
                                                         'Camera',
                                                         style: TextStyle(
                                                           fontSize: 22,
-                                                          fontWeight: FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                         ),
                                                       ),
                                                       SizedBox(
@@ -820,13 +851,17 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                                               //pick by camera
                                                               _pickImageUsingCamera();
                                                             },
-                                                            icon: const SizedBox(
+                                                            icon:
+                                                                const SizedBox(
                                                               height: 100,
                                                               width: 100,
-                                                              child: CircleAvatar(
+                                                              child:
+                                                                  CircleAvatar(
                                                                 child: Icon(
-                                                                  Icons.camera_alt_outlined,
-                                                                  color: Colors.white,
+                                                                  Icons
+                                                                      .camera_alt_outlined,
+                                                                  color: Colors
+                                                                      .white,
                                                                   size: 50,
                                                                 ),
                                                               ),
@@ -865,35 +900,51 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                     ),
                   ),
                 ),
-                //Add announcement button
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                  ),
-                  child: WideButton(
-                    choice: 1,
-                    width: double.infinity,
-                    title: "Update announcement!",
-                    onPressed: () {
-                      submitFormOnUpdate();
-                    },
-                  ),
-                ),
+                //edit announcement button
+                _isLoading
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: CircularProgressIndicator(
+                              backgroundColor: primaryColor,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                        ),
+                        child: WideButton(
+                          choice: 1,
+                          width: double.infinity,
+                          title: "Update announcement!",
+                          onPressed: () {
+                            submitFormOnUpdate();
+                          },
+                        ),
+                      ),
                 //Cancel button
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 0,
-                  ),
-                  child: WideButton(
-                    choice: 2,
-                    width: double.infinity,
-                    title: "Cancel",
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
+                _isLoading
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 0,
+                        ),
+                        child: WideButton(
+                          choice: 2,
+                          width: double.infinity,
+                          title: "Cancel",
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
               ],
             ),
           ),

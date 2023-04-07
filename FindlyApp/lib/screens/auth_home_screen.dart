@@ -23,10 +23,10 @@ class AuthHomeScreen extends StatelessWidget {
               padding: const EdgeInsets.only(
                 left: 24,
                 right: 24,
+                bottom: 6
               ),
               child: Image.asset(
-                "assets/findly.png",
-                color: Colors.black,
+                "assets/FindlyBlue.png",
               ),
             ),
             const Padding(

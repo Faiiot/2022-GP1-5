@@ -33,44 +33,46 @@ class GlobalMethods {
     required String error,
     required BuildContext context,
   }) {
-    String result = getMessage(error);
+    String message = getMessage(error);
+    if(message == "The password is invalid or the user does not have a password."){
+      message = "Member ID or password is incorrect !";
+    }
+    if(message == "RangeError (index): Invalid value: Valid value range is empty: 0" ){
+      message = "Could not find an account related to this member ID !";
+    }
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.error,
-                  color: Colors.redAccent,
-                ),
-              ),
-              Flexible(
-                child: Text(result),
-              ),
-            ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
           ),
+          title: const Text("Something went wrong!"),
+          titleTextStyle: TextStyles.alertDialogueTitleTextStyle,
+          backgroundColor: Colors.white,
           content: Text(
-            result,
-            style: const TextStyle(
-              color: Colors.red,
-              fontSize: 20,
-            ),
+            message,
+            style: TextStyles.alertDialogueMessageTextStyle,
           ),
+          elevation: 7,
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.canPop(context) ? Navigator.pop(context) : null;
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(
-                  color: Colors.red,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: DialogueButton(
+                    choice: 1,
+                    title: "OK",
+                    onPressed: () {
+                      Navigator.canPop(context) ? Navigator.pop(context) : null;
+                    },
+                  ),
                 ),
-              ),
-            )
+                const SizedBox(
+                  width: 12,
+                ),
+              ],
+            ),
           ],
         );
       },
@@ -86,7 +88,8 @@ class GlobalMethods {
     if (selectedDate != null) {
       data.retainWhere(
         (datum) {
-          return Dates.parsedDate(datum['annoucementDate']).isAfter(selectedDate);
+          return Dates.parsedDate(datum['annoucementDate'])
+              .isAfter(selectedDate);
         },
       );
     }
@@ -117,7 +120,8 @@ class GlobalMethods {
     //Resetting the value before assigning it a new one
     ReferenceData.instance.returnedItems = 0;
 
-    QuerySnapshot lostItemSnapshot = await FirebaseFirestore.instance.collection('lostItem').get();
+    QuerySnapshot lostItemSnapshot =
+        await FirebaseFirestore.instance.collection('lostItem').get();
     ReferenceData.instance.returnedItems += lostItemSnapshot.docs
         .where(
           (e) => (e.data() as Map)["found"] == true,

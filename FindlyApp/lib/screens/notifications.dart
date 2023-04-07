@@ -66,6 +66,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       leading: const Icon(
                         Icons.notifications_none,
+                        color: primaryColor,
                         size: 32,
                       ),
                       title: Text(
