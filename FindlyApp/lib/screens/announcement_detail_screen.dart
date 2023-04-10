@@ -115,11 +115,13 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     //generating the chatroom id
     String chatroomID = chatMethods.generateChatroomId(uid, widget.publisherID);
     //chatroom info
+    final time = DateTime.now().millisecondsSinceEpoch;
     Map<String, dynamic> chatroomMap = {
       "users": users,
       "chatroomID": chatroomID,
       "usersNames": usersNames,
       "lastMessage": "",
+      "lastMessageTime": time,
     };
     chatMethods.createChatRoom(chatroomID, chatroomMap);
     if (!mounted) return;
@@ -238,12 +240,12 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      height: 300,
+                      height: 400,
                       width: double.infinity,
                       child: announcementImg != ""
                           ? Image.network(
                               announcementImg,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fill,
                             )
                           : Container(
                               decoration: BoxDecoration(

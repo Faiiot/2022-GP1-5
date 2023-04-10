@@ -54,7 +54,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
           time,
         );
       });
-      PushNotificationController.getUserAndSendPush(msgController.text, widget.peerId);
+      PushNotificationController.getUserAndSendPush(msgController.text, widget.peerId,widget.chatroomID);
       msgController.clear();
     }
   }

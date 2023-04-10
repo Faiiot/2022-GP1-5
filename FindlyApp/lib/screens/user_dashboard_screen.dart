@@ -213,7 +213,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         ),
         children: [
           const Text(
-            'Items found today',
+            'Items found recently!',
             style: TextStyle(
               color: primaryColor,
               fontSize: 20,
@@ -237,7 +237,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("foundItem")
-                  .limit(5)
+                  .limit(5).orderBy('annoucementDate',descending: true)
                   .snapshots()
                   .asBroadcastStream(),
               builder: (context, snapshot) {

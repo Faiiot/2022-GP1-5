@@ -4,7 +4,6 @@ import 'package:findly_app/screens/change_password_screen.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-
 import '../constants/constants.dart';
 import '../constants/text_styles.dart';
 import '../services/global_methods.dart';
@@ -137,7 +136,7 @@ class UserProfileState extends State<UserProfilePage> {
                   fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 12.0),
               Text(
                 fullName,
                 style: const TextStyle(
@@ -156,7 +155,7 @@ class UserProfileState extends State<UserProfilePage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 12.0),
               Text(
                 id,
                 style: const TextStyle(
@@ -175,6 +174,7 @@ class UserProfileState extends State<UserProfilePage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              const SizedBox(height: 12.0),
               Row(
                 children: [
                   Expanded(
@@ -187,60 +187,60 @@ class UserProfileState extends State<UserProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      GlobalMethods.showCustomizedDialogue(
-                        context: context,
-                        title: "Update",
-                        content: ReactiveForm(
-                          formGroup: userInfo,
-                          child: buildTextField(
-                            label: "Email address *",
-                            prefixIcon: Icons.mail,
-                            formControlName: "email",
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                        ),
-                        mainAction: "Update",
-                        secondaryAction: "Cancel",
-                        onPressedMain: () async {
-                          final bool isInvalidEmail = !userInfo.control("email").valid;
-                          if (isInvalidEmail) return;
-                          try {
-                            await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(widget.userID)
-                                .update(
-                              {
-                                'Email': userInfo.control("email").value,
-                              },
-                            );
-                            await getUserInfo();
-                            await GlobalMethods.showToast(
-                              "Email updated successfully",
-                            );
-                            if (mounted) Navigator.pop(context);
-                          } catch (error) {
-                            GlobalMethods.showErrorDialog(
-                              context: context,
-                              error: error.toString(),
-                            );
-                          }
-                        },
-                        onPressedSecondary: () {
-                          userInfo.reset();
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                    icon: const Icon(
-                      Icons.edit,
-                      color: primaryColor,
-                    ),
-                  ),
+                  // const SizedBox(
+                  //   width: 4,
+                  // ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     GlobalMethods.showCustomizedDialogue(
+                  //       context: context,
+                  //       title: "Update",
+                  //       content: ReactiveForm(
+                  //         formGroup: userInfo,
+                  //         child: buildTextField(
+                  //           label: "Email address *",
+                  //           prefixIcon: Icons.mail,
+                  //           formControlName: "email",
+                  //           keyboardType: TextInputType.emailAddress,
+                  //         ),
+                  //       ),
+                  //       mainAction: "Update",
+                  //       secondaryAction: "Cancel",
+                  //       onPressedMain: () async {
+                  //         final bool isInvalidEmail = !userInfo.control("email").valid;
+                  //         if (isInvalidEmail) return;
+                  //         try {
+                  //           await FirebaseFirestore.instance
+                  //               .collection('users')
+                  //               .doc(widget.userID)
+                  //               .update(
+                  //             {
+                  //               'Email': userInfo.control("email").value,
+                  //             },
+                  //           );
+                  //           await getUserInfo();
+                  //           await GlobalMethods.showToast(
+                  //             "Email updated successfully",
+                  //           );
+                  //           if (mounted) Navigator.pop(context);
+                  //         } catch (error) {
+                  //           GlobalMethods.showErrorDialog(
+                  //             context: context,
+                  //             error: error.toString(),
+                  //           );
+                  //         }
+                  //       },
+                  //       onPressedSecondary: () {
+                  //         userInfo.reset();
+                  //         Navigator.pop(context);
+                  //       },
+                  //     );
+                  //   },
+                  //   icon: const Icon(
+                  //     Icons.edit,
+                  //     color: primaryColor,
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(

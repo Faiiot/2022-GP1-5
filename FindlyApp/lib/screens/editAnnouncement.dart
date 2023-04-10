@@ -2,6 +2,7 @@ import 'dart:core';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/reference_data.dart';
+import 'package:findly_app/screens/dialogflow_chatbot_screen.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -362,12 +363,29 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                           height: 20,
                         ),
                         // Category
-                        const Text(
-                          'Item category *',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children:  [
+                            const Text(
+                              'Item category *',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4,),
+                            const Text(" Need help? "),
+                            InkWell(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const DialogflowChatBotScreen(),
+                                  ),
+                                );
+                              },
+                              child: AnimatedAlign(duration:const Duration(minutes: 2),curve:Curves.bounceIn,alignment:Alignment.centerLeft,child: Image.asset("assets/chatbot.png",width: MediaQuery.of(context).size.width*0.08,)),
+                            )
+                          ],
                         ),
                         const SizedBox(
                           height: 8.0,
@@ -924,8 +942,28 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                           width: double.infinity,
                           title: "Update announcement!",
                           onPressed: () {
-                            submitFormOnUpdate();
-                          },
+                            final isValid = _editFormKey.currentState!
+                              .validate();
+                          if (!mounted) return;
+                          FocusScope.of(context).unfocus();
+                          if (isValid) {
+                              GlobalMethods.showCustomizedDialogue(
+                                  title:
+                                  "Are you sure you want to edit this announcement?",
+                                  mainAction: "Yes",
+                                  context: context,
+                                  secondaryAction: "No",
+                                  onPressedMain: () {
+                                    submitFormOnUpdate();
+                                    Navigator.pop(context);
+                                  },
+                                  onPressedSecondary: () {
+                                    Navigator.pop(context);
+                                  });
+                          }
+                          else {
+                            debugPrint("form not valid!");
+                          }},
                         ),
                       ),
                 //Cancel button

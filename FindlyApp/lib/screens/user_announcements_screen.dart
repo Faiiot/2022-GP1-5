@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:findly_app/screens/widgets/announcements_widget.dart';
+import 'package:findly_app/services/global_methods.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/constants.dart';
@@ -14,7 +15,8 @@ class UserAnnouncementsScreen extends StatefulWidget {
   });
 
   @override
-  State<UserAnnouncementsScreen> createState() => _UserAnnouncementsScreenState();
+  State<UserAnnouncementsScreen> createState() =>
+      _UserAnnouncementsScreenState();
 }
 
 class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
@@ -112,7 +114,9 @@ class _StreamBuilderWidget extends StatelessWidget {
         } else if (snapshot.connectionState == ConnectionState.active) {
           //if the collection snapshot is empty
           if (snapshot.data!.docs.isNotEmpty) {
-            final data = snapshot.data!.docs;
+            List data = snapshot.data!.docs;
+            //
+            // data = GlobalMethods.quickSortAnnouncement(data);
             return GridView.builder(
               itemCount: data.length,
               padding: const EdgeInsets.all(
@@ -147,8 +151,12 @@ class _StreamBuilderWidget extends StatelessWidget {
             return const Center(
               //if no announcement was uploaded
               child: Text(
-                "No Announcements has been uploaded yet!",
-                style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                "No Announcements has\n been uploaded yet!",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
               ),
             );
           }

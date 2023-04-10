@@ -6,16 +6,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 class InAppNotifications {
-  static Map<String, dynamic> buildInAppNotification(String message,
-      String receiverId, String title, String notifyBy, String postId) {
+  static Map<String, dynamic> buildInAppNotification(String notificationID,String message,
+      String receiverId, String title, String notifyBy, String sourceId, String type,) {
     Map<String, dynamic> body = {
+      'notificationID': notificationID,
+      'type': type,
       'message': message,
-      "post_id": postId,
+      "source_id": sourceId,
       'is_seen': false,
       'notify_to': receiverId,
       'notify_by': notifyBy,
-      'created_at': Timestamp.now(),
-      'title': title
+      'created_at':DateTime.now().millisecondsSinceEpoch,
+      'title': title,
     };
     return body;
   }
@@ -25,24 +27,25 @@ class InAppNotifications {
         .collection("notifications")
         .doc(key)
         .set(body);
-    log("Inapp sent: $body");
+    log("******** Inapp sent: $body ********");
   }
 }
 
 class PushNotificationController {
   static String fcm = '';
-  static Future<void> getUserAndSendPush(String body, String userId) async {
+  static Future<void> getUserAndSendPush(String body,String receiverId, String chatroomID) async {
     var current = FirebaseAuth.instance.currentUser;
-    DocumentSnapshot sna =
-        await FirebaseFirestore.instance.collection("users").doc(userId).get();
-    if (sna.exists) {
-      var a = sna.data() as Map;
+    DocumentSnapshot snap =
+        await FirebaseFirestore.instance.collection("users").doc(current!.uid).get();
+    if (snap.exists) {
+      var a = snap.data() as Map;
       var title = (a['firstName'] ?? "") + " " + (a['LastName'] ?? "");
-      log("User: ${sna.data()}");
+      log("User: ${snap.data()}");
+      String time = Timestamp.now().toString();
       await InAppNotifications.sendInAppNotification(
-          Timestamp.now().toString(),
+          time,
           InAppNotifications.buildInAppNotification(
-              body, userId, title, current!.uid, ""));
+              time,body, receiverId, title, current!.uid, chatroomID, "chat",));
 
       // final Map<String, dynamic> doc = sna.data as Map<String, dynamic>;
 

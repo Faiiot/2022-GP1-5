@@ -120,6 +120,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
       setState(() {
         _isLoading = true;
       });
+
       try {
         if (annType == 'lost') {
           await FirebaseFirestore.instance
@@ -142,45 +143,41 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             'reportCount': 0
           });
           try {
-            QuerySnapshot snapshot = await FirebaseFirestore.instance
-                .collection('foundItem')
-                .where("itemCategory", isEqualTo: annCategory)
-                .get();
-            if (snapshot.docs.isNotEmpty) {
-              var snapData = snapshot.docs.map((e) {
-                var data = (e.data() as Map<String, dynamic>)['publishedBy'];
-                log(data);
-                return data;
-              });
-              var a = snapData.toList().toSet().toList();
-              log("aaaaaaaaaaaaaa${a.toString()}");
+            List<String> publishers =
+            await getPublishers(isLost: true, cat: annCategory);
+            if (publishers.isNotEmpty) {
+              log("all Publishers:  ${publishers.toString()}");
               List<String> fcms = [];
-              a.map((element) async {
-                DocumentSnapshot sna = await FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(element)
-                    .get();
-                if (sna.exists) {
+              await Future.forEach(publishers, (element) async {
+                var user = allUsers.firstWhere((user) => user['id'] == element,
+                    orElse: () => {});
+                if (user == {}) {
+                  throw Exception("User Not found");
+                }
+                log("\n\nUser: $user\n\n");
+                String userFcm = user['fcm'] ?? "";
+                if (userFcm.isNotEmpty) {
+                  fcms.add(userFcm);
+                }
+                String notificationTime = Timestamp.now().toString();
+                if (element != uid) {
                   await InAppNotifications.sendInAppNotification(
-                      Timestamp.now().toString(),
+                      notificationTime,
                       InAppNotifications.buildInAppNotification(
-                          " Hi, I lost $itemName in $annCategory",
-                          element,
-                          "Item Lost",
-                          uid,
-                          announcementID));
-                  // final Map<String, dynamic> doc = sna.data as Map<String, dynamic>;
-                  var a = sna.data() as Map;
-                  log(sna.data().toString());
-                  if (a.isNotEmpty) {
-                    fcms.add(a['fcm'] ?? "");
-                  }
+                        notificationTime,
+                        "Hi, I have lost $itemName in $annCategory",
+                        element,
+                        "Lost item",
+                        uid,
+                        announcementID,
+                        "lost",
+                      ));
                 }
               });
               log("All FCMs: ${fcms.length}");
-              await Future.delayed(const Duration(seconds: 5));
-              if (a.isNotEmpty) {
-                PushNotificationController.sendPushNotification(
+              await Future.delayed(const Duration(seconds: 1));
+              if (fcms.isNotEmpty) {
+                await PushNotificationController.sendPushNotification(
                     fcms, "Item Lost", "Hi, I Lost $itemName in $annCategory");
               }
             }
@@ -210,44 +207,40 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
         }
 
         try {
-          QuerySnapshot snapshot = await FirebaseFirestore.instance
-              .collection('lostItem')
-              .where("itemCategory", isEqualTo: annCategory)
-              .get();
-          if (snapshot.docs.isNotEmpty) {
-            var snapData = snapshot.docs.map((e) {
-              var data = (e.data() as Map<String, dynamic>)['publishedBy'];
-              log(data);
-              return data;
-            });
-            var a = snapData.toList().toSet().toList();
-            log("aaaaaaaaaaaaaa${a.toString()}");
+          List<String> publishers =
+          await getPublishers(isLost: false, cat: annCategory);
+          if (publishers.isNotEmpty) {
+            log("all Publishers:  ${publishers.toString()}");
             List<String> fcms = [];
-            a.map((element) async {
-              DocumentSnapshot sna = await FirebaseFirestore.instance
-                  .collection("users")
-                  .doc(element)
-                  .get();
-              if (sna.exists) {
+            await Future.forEach(publishers, (element) async {
+              var user = allUsers.firstWhere((user) => user['id'] == element,
+                  orElse: () => {});
+              if (user == {}) {
+                throw Exception("User Not found");
+              }
+              log("\n\nUser: $user\n\n");
+              String userFcm = user['fcm'] ?? "";
+              if (userFcm.isNotEmpty) {
+                fcms.add(userFcm);
+              }
+              String notificationTime = Timestamp.now().toString();
+              if (element != uid) {
                 await InAppNotifications.sendInAppNotification(
-                    Timestamp.now().toString(),
+                    notificationTime,
                     InAppNotifications.buildInAppNotification(
-                        " Hi, I have found $itemName in $annCategory",
-                        element,
-                        "Item Found",
-                        uid,
-                        announcementID));
-                // final Map<String, dynamic> doc = sna.data as Map<String, dynamic>;
-                var a = sna.data() as Map;
-                log(sna.data().toString());
-                if (a.isNotEmpty) {
-                  fcms.add(a['fcm'] ?? "");
-                }
+                      notificationTime,
+                      " Hi, I have found $itemName in $annCategory",
+                      element,
+                      "Found item",
+                      uid,
+                      announcementID,
+                      "found",
+                    ));
               }
             });
-            log("sssseeeeeee${fcms.length}");
-            await Future.delayed(const Duration(seconds: 5));
-            if (a.isNotEmpty) {
+            log("All FCMs: ${fcms.length}");
+            await Future.delayed(const Duration(seconds: 1));
+            if (fcms.isNotEmpty) {
               PushNotificationController.sendPushNotification(fcms,
                   "Item Found", " Hi, I have found $itemName in $annCategory");
             }
@@ -285,6 +278,28 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
       debugPrint("form not valid!");
     }
     setState(() {});
+  }
+
+  List<Map<String, dynamic>> allUsers = [];
+  getAllUsers() async {
+    QuerySnapshot qs =
+    await FirebaseFirestore.instance.collection("users").get();
+
+    allUsers = qs.docs.map((e) => e.data() as Map<String, dynamic>).toList();
+    log("All Users: $allUsers");
+  }
+
+  Future<List<String>> getPublishers({required bool isLost, cat}) async {
+    String collection = isLost ? "foundItem" : "lostItem";
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection(collection)
+        .where("itemCategory", isEqualTo: annCategory)
+        .get();
+    return snapshot.docs
+        .map(
+            (e) => (e.data() as Map<String, dynamic>)['publishedBy'].toString())
+        .toSet()
+        .toList();
   }
 
   @override
@@ -373,7 +388,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                 DropdownMenuItem<String>(
                                     value: '',
                                     child: Text(
-                                      'Choose Announcment type',
+                                      'Choose Announcement type',
                                       style: TextStyle(color: Colors.grey),
                                     )),
                                 DropdownMenuItem<String>(
@@ -1016,11 +1031,16 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           choice: 1,
                           width: double.infinity,
                           title: "Add announcement!",
-                          onPressed: () {
+                          onPressed: () {final isValid = _addFormKey.currentState!
+                              .validate();
+                          if (!mounted) return;
+                          FocusScope.of(context).unfocus();
+
+                          if (isValid) {
                             if (annType == "found") {
                               GlobalMethods.showCustomizedDialogue(
                                   title:
-                                      "Are you sure you want to add this announcement?",
+                                  "Are you sure you want to add this announcement?",
                                   message: "If you proceed the addition, the item will be under your responsibility",
                                   mainAction: "Yes",
                                   context: context,
@@ -1046,8 +1066,11 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   onPressedSecondary: () {
                                     Navigator.pop(context);
                                   });
-
                             }
+                          }
+                          else {
+                            debugPrint("form not valid!");
+                          }
                           },
                         ),
                       ),

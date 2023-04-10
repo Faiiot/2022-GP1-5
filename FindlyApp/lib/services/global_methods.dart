@@ -266,4 +266,63 @@ class GlobalMethods {
 
     return [...left, pivot, ...right];
   }
+
+  static List sortNotification (List notifications){
+    if (notifications.length <= 1) {
+      return notifications;
+    }
+    var pivot = notifications[0];
+    List left = [];
+    List right = [];
+
+    for (int i = 1; i < notifications.length; i++) {
+      if (notifications[i]["created_at"] >= pivot["created_at"]) {
+        left.add(notifications[i]);
+      } else {
+        right.add(notifications[i]);
+      }
+    }
+
+    left = sortNotification(left);
+    right = sortNotification(right);
+
+    return [...left, pivot, ...right];
+  }
+
+  static List quickSortAnnouncement(List data){
+    if (data.length <= 1) {
+      return data;
+    }
+    var pivot = data[0];
+    List left = [];
+    List right = [];
+
+    for (int i = 1; i < data.length; i++) {
+      if (data[i]["annoucementDate"] >= pivot["annoucementDate"]) {
+        left.add(data[i]);
+      } else {
+        right.add(data[i]);
+      }
+    }
+
+    left = sortNotification(left);
+    right = sortNotification(right);
+
+    return [...left, pivot, ...right];
+  }
+
+  // static List<DocumentSnapshot> sortDocumentsByTimestamp(List<DocumentSnapshot> documents, String timestampAttributeName, bool ascending) {
+  //   return documents..sort((a, b) {
+  //     Timestamp aTimestamp = a.data()?[timestampAttributeName];
+  //     Timestamp bTimestamp = b.data()?[timestampAttributeName];
+  //     if (aTimestamp == null || bTimestamp == null) {
+  //       return 0;
+  //     }
+  //     if (ascending) {
+  //       return aTimestamp.compareTo(bTimestamp);
+  //     } else {
+  //       return bTimestamp.compareTo(aTimestamp);
+  //     }
+  //   });
+  // }
 }
