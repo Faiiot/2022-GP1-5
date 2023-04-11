@@ -1,3 +1,4 @@
+import 'package:findly_app/screens/about_us_screen.dart';
 import 'package:findly_app/screens/auth_home_screen.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:findly_app/screens/user_profile_page.dart';
@@ -92,7 +93,7 @@ class DrawerWidget extends StatelessWidget {
                       label: "About Us",
                       icon: "info",
                       onTap: () {
-                        debugPrint("To be implemented");
+                        onTap(context, const AboutUsScreen());
                       },
                     ),
                     const Divider(thickness: 1),

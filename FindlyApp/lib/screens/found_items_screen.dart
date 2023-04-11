@@ -4,7 +4,6 @@ import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/widgets/announcements_widget.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:flutter/material.dart';
-
 import '../constants/dates.dart';
 import '../constants/reference_data.dart';
 import '../constants/text_styles.dart';

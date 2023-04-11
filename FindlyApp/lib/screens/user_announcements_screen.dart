@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:findly_app/screens/widgets/announcements_widget.dart';
-import 'package:findly_app/services/global_methods.dart';
 import 'package:flutter/material.dart';
-
 import '../constants/constants.dart';
 
 class UserAnnouncementsScreen extends StatefulWidget {
@@ -99,23 +97,22 @@ class _StreamBuilderWidget extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection(type)
-          .where(
-            'publishedBy',
-            isEqualTo: userID,
-          )
+          .orderBy("annoucementDate",descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         //if the connection state is "waiting", a progress indicatior will appear
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(color: primaryColor,),
           );
           //if the connection state is "active"
         } else if (snapshot.connectionState == ConnectionState.active) {
           //if the collection snapshot is empty
           if (snapshot.data!.docs.isNotEmpty) {
             List data = snapshot.data!.docs;
-            //
+            data.retainWhere(
+                  (element) => element['publishedBy']==userID
+            );
             // data = GlobalMethods.quickSortAnnouncement(data);
             return GridView.builder(
               itemCount: data.length,

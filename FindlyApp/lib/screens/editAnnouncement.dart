@@ -1,10 +1,13 @@
 import 'dart:core';
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/reference_data.dart';
 import 'package:findly_app/screens/dialogflow_chatbot_screen.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
+import 'package:findly_app/services/push_notifications_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -56,6 +59,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   late String buildingName = widget.buildingName;
   late String annType = widget.announcementType;
   late String annCategory = widget.itemCategory;
+  late String oldCategory = widget.itemCategory;
+  late String newCategory;
   late String contactChanel = widget.contactChannel;
   late String imageUrl = widget.announcementImg;
   late String annDesc = widget.announcementDes;
@@ -84,6 +89,7 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   final _editFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String dropDownValue = '';
+  final FirebaseAuth _auth =FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -125,6 +131,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
 
   //Method to update the announcement in the database
   void submitFormOnUpdate() async {
+    final User? user = _auth.currentUser;
+    final String uid = user!.uid;
     final String uniqueImgID = DateTime.now().millisecondsSinceEpoch.toString();
     if (imgFile != null) {
       final ref = FirebaseStorage.instance
@@ -159,6 +167,50 @@ class _EditAnnouncement extends State<EditAnnouncement> {
             'roomnumber': roomNumber,
             'floornumber': floorNumber
           });
+
+          if(newCategory != oldCategory){
+            try{List<String> publishers =
+            await getPublishers(isLost: true, cat: annCategory);
+            if (publishers.isNotEmpty) {
+              log("all Publishers:  ${publishers.toString()}");
+              List<String> fcms = [];
+              await Future.forEach(publishers, (element) async {
+                var user = allUsers.firstWhere((user) => user['id'] == element,
+                    orElse: () => {});
+                if (user == {}) {
+                  throw Exception("User Not found");
+                }
+                log("\n\nUser: $user\n\n");
+                String userFcm = user['fcm'] ?? "";
+                if (userFcm.isNotEmpty) {
+                  fcms.add(userFcm);
+                }
+                String notificationTime = Timestamp.now().toString();
+                if (element != uid) {
+                  await InAppNotifications.sendInAppNotification(
+                      notificationTime,
+                      InAppNotifications.buildInAppNotification(
+                        notificationTime,
+                        "Hi, I have lost $itemName in $annCategory",
+                        element,
+                        "Lost item",
+                        uid,
+                        widget.announcementID,
+                        "lost",
+                      ));
+                }
+              });
+              log("All FCMs: ${fcms.length}");
+              await Future.delayed(const Duration(seconds: 1));
+              if (fcms.isNotEmpty) {
+                await PushNotificationController.sendPushNotification(
+                    fcms, "Item Lost", "Hi, I Lost $itemName in $annCategory");
+              }
+            }}
+                catch(e){
+              log("message${e.toString()}");
+            }
+          }
         } else {
           await FirebaseFirestore.instance
               .collection('foundItem')
@@ -174,6 +226,51 @@ class _EditAnnouncement extends State<EditAnnouncement> {
             'roomnumber': roomNumber,
             'floornumber': floorNumber
           });
+
+          if(newCategory != oldCategory){
+            try {
+              List<String> publishers =
+              await getPublishers(isLost: false, cat: annCategory);
+              if (publishers.isNotEmpty) {
+                log("all Publishers:  ${publishers.toString()}");
+                List<String> fcms = [];
+                await Future.forEach(publishers, (element) async {
+                  var user = allUsers.firstWhere((user) => user['id'] == element,
+                      orElse: () => {});
+                  if (user == {}) {
+                    throw Exception("User Not found");
+                  }
+                  log("\n\nUser: $user\n\n");
+                  String userFcm = user['fcm'] ?? "";
+                  if (userFcm.isNotEmpty) {
+                    fcms.add(userFcm);
+                  }
+                  String notificationTime = Timestamp.now().toString();
+                  if (element != uid) {
+                    await InAppNotifications.sendInAppNotification(
+                        notificationTime,
+                        InAppNotifications.buildInAppNotification(
+                          notificationTime,
+                          " Hi, I have found $itemName in $annCategory",
+                          element,
+                          "Found item",
+                          uid,
+                          widget.announcementID,
+                          "found",
+                        ));
+                  }
+                });
+                log("All FCMs: ${fcms.length}");
+                await Future.delayed(const Duration(seconds: 1));
+                if (fcms.isNotEmpty) {
+                  PushNotificationController.sendPushNotification(fcms,
+                      "Item Found", " Hi, I have found $itemName in $annCategory");
+                }
+              }
+            } catch (e) {
+              log("message${e.toString()}");
+            }
+          }
         }
         if (mounted) Navigator.canPop(context) ? Navigator.pop(context) : null;
         //A confirmation message when the announcement is updated
@@ -194,6 +291,28 @@ class _EditAnnouncement extends State<EditAnnouncement> {
       debugPrint("form not valid!");
     }
     setState(() {});
+  }
+
+  List<Map<String, dynamic>> allUsers = [];
+  getAllUsers() async {
+    QuerySnapshot qs =
+    await FirebaseFirestore.instance.collection("users").get();
+
+    allUsers = qs.docs.map((e) => e.data() as Map<String, dynamic>).toList();
+    log("All Users: $allUsers");
+  }
+
+  Future<List<String>> getPublishers({required bool isLost, cat}) async {
+    String collection = isLost ? "foundItem" : "lostItem";
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection(collection)
+        .where("itemCategory", isEqualTo: annCategory)
+        .get();
+    return snapshot.docs
+        .map(
+            (e) => (e.data() as Map<String, dynamic>)['publishedBy'].toString())
+        .toSet()
+        .toList();
   }
 
   @override
@@ -421,6 +540,7 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                               annCategory = value.toString();
                               setState(() {
                                 annCategory = value.toString();
+                                newCategory = annCategory;
                               });
                               FocusScope.of(context)
                                   .requestFocus(_buildingNameFocusNode);

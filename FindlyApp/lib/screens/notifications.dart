@@ -46,19 +46,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     final userDoc =
     await FirebaseFirestore.instance.collection("users").doc(uid).get();
-    // setState(() {
-    //   print(uid);
-    //   phoneNumber = userDoc.get('phoneNo');
-    //   print(phoneNumber);
-    //   email = userDoc.get('Email');
-    //   print(email);
-    //
-    // });
-    // setState(() {
-    //   contactChannel = doc.get("contact");
-    // });
-    // final announcement = doc.docs.first.data();
-    // getAnnouncementInfo(uid);
     if (!mounted) return;
     setState(() {
       firstName = userDoc.get('firstName');

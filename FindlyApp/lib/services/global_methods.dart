@@ -313,7 +313,7 @@ class GlobalMethods {
 
   // static List<DocumentSnapshot> sortDocumentsByTimestamp(List<DocumentSnapshot> documents, String timestampAttributeName, bool ascending) {
   //   return documents..sort((a, b) {
-  //     Timestamp aTimestamp = a.data()?[timestampAttributeName];
+  //     Timestamp aTimestamp = a.data()?["timestampAttributeName"];
   //     Timestamp bTimestamp = b.data()?[timestampAttributeName];
   //     if (aTimestamp == null || bTimestamp == null) {
   //       return 0;
