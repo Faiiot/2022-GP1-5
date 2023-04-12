@@ -1,11 +1,9 @@
-import 'package:findly_app/screens/about_us_screen.dart';
 import 'package:findly_app/screens/auth_home_screen.dart';
 import 'package:findly_app/screens/user_dashboard_screen.dart';
 import 'package:findly_app/screens/user_profile_page.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../../constants/constants.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -89,13 +87,13 @@ class DrawerWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    _listTiles(
-                      label: "About Us",
-                      icon: "info",
-                      onTap: () {
-                        onTap(context, const AboutUsScreen());
-                      },
-                    ),
+                    // _listTiles(
+                    //   label: "About Us",
+                    //   icon: "info",
+                    //   onTap: () {
+                    //     onTap(context, const AboutUsScreen());
+                    //   },
+                    // ),
                     const Divider(thickness: 1),
                   ],
                 ),

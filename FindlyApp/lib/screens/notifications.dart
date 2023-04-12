@@ -35,6 +35,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   String lastName = "";
   String fullName = "";
 
+
   Future<void> fetchAnnouncementDetails(
       String announcementID, String announcementType, String uid) async {
     final String collection =
@@ -120,6 +121,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ),
             );
           } else {
+
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.only(top: 10),

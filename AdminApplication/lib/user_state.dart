@@ -1,4 +1,4 @@
-import 'package:findly_admin/screens/admin_home_page.dart';
+import 'package:findly_admin/screens/admin_dashboard_screen.dart';
 import 'package:findly_admin/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ class _UserStateState extends State<UserState> {
           final User? user = auth.currentUser;
           final uid = user!.uid;
 
-          return AdminHomePage(userID: uid);
+          return AdminDashboardScreen(userID: uid);
         } else if (userSnapshot.hasError) {
           return const Center(
             child: Text(

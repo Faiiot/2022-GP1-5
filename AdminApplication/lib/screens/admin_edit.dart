@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'admin_home_page.dart';
+import 'admin_dashboard_screen.dart';
 import 'edit_bulding.dart';
 import 'edit_category.dart';
 import 'my_button2.dart';
@@ -46,7 +46,7 @@ class _AdminEdit extends State<AdminEdit> {
                     //back button
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AdminHomePage(
+                      builder: (context) => AdminDashboardScreen(
                         userID: uid,
                       ),
                     ));
