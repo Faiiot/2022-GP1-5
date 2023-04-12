@@ -67,33 +67,18 @@ class DrawerWidget extends StatelessWidget {
                       ),
                       accountEmail: const Text(""),
                     ),
-                    _listTiles(
-                      label: "Dashboard",
-                      icon: "menu",
-                      onTap: () => onTap(
-                        context,
-                        AdminDashboardScreen(
-                          userID: userId,
-                        ),
-                      ),
-                    ),
+
                     _listTiles(
                       label: "Profile",
                       icon: "user_outlined",
                       onTap: () => onTap(
                         context,
-                        AdminProfile(
+                        AdminProfilePage(
                           userID: userId,
                         ),
                       ),
                     ),
-                    // _listTiles(
-                    //   label: "About Us",
-                    //   icon: "info",
-                    //   onTap: () {
-                    //     onTap(context, const AboutUsScreen());
-                    //   },
-                    // ),
+
                     const Divider(thickness: 1),
                   ],
                 ),

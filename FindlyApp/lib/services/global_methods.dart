@@ -305,24 +305,10 @@ class GlobalMethods {
       }
     }
 
-    left = sortNotification(left);
-    right = sortNotification(right);
+    left = quickSortAnnouncement(left);
+    right = quickSortAnnouncement(right);
 
     return [...left, pivot, ...right];
   }
 
-  // static List<DocumentSnapshot> sortDocumentsByTimestamp(List<DocumentSnapshot> documents, String timestampAttributeName, bool ascending) {
-  //   return documents..sort((a, b) {
-  //     Timestamp aTimestamp = a.data()?["timestampAttributeName"];
-  //     Timestamp bTimestamp = b.data()?[timestampAttributeName];
-  //     if (aTimestamp == null || bTimestamp == null) {
-  //       return 0;
-  //     }
-  //     if (ascending) {
-  //       return aTimestamp.compareTo(bTimestamp);
-  //     } else {
-  //       return bTimestamp.compareTo(aTimestamp);
-  //     }
-  //   });
-  // }
 }

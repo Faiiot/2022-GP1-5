@@ -3,7 +3,6 @@ import 'package:findly_app/screens/user_edit.dart';
 import 'package:findly_app/screens/user_profile_page.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
 import 'package:flutter/material.dart';
-
 import '../constants/constants.dart';
 
 class EditPhone extends StatefulWidget {

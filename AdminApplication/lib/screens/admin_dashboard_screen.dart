@@ -4,11 +4,7 @@ import 'package:findly_admin/screens/found_items_screen.dart';
 import 'package:findly_admin/screens/lost_items_screen.dart';
 import 'package:findly_admin/screens/reported_announcement.dart';
 import 'package:findly_admin/screens/widgets/drawer_widget.dart';
-import 'package:findly_admin/user_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-
 import '../constants/curved_app_bar.dart';
 import '../constants/text_styles.dart';
 
@@ -147,120 +143,21 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
           vertical: 20.0,
         ),
         children: [
-          // const Text(
-          //   'Items found recently!',
-          //   style: TextStyle(
-          //     color: primaryColor,
-          //     fontSize: 20,
-          //     fontWeight: FontWeight.w800,
-          //   ),
-          // ),
-          // Container(
-          //   height: 150,
-          //   margin: const EdgeInsets.symmetric(
-          //     horizontal: 0.0,
-          //     vertical: 16.0,
-          //   ),
-          //   padding: const EdgeInsets.only(
-          //     top: 12.0,
-          //     bottom: 12.0,
-          //   ),
-          //   decoration: BoxDecoration(
-          //     color: primaryColor,
-          //     borderRadius: BorderRadius.circular(16.0),
-          //   ),
-          //   child: StreamBuilder(
-          //     stream: FirebaseFirestore.instance
-          //         .collection("foundItem")
-          //         .limit(5).orderBy('annoucementDate',descending: true)
-          //         .snapshots()
-          //         .asBroadcastStream(),
-          //     builder: (context, snapshot) {
-          //       final docs = snapshot.data?.docs;
-          //       return ListView.builder(
-          //         itemCount: docs?.length,
-          //         scrollDirection: Axis.horizontal,
-          //         itemBuilder: (context, index) {
-          //           return Row(
-          //             mainAxisSize: MainAxisSize.min,
-          //             children: [
-          //               if (index == 0) const SizedBox(width: 16.0),
-          //               GestureDetector(
-          //                 onTap: () async {
-          //                   final info = await getNeededPublisherInfo(docs?[index]["publishedBy"]);
-          //                   if (mounted) {
-          //                     Navigator.push(
-          //                       context,
-          //                       MaterialPageRoute(
-          //                         builder: (context) => AnnouncementDetailsScreen(
-          //                           announcementID: docs?[index]["announcementID"],
-          //                           publisherID: docs?[index]["publishedBy"],
-          //                           announcementType: docs?[index]["announcementType"],
-          //                           publishedBy: info["name"],
-          //                           phoneNumber: info["phone"],
-          //                           email: info["email"],
-          //                           profile: false,
-          //                           reported: docs?[index]["reported"],
-          //                           reportCount: docs?[index]["reportCount"],
-          //                         ),
-          //                       ),
-          //                     );
-          //                   }
-          //                 },
-          //                 child: Container(
-          //                   width: size.width / 2.5,
-          //                   margin: const EdgeInsets.only(right: 16.0),
-          //                   padding: const EdgeInsets.all(8.0),
-          //                   decoration: BoxDecoration(
-          //                     color: Colors.white,
-          //                     borderRadius: BorderRadius.circular(12.0),
-          //                   ),
-          //                   child: Column(
-          //                     children: [
-          //                       docs != null && docs[index]["url"] != ""
-          //                           ? Expanded(
-          //                         child: Image.network(
-          //                           docs[index]["url"],
-          //                         ),
-          //                       )
-          //                           : Expanded(
-          //                         child: Image.asset(
-          //                           "assets/Image_not_available.png",
-          //                           fit: BoxFit.fill,
-          //                         ),
-          //                       ),
-          //                       Text(
-          //                         docs != null ? docs[index]["itemName"] : "",
-          //                         overflow: TextOverflow.ellipsis,
-          //                         style: const TextStyle(
-          //                           color: primaryColor,
-          //                           fontWeight: FontWeight.bold,
-          //                         ),
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 ),
-          //               ),
-          //             ],
-          //           );
-          //         },
-          //       );
-          //     },
-          //   ),
-          // ),
           Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Image.asset("assets/users.png",height: 60,),
+                padding: const EdgeInsets.only(top: 16,bottom: 8.0),
+                child: Image.asset("assets/users.png",height: 70,),
               ),
+              const SizedBox(height: 16,),
               Text("$userCount users are using Findly!",
               style: const TextStyle(
-                fontWeight: FontWeight.w600
+                fontWeight: FontWeight.w600,
+                fontSize: 16
               ),)
             ],
           ),
-          const SizedBox(height: 16,),
+          const SizedBox(height: 36,),
           Container(
             height: 1.0,
             decoration: const BoxDecoration(
@@ -427,80 +324,7 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
     );
   }
 
-  void _logout(context) {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.logout_outlined,
-                  size: 30,
-                  color: Constants.darkBlue,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Log out",
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Constants.darkBlue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          //Log out confirmation message
-          content: Text(
-            "Are you sure you want to log out?",
-            maxLines: 2,
-            style: TextStyle(
-              color: Constants.darkBlue,
-              fontSize: 20,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          actions: [
-            //Cancel button > back to the drawer
-            TextButton(
-                onPressed: () {
-                  Navigator.canPop(context) ? Navigator.pop(context) : null;
-                },
-                child: const Text("Cancel")),
-            TextButton(
-              onPressed: () async {
-                //if the user click "OK" she will be logged out and redurected to log in screen
-                await auth.signOut();
-                if (!mounted) return;
-                Navigator.canPop(context) ? Navigator.pop(context) : null;
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const UserState(),
-                  ),
-                );
-                Fluttertoast.showToast(
-                    msg: "You have been logged out successfully!",
-                    toastLength: Toast.LENGTH_SHORT,
-                    backgroundColor: Colors.blueGrey,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   Widget dashboardButton({
     required String iconName,

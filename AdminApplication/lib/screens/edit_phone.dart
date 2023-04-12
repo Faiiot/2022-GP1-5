@@ -46,7 +46,7 @@ class EditPhoneState extends State<EditPhone> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => AdminProfile(userID: widget.userID),
+        builder: (context) => AdminProfilePage(userID: widget.userID),
       ),
     );
   }
@@ -92,7 +92,7 @@ class EditPhoneState extends State<EditPhone> {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => AdminProfile(userID: widget.userID),
+              builder: (context) => AdminProfilePage(userID: widget.userID),
             ));
       } catch (error) {
         setState(() {});
@@ -117,7 +117,7 @@ class EditPhoneState extends State<EditPhone> {
                   Navigator.pushReplacement(
                       //back button
                       context,
-                      MaterialPageRoute(builder: (context) => AdminProfile(userID: widget.userID)));
+                      MaterialPageRoute(builder: (context) => AdminProfilePage(userID: widget.userID)));
                 },
                 icon: const Icon(
                   Icons.account_circle_outlined,

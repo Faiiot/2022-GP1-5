@@ -46,7 +46,7 @@ class EditEmailState extends State<EditEmail> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => AdminProfile(userID: widget.userID),
+        builder: (context) => AdminProfilePage(userID: widget.userID),
       ),
     );
   }
@@ -90,7 +90,7 @@ class EditEmailState extends State<EditEmail> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AdminProfile(userID: widget.userID),
+            builder: (context) => AdminProfilePage(userID: widget.userID),
           ),
         );
       } catch (error) {
@@ -116,7 +116,7 @@ class EditEmailState extends State<EditEmail> {
                   Navigator.pushReplacement(
                       //back button
                       context,
-                      MaterialPageRoute(builder: (context) => AdminProfile(userID: widget.userID)));
+                      MaterialPageRoute(builder: (context) => AdminProfilePage(userID: widget.userID)));
                 },
                 icon: const Icon(
                   Icons.account_circle_outlined,

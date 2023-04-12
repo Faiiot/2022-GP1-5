@@ -1,28 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:findly_admin/screens/reported_announcement.dart';
-
+import 'package:findly_admin/constants/constants.dart';
+import 'package:findly_admin/screens/widgets/wide_button.dart';
+import 'package:findly_admin/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-import '../constants/constants.dart';
+import '../constants/dates.dart';
+import '../constants/global_colors.dart';
+import '../constants/text_styles.dart';
 
 class AnnouncementDetailsScreen extends StatefulWidget {
   final String announcementID;
   final String publisherID;
-  final String itemName;
   final String announcementType;
-  final String itemCategory;
-  final Timestamp postDate;
-  final String announcementImg;
-  final String buildingName;
-  final String contactChannel;
-  final String theChannel;
+  final String phoneNumber;
+  final String email;
   final String publishedBy;
-  final String announcementDes;
   final bool profile;
-  final String roomNumber;
-  final String floorNumber;
   final bool reported;
   final int reportCount;
 
@@ -31,476 +25,438 @@ class AnnouncementDetailsScreen extends StatefulWidget {
     super.key,
     required this.announcementID,
     required this.publisherID,
-    required this.itemName,
     required this.announcementType,
-    required this.itemCategory,
-    required this.postDate,
-    required this.announcementImg,
-    required this.buildingName,
-    required this.contactChannel,
-    required this.theChannel,
+    required this.phoneNumber,
+    required this.email,
     required this.publishedBy,
-    required this.announcementDes,
     required this.profile,
     required this.reportCount,
     required this.reported,
-    required this.roomNumber,
-    required this.floorNumber,
   });
 
   @override
-  State<AnnouncementDetailsScreen> createState() => _AnnouncementDetailsScreenState();
+  State<AnnouncementDetailsScreen> createState() =>
+      _AnnouncementDetailsScreenState();
 }
 
 class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
+  String itemName = "";
+  String announcementType = "";
+  String itemCategory = "";
+  Timestamp postDate = Timestamp.fromDate(DateTime.now());
+  String announcementImg = "";
+  String buildingName = "";
+  String contactChannel = "";
+  String theChannel = "";
+  String announcementDes = "";
+  String roomNumber = "";
+  String floorNumber = "";
+  bool fetchingData = true;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool sameUser() {
-    return widget.publisherID == _auth.currentUser!.uid.toString();
+    if (widget.publisherID == _auth.currentUser!.uid.toString()) {
+      return true;
+    }
+    return false;
+  }
+
+  void fetchAnnouncementDetails() async {
+    final String collection =
+        announcementType == "lost" ? "lostItem" : "foundItem";
+    final doc = await FirebaseFirestore.instance
+        .collection(collection)
+        .where(
+          "announcementID",
+          isEqualTo: widget.announcementID,
+        )
+        .get();
+    final announcement = doc.docs.first.data();
+    itemName = announcement["itemName"];
+    announcementType = announcement["announcementType"];
+    itemCategory = announcement["itemCategory"];
+    postDate = announcement["annoucementDate"];
+    announcementImg = announcement["url"];
+    buildingName = announcement['buildingName'];
+    contactChannel = announcement['contact'];
+    theChannel =
+        contactChannel == "Phone Number" ? widget.phoneNumber : widget.email;
+    announcementDes = announcement["announcementDes"];
+    roomNumber = announcement["roomnumber"];
+    floorNumber = announcement["floornumber"];
+    setState(() {
+      fetchingData = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    announcementType = widget.announcementType;
+    fetchAnnouncementDetails();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-            onPressed: () {
-              if (widget.profile) {
-                Navigator.pop(context);
-              } else if (widget.announcementType == 'lost') {
-                Navigator.pop(context);
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            icon: const Icon(Icons.arrow_back_ios)),
-        title: const Text(
-          'Announcement Details',
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: primaryColor,
+          ),
+        ),
+        title: Text(
+          "Announcement Details",
+          style: TextStyles.appBarTitleStyle.copyWith(color: primaryColor),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: 300,
-                  width: double.infinity,
-                  child: widget.announcementImg != ""
-                      ? Image.network(
-                          widget.announcementImg,
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue, width: 3),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.image,
-                                size: 120,
-                                color: Colors.grey,
-                              ),
-                              Text(
-                                "No image was uploaded",
-                                style: TextStyle(fontSize: 18),
-                              )
-                            ],
-                          ),
-                        )),
-            ),
-            const SizedBox(
-              height: 14,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration:
-                    BoxDecoration(color: Colors.blue[400], borderRadius: BorderRadius.circular(20)),
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
+      body: fetchingData
+          ? const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: primaryColor,
+                color: Colors.white,
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //announcement type
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Announcement type:  ${widget.announcementType}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
+                    SizedBox(
+                      height: 400,
+                      width: double.infinity,
+                      child: announcementImg != ""
+                          ? Image.network(
+                              announcementImg,
+                              fit: BoxFit.fill,
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.blue, width: 3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.all(4.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Expanded(
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: Icon(
+                                        Icons.image,
+                                        size: 120,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "No image was uploaded",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black54,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
                     ),
-                    //item name
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Item name:  ${widget.itemName}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
+                    const SizedBox(
+                      height: 12,
                     ),
-                    //item category
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Item category:  ${widget.itemCategory}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                    //building name
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        'Location:\n   Building: ${widget.buildingName}\n   Floor: ${widget.floorNumber}\n   Room: ${widget.roomNumber}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
                         ),
-                      ),
-                    ),
-                    //description
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
-                      child: const Text(
-                        'Description: ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: GlobalColors.extraColor,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${announcementType.toUpperCase()} ITEM",
+                              style:
+                                  TextStyles.alertDialogueMainButtonTextStyle,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                          widget.announcementDes,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Constants.darkBlue,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 16.0,
                       ),
-                    ),
-                    //publisher Name
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      alignment: Alignment.topLeft,
                       child: Text(
-                        'Published by:  ${widget.publishedBy}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
+                        itemName,
+                        style: TextStyles.secondButtonTextStyle,
                       ),
                     ),
-                    //another contact channel based on the user's choice
-                    widget.contactChannel == "Phone Number"
-                        ? Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'Phone number:  ${widget.theChannel} ',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 0,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.category_outlined,
+                                color: GlobalColors.mainColor,
                               ),
-                            ),
-                          )
-                        : Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              'Email:  ${widget.theChannel}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    itemCategory,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    "$buildingName, $floorNumber, $roomNumber",
+                                    maxLines: 2,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.date_range_outlined,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    Dates.parsedDate(postDate)
+                                        .toString()
+                                        .substring(0, 10),
+                                    maxLines: 2,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.account_box,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    widget.publishedBy,
+                                    maxLines: 2,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                contactChannel == "Phone Number"
+                                    ? Icons.phone
+                                    : Icons.email,
+                                color: GlobalColors.mainColor,
+                              ),
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    theChannel,
+                                    maxLines: 2,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Card(
+                            margin: const EdgeInsets.only(top: 16, bottom: 16),
+                            elevation: 7,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: GlobalColors.mainColor,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(12.0),
+                                    child: Text(
+                                      "Description:",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      announcementDes,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                    Center(
+                      child: WideButton(
+                        choice: 2,
+                        width: double.infinity,
+                        title: contactChannel == "Phone Number"
+                            ? "Call Now"
+                            : "Send an Email",
+                        onPressed: () {
+                          contactChannel == "Phone Number"
+                              ? GlobalMethods.makePhoneCall(theChannel)
+                              : GlobalMethods.sendEmail(theChannel);
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Container(
+                      height: 1.0,
+                      decoration: const BoxDecoration(
+                        color: primaryColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: primaryColor,
+
+                            blurRadius: 6,
+                            offset: Offset(0, 3), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 8,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFA44237),
+                                    Colors.redAccent,
+                                  ],
+                                ),
+                              ),
+                              child: MaterialButton(
+                                onPressed: () {
+                                  ///to do
+                                },
+                                minWidth: double.infinity,
+                                height: 48,
+                                child: Text(
+                                  "Delete",
+                                  style: TextStyles.buttonTextStyle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        WideButton(
+                            choice: 1,
+                            title: "Decline",
+                            onPressed: () {},
+                            width: double.infinity),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 6,
-                  child: InkWell(
-                    onTap: () {
-                      _delete(context);
-                    },
-                    child: SizedBox(
-                      height: 100,
-                      child: Card(
-                        elevation: 7,
-                        color: const Color(0xfff8f8f8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'Delete',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  flex: 1,
-                  child: SizedBox(
-                    height: 20,
-                  ),
-                ),
-                Expanded(
-                  flex: 6,
-                  child: InkWell(
-                    onTap: () {
-                      _decline(context);
-                    },
-                    child: SizedBox(
-                      height: 100,
-                      child: Card(
-                        elevation: 7,
-                        color: const Color(0xfff8f8f8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'Decline',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
-  }
-
-  Future<void> _delete(context) async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.delete,
-                    size: 30,
-                    color: Constants.darkBlue,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Delete Announcement",
-                    style: TextStyle(
-                        color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-
-            //Log out confirmation message
-            content: Text(
-              "Are you sure you want to delete ${widget.itemName} ?",
-              maxLines: 2,
-              style:
-                  TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-            ),
-            actions: [
-              //Cancel button > back to the drawer
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel")),
-              TextButton(
-                  onPressed: () async {
-                    //if the user click "OK" she will be logged out and redirected to log in screen
-                    if (widget.announcementType == 'lost') {
-                      await FirebaseFirestore.instance
-                          .collection('lostItem')
-                          .doc(widget.announcementID)
-                          .delete();
-                      await FirebaseFirestore.instance
-                          .collection('reportedItem')
-                          .doc(widget.announcementID)
-                          .delete();
-                    } else {
-                      await FirebaseFirestore.instance
-                          .collection('foundItem')
-                          .doc(widget.announcementID)
-                          .delete();
-                      await FirebaseFirestore.instance
-                          .collection('reportedItem')
-                          .doc(widget.announcementID)
-                          .delete();
-                    }
-                  },
-                  child: const Text(
-                    "OK",
-                    style: TextStyle(color: Colors.red),
-                  ))
-            ],
-          );
-        });
-  }
-
-  Future<void> _decline(context) async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.delete,
-                    size: 30,
-                    color: Constants.darkBlue,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Decline Announcement",
-                    style: TextStyle(
-                        color: Constants.darkBlue, fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-
-            //Log out confirmation message
-            content: Text(
-              "Are you sure you want to decline ${widget.itemName} ?",
-              maxLines: 2,
-              style:
-                  TextStyle(color: Constants.darkBlue, fontSize: 20, fontStyle: FontStyle.italic),
-            ),
-            actions: [
-              //Cancel button > back to the drawer
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel")),
-              TextButton(
-                  onPressed: () async {
-                    //if the user click "OK" she will be logged out and redirected to log in screen
-
-                    declineProcess();
-                    Fluttertoast.showToast(
-                      msg: "Announcement has been declined successfully",
-                      toastLength: Toast.LENGTH_SHORT,
-                      backgroundColor: Colors.blueGrey,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
-
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ReportedAnnouncement(userID: widget.publishedBy),
-                        ));
-                  },
-                  child: const Text(
-                    "OK",
-                    style: TextStyle(color: Colors.red),
-                  ))
-            ],
-          );
-        });
-  }
-
-  void declineProcess() async {
-    if (widget.announcementType == 'lost') {
-      await FirebaseFirestore.instance
-          .collection('reportedItem')
-          .doc(widget.announcementID)
-          .delete();
-      await FirebaseFirestore.instance.collection('lostItem').doc(widget.announcementID).update({
-        'reported': false,
-        'reportCount': 0,
-      });
-    } else {
-      await FirebaseFirestore.instance
-          .collection('reportedItem')
-          .doc(widget.announcementID)
-          .delete();
-      await FirebaseFirestore.instance.collection('foundItem').doc(widget.announcementID).update({
-        'reported': false,
-        'reportCount': 0,
-      });
-    }
   }
 }

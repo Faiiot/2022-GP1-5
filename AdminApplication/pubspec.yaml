@@ -46,6 +46,7 @@ dependencies:
   dropdown_search: 3.0.1
   shared_preferences: ^2.0.17
   url_launcher: ^6.1.10
+  reactive_forms: ^14.2.0
 
 
 dev_dependencies:
