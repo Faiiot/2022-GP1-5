@@ -431,7 +431,22 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                               ),
                               child: MaterialButton(
                                 onPressed: () {
-                                  ///to do
+                                  GlobalMethods.showCustomizedDialogue(
+                                      title: "Delete announcement",
+                                      message:
+                                          "Are you sure you want to delete this announcement?",
+                                      mainAction: "Yes",
+                                      context: context,
+                                      secondaryAction: "No",
+                                      onPressedMain: () {
+                                        _adminDelete();
+                                        Navigator.pop(context);
+                                        GlobalMethods.showToast(
+                                            "Announcement has been deleted successfuly!");
+                                        Navigator.pop(context);
+                                      },
+                                      onPressedSecondary: () =>
+                                          Navigator.pop(context));
                                 },
                                 minWidth: double.infinity,
                                 height: 48,
@@ -449,7 +464,24 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                         WideButton(
                             choice: 1,
                             title: "Decline",
-                            onPressed: () {},
+                            onPressed: () {
+                              GlobalMethods.showCustomizedDialogue(
+                                  title: "Decline reports",
+                                  message:
+                                      "Are you sure you want to decline reports on this announcement?",
+                                  mainAction: "Yes",
+                                  context: context,
+                                  secondaryAction: "No",
+                                  onPressedMain: () {
+                                    _decline();
+                                    Navigator.pop(context);
+                                    GlobalMethods.showToast(
+                                        "Reports on this announcement has been declined");
+                                    Navigator.pop(context);
+                                  },
+                                  onPressedSecondary: () =>
+                                      Navigator.pop(context));
+                            },
                             width: double.infinity),
                       ],
                     ),
@@ -458,5 +490,36 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
               ),
             ),
     );
+  }
+
+  void _adminDelete() {
+    String collection = announcementType == "lost" ? "lostItem" : "foundItem";
+    FirebaseFirestore.instance
+        .collection(collection)
+        .doc(widget.announcementID)
+        .delete();
+    String notificationID;
+    final doc = FirebaseFirestore.instance
+        .collection("notifications")
+        .where('source_id', isEqualTo: widget.announcementID).get().then((value) => {
+          notificationID =  value.docs[0]["notificationID"].toString(),
+         FirebaseFirestore.instance
+        .collection("notifications")
+        .doc(notificationID)
+        .delete()
+    });
+
+
+  }
+
+  void _decline() {
+    String collection = announcementType == "lost" ? "lostItem" : "foundItem";
+    FirebaseFirestore.instance
+        .collection(collection)
+        .doc(widget.announcementID)
+        .update({
+      'reported': false,
+      'reportCount': 0,
+    });
   }
 }

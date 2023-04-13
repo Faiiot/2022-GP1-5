@@ -34,7 +34,8 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        toolbarHeight: kToolbarHeight + MediaQuery.of(context).viewPadding.top + 32,
+        toolbarHeight:
+            kToolbarHeight + MediaQuery.of(context).viewPadding.top + 32,
         flexibleSpace: Container(
           padding: EdgeInsets.only(
             top: MediaQuery.of(context).viewPadding.top,
@@ -117,7 +118,8 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                                     ),
                                   ],
                                   onChanged: (dropDownValue) {
-                                    selectedDate = Dates.stringToDate(dropDownValue);
+                                    selectedDate =
+                                        Dates.stringToDate(dropDownValue);
                                   },
                                 ),
                                 const SizedBox(height: 20),
@@ -134,7 +136,8 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                                         )),
                                     ...ReferenceData.instance.categories
                                         .map(
-                                          (categoryName) => DropdownMenuItem<String>(
+                                          (categoryName) =>
+                                              DropdownMenuItem<String>(
                                             value: categoryName,
                                             child: Text(
                                               categoryName,
@@ -153,7 +156,8 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                                   mode: Mode.DIALOG,
                                   showSelectedItems: true,
                                   items: ReferenceData.instance.locations,
-                                  dropdownSearchDecoration: const InputDecoration(
+                                  dropdownSearchDecoration:
+                                      const InputDecoration(
                                     hintText: "Building name",
                                     hintStyle: TextStyle(color: Colors.grey),
                                     contentPadding: EdgeInsets.symmetric(
@@ -206,7 +210,8 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                                 "Reset",
                                 false,
                                 () {
-                                  selectedDate = selectedCategory = selectedBuildingName = null;
+                                  selectedDate = selectedCategory =
+                                      selectedBuildingName = null;
                                   Navigator.pop(context);
                                 },
                               ),
@@ -269,7 +274,6 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
               .snapshots()
               .asBroadcastStream(),
           builder: (context, lostSnapshots) {
-
             return StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection("foundItem")
@@ -277,24 +281,26 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                   .snapshots()
                   .asBroadcastStream(),
               builder: (context, foundSnapshots) {
-
                 //if the connection state is "waiting", a progress indicatior will appear
                 if (foundSnapshots.connectionState == ConnectionState.waiting ||
                     lostSnapshots.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(color: primaryColor,),
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
                   );
                   //if the connection state is "active"
-                } else if (foundSnapshots.connectionState == ConnectionState.active ||
+                } else if (foundSnapshots.connectionState ==
+                        ConnectionState.active ||
                     lostSnapshots.connectionState == ConnectionState.active) {
                   //if the collection snapshot is not empty
                   final List reportedLost = lostSnapshots.data!.docs;
                   reportedLost.retainWhere(
-                        (announcement) => announcement["reported"] == true,
+                    (announcement) => announcement["reported"] == true,
                   );
                   final List reportedFound = foundSnapshots.data!.docs;
                   reportedFound.retainWhere(
-                        (announcement) => announcement["reported"] == true,
+                    (announcement) => announcement["reported"] == true,
                   );
                   List totalReported = [...reportedLost, ...reportedFound];
                   if (totalReported.isNotEmpty) {
@@ -307,58 +313,67 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                     );
                     if (searchText.isNotEmpty) {
                       data.retainWhere(
-                            (element) => element['itemName'].toString().toLowerCase().contains(
-                          searchText.toLowerCase(),
-                        ),
+                        (element) => element['itemName']
+                            .toString()
+                            .toLowerCase()
+                            .contains(
+                              searchText.toLowerCase(),
+                            ),
                       );
-
                     }
                     return data.isEmpty
                         ? const Center(
-                      //if no announcement was uploaded
-                      child: Text(
-                        "No match found",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    )
+                            //if no announcement was uploaded
+                            child: Text(
+                              "No match found",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          )
                         : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        // crossAxisSpacing: 16.0,
-                        // mainAxisSpacing: 16.0,
-                      ),
-                        itemCount: data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Announcement(
-                            //snapshot.data!.docs is a list of the announcements
-                            //by pointing to the index of a specific announcement and fetching info
-                            announcementID: data[index]['announcementID'],
-                            itemName: data[index]['itemName'],
-                            announcementType: data[index]['announcementType'],
-                            itemCategory: data[index]['itemCategory'],
-                            postDate: data[index]['annoucementDate'],
-                            announcementImg: data[index]['url'],
-                            buildingName: data[index]['buildingName'],
-                            contactChannel: data[index]['contact'],
-                            publisherID: data[index]['publishedBy'],
-                            announcementDes: data[index]['announcementDes'],
-                            profile: false,
-                            reported: data[index]['reported'],
-                            reportCount: data[index]['reportCount'],
-                            roomNumber: data[index]['roomnumber'],
-                            floorNumber: data[index]['floornumber'],
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              // crossAxisSpacing: 16.0,
+                              // mainAxisSpacing: 16.0,
+                            ),
+                            itemCount: data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Announcement(
+                                //snapshot.data!.docs is a list of the announcements
+                                //by pointing to the index of a specific announcement and fetching info
+                                announcementID: data[index]['announcementID'],
+                                itemName: data[index]['itemName'],
+                                announcementType: data[index]
+                                    ['announcementType'],
+                                itemCategory: data[index]['itemCategory'],
+                                postDate: data[index]['annoucementDate'],
+                                announcementImg: data[index]['url'],
+                                buildingName: data[index]['buildingName'],
+                                contactChannel: data[index]['contact'],
+                                publisherID: data[index]['publishedBy'],
+                                announcementDes: data[index]['announcementDes'],
+                                profile: false,
+                                reported: data[index]['reported'],
+                                reportCount: data[index]['reportCount'],
+                                roomNumber: data[index]['roomnumber'],
+                                floorNumber: data[index]['floornumber'],
+                              );
+                            },
                           );
-
-                        },);
                   } else {
                     return const Center(
                       //if no announcement was uploaded
-                      child: Text(
-                        "No Announcements has been reported yet!",
-                        style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          "No Announcements has\nbeen reported yet!",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600),
+                        ),
                       ),
                     );
                   }

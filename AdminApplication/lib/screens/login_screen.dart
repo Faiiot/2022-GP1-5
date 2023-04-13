@@ -46,14 +46,14 @@ class _LoginScreenState extends State<LoginScreen>
       setState(() {
         _isLoading = true;
       });
-      debugPrint('before Try -----------------------');
+      // debugPrint('before Try -----------------------');
       try {
         QuerySnapshot snap = await FirebaseFirestore.instance
             .collection('admin')
             .where('adminID', isEqualTo: _memberIDController.text.trim())
             .get();
-        debugPrint(
-            "SNAPSHOT---------------------------------------${snap.docs[0]['Email']}");
+        // debugPrint(
+        //     "SNAPSHOT---------------------------------------${snap.docs[0]['Email']}");
         await _auth.signInWithEmailAndPassword(
             email: snap.docs[0]['Email'],
             password: _passwordTextController.text.trim());
