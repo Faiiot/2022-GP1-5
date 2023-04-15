@@ -508,8 +508,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         .doc(notificationID)
         .delete()
     });
-
-
+    if (!mounted) return;
   }
 
   void _decline() {

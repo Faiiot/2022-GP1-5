@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/constants.dart';
 import 'package:findly_app/screens/login_screen.dart';
-import 'package:findly_app/screens/widgets/my_button.dart';
+import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,6 +20,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late final TextEditingController _emailTextController = TextEditingController(text: '');
   late final TextEditingController _passwordTextController = TextEditingController(text: '');
+  late final TextEditingController _confirmPasswordTextController = TextEditingController(text: '');
   late final TextEditingController _firstNameController = TextEditingController(text: '');
   late final TextEditingController _lastNameController = TextEditingController(text: '');
   late final TextEditingController _phoneNoController = TextEditingController(text: '');
@@ -29,6 +30,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final FocusNode _lastNameFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _confirmPasswordFocusNode = FocusNode();
   final FocusNode _phoneNoFocusNode = FocusNode();
   bool _obscureText = true;
   final _signUpFormKey = GlobalKey<FormState>();
@@ -39,6 +41,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     //dispose from device memory so its performance isn't affected
     _emailTextController.dispose();
     _passwordTextController.dispose();
+    _confirmPasswordTextController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneNoController.dispose();
@@ -46,6 +49,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _lastNameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     _phoneNoFocusNode.dispose();
     _memberIDController.dispose();
     _memberIDFocusNode.dispose();
@@ -429,9 +433,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           height: 8,
                         ),
                         TextFormField(
-                          textInputAction: TextInputAction.done,
+                          textInputAction: TextInputAction.next,
                           focusNode: _passwordFocusNode,
-                          onEditingComplete: submitFormOnSignUp,
+                          onEditingComplete: () =>
+                              FocusScope.of(context).requestFocus(_confirmPasswordFocusNode),
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "You did not enter a password!";
@@ -488,7 +493,110 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ),
                         ),
                         const SizedBox(
-                          height: 15,
+                          height: 8,
+                        ),
+                        TextFormField(
+                          textInputAction: TextInputAction.done,
+                          focusNode: _confirmPasswordFocusNode,
+                          onEditingComplete: submitFormOnSignUp,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Please confirm your password!";
+                            } else if (value != _passwordTextController.text.trim()) {
+                              return "Passwords does not match!";
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.visiblePassword,
+                          controller: _confirmPasswordTextController,
+                          obscureText: _obscureText,
+                          textAlign: TextAlign.start,
+                          onChanged: (value) {},
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.lock),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                              child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                            ),
+                            labelText: "Password *",
+                            hintText: "Enter your Password",
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.blueAccent,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            errorBorder:
+                            const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 4.0),
+                                child: Text("At least 8 characters.",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 14
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 4.0),
+                                child: Text("At least 1 number.",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 14
+                                  ),),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 4.0),
+                                child: Text("At least 1 uppercase character.",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 14
+                                  ),),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 4.0),
+                                child: Text("At least 1 lowercase character.",
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 14
+                                  ),),
+                              ),
+                              Text("At least 1 special character.",
+                                style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 14
+                                ),)
+                            ],
+                          ),
                         ),
                         _isLoading
                             ? const Center(
@@ -501,8 +609,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   ),
                                 ),
                               )
-                            : MyButton(
-                                color: primaryColor,
+                            : WideButton(
+                                choice:1,
+                                width: double.infinity,
                                 title: "Sign up!",
                                 onPressed: () {
                                   submitFormOnSignUp();

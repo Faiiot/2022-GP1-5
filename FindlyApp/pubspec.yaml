@@ -60,7 +60,7 @@ dependencies:
   intro_slider: ^4.2.0
   url_launcher: ^6.1.10
   reactive_forms: ^14.2.0
-
+  flutter_pw_validator: ^1.5.0
 
 
 

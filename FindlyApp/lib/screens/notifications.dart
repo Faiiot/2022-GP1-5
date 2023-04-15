@@ -68,6 +68,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
       floorNumber = doc.get("floornumber");
       reportCount = doc.get('reportCount');
       reported = doc.get('reported');
+      print(fullName);
+      print(phoneNumber);
+      print(email);
+
     });
   }
 
@@ -107,8 +111,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
-          List notifications = snapshot.data!.docs;
-          notifications = GlobalMethods.sortNotification(notifications);
+
           if (!snapshot.hasData) {
             return const Center(
               child: Text(
@@ -121,7 +124,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ),
             );
           } else {
-
+            List notifications = snapshot.data!.docs;
+            notifications = GlobalMethods.sortNotification(notifications);
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.only(top: 10),
@@ -151,7 +155,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                         notifications[index]["source_id"],
                                         notifications[index]["type"],
                                         notifications[index]["notify_by"]);
-
 
                                     Navigator.push(
                                       context,

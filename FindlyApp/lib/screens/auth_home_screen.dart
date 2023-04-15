@@ -1,8 +1,8 @@
 import 'package:findly_app/screens/login_screen.dart';
 import 'package:findly_app/screens/registration_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
+import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:flutter/material.dart';
-
 import '../constants/curved_app_bar.dart';
 import '../constants/constants.dart';
 
@@ -46,9 +46,10 @@ class AuthHomeScreen extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.75,
             ),
             const SizedBox(height: 48),
-            MyButton(
-              color: primaryColor,
-              title: "Log in",
+            WideButton(
+              choice: 1,
+              width: double.infinity,
+              title: "Log in!",
               onPressed: () {
                 Navigator.push(
                   context,
@@ -58,8 +59,9 @@ class AuthHomeScreen extends StatelessWidget {
                 );
               },
             ),
-            MyButton(
-              color: primaryColor,
+            WideButton(
+              choice: 2,
+              width: double.infinity,
               title: "Sign Up!",
               onPressed: () {
                 Navigator.push(

@@ -93,7 +93,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   getUsersCount() async {
     try {
-      QuerySnapshot data = await FirebaseFirestore.instance.collection('users').get();
+      QuerySnapshot data =
+          await FirebaseFirestore.instance.collection('users').get();
       setState(() {
         userCount = data.size.toString();
       });
@@ -126,7 +127,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   getLostItemsCount() async {
     try {
-      QuerySnapshot data = await FirebaseFirestore.instance.collection('lostItem').get();
+      QuerySnapshot data =
+          await FirebaseFirestore.instance.collection('lostItem').get();
       lostCount = data.size.toString();
       returnedItems += data.docs
           .where(
@@ -141,7 +143,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
 
   getFoundItemsCount() async {
     try {
-      QuerySnapshot data = await FirebaseFirestore.instance.collection('foundItem').get();
+      QuerySnapshot data =
+          await FirebaseFirestore.instance.collection('foundItem').get();
       foundCount = data.size.toString();
       returnedItems += data.docs
           .where(
@@ -184,24 +187,64 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 16.0,
-              right: 15.0,
-            ),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationScreen(),
-                  ),
-                );
-              },
-              child: const Icon(
-                Icons.notifications_none,
-                size: 32,
-              ),
+          // show number of unseen notifications
+          SizedBox(
+            width: 50,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                    child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("notifications")
+                      .where("notify_to",isEqualTo: widget.userID)
+                      .snapshots()
+                      .asBroadcastStream(),
+                      builder: (context,userNotifications){
+                    int notificationsCount=0;
+                    if(userNotifications.data!= null){
+                      final List uNotifications = userNotifications.data!.docs;
+                      notificationsCount = uNotifications.where(
+                          (notification)=> notification["is_seen"] == false,
+                      )
+                          .length;
+                    }
+                    return Stack(
+                      alignment: AlignmentDirectional.topStart,
+                      children: [
+                        IconButton(onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationScreen(),
+                            ),
+                          );
+                        },
+                            icon: const Icon(
+                              Icons.notifications_none,
+                              size: 35,
+                            ),),
+                        const SizedBox(width: 6,),
+                        notificationsCount != 0
+                        ?CircleAvatar(
+                          radius: 11.0,
+                          backgroundColor: Colors.redAccent,
+                          child: Text(
+                            notificationsCount.toString(),
+                            style: const TextStyle(
+                              // color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white
+                            ),
+                          ),
+                        )
+                            :const SizedBox.shrink(),
+                      ],
+                    );
+                      },
+                )),
+              ],
             ),
           ),
         ],
@@ -237,7 +280,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("foundItem")
-                  .limit(5).orderBy('annoucementDate',descending: true)
+                  .limit(5)
+                  .orderBy('annoucementDate', descending: true)
                   .snapshots()
                   .asBroadcastStream(),
               builder: (context, snapshot) {
@@ -252,15 +296,19 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         if (index == 0) const SizedBox(width: 16.0),
                         GestureDetector(
                           onTap: () async {
-                            final info = await getNeededPublisherInfo(docs?[index]["publishedBy"]);
+                            final info = await getNeededPublisherInfo(
+                                docs?[index]["publishedBy"]);
                             if (mounted) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AnnouncementDetailsScreen(
-                                    announcementID: docs?[index]["announcementID"],
+                                  builder: (context) =>
+                                      AnnouncementDetailsScreen(
+                                    announcementID: docs?[index]
+                                        ["announcementID"],
                                     publisherID: docs?[index]["publishedBy"],
-                                    announcementType: docs?[index]["announcementType"],
+                                    announcementType: docs?[index]
+                                        ["announcementType"],
                                     publishedBy: info["name"],
                                     phoneNumber: info["phone"],
                                     email: info["email"],
@@ -323,7 +371,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LostItemsScreen(userID: widget.userID),
+                        builder: (context) =>
+                            LostItemsScreen(userID: widget.userID),
                       ),
                     );
                   },
@@ -340,7 +389,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => FoundItemsScreen(userID: widget.userID),
+                        builder: (context) =>
+                            FoundItemsScreen(userID: widget.userID),
                       ),
                     );
                   },
@@ -484,7 +534,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   "assets/$iconName.png",
                   fit: BoxFit.fill,
                   color: primaryColor,
-
                 ),
               ),
               const SizedBox(

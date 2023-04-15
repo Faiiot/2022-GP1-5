@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_admin/constants/constants.dart';
+import 'package:findly_admin/screens/add_building_screen.dart';
+import 'package:findly_admin/screens/add_category_screen.dart';
 import 'package:findly_admin/screens/found_items_screen.dart';
 import 'package:findly_admin/screens/lost_items_screen.dart';
 import 'package:findly_admin/screens/reported_announcement.dart';
@@ -219,7 +221,15 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
                 child: dashboardButton(
                   iconName: "category",
                   label: "Add category",
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const AddCategoryScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(
@@ -229,7 +239,15 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
                 child: dashboardButton(
                   iconName: "building",
                   label: "Add building",
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                        const AddBuildingScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -264,7 +282,7 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
                                       )
                                       .length;
                                 }
-                                if (lostSnapshots.data != null) {
+                                if (foundSnapshots.data != null) {
                                   final List reportedFound = foundSnapshots.data!.docs;
                                   b = reportedFound
                                       .where(
@@ -294,7 +312,8 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
                                         const SizedBox(
                                           width: 16,
                                         ),
-                                        CircleAvatar(
+                                        reported != 0
+                                        ?CircleAvatar(
                                           radius: 16.0,
                                           backgroundColor: Colors.white,
                                           child: Text(
@@ -305,7 +324,8 @@ class _AdminDashboaredScreenn extends State<AdminDashboardScreen> {
                                               fontWeight: FontWeight.w900,
                                             ),
                                           ),
-                                        ),
+                                        )
+                                            :const SizedBox.shrink(),
                                       ],
                                     );
                               },

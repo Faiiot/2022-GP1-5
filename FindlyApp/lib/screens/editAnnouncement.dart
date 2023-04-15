@@ -60,7 +60,7 @@ class _EditAnnouncement extends State<EditAnnouncement> {
   late String annType = widget.announcementType;
   late String annCategory = widget.itemCategory;
   late String oldCategory = widget.itemCategory;
-  late String newCategory;
+  late String newCategory = widget.itemCategory;
   late String contactChanel = widget.contactChannel;
   late String imageUrl = widget.announcementImg;
   late String annDesc = widget.announcementDes;

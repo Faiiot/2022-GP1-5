@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/screens/forgot_password_screen.dart';
 import 'package:findly_app/screens/registration_screen.dart';
 import 'package:findly_app/screens/widgets/my_button.dart';
+import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:findly_app/user_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -280,15 +281,16 @@ class _LoginScreenState extends State<LoginScreen>
                                   width: 30,
                                   height: 30,
                                   child: CircularProgressIndicator(
-                                    backgroundColor: Colors.blue,
+                                    backgroundColor: primaryColor,
                                     color: Colors.white,
                                   ),
                                 ),
                               )
-                            : MyButton(
+                            : WideButton(
                                 //submission button
-                                color: primaryColor,
-                                title: "Log in",
+                                choice: 1,
+                                width: double.infinity,
+                                title: "Log in!",
                                 onPressed: () {
                                   submitFormOnLogin();
                                 }),

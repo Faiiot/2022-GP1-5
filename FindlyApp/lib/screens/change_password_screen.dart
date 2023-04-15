@@ -1,6 +1,7 @@
 import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../constants/constants.dart';
@@ -128,7 +129,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           });
                         },
                         child: Icon(
-                          obscureCurrentPassword ? Icons.visibility : Icons.visibility_off,
+                          obscureCurrentPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                       ),
                     ),
@@ -144,7 +147,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           });
                         },
                         child: Icon(
-                          obscureNewPassword ? Icons.visibility : Icons.visibility_off,
+                          obscureNewPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                       ),
                     ),
@@ -160,8 +165,56 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           });
                         },
                         child: Icon(
-                          obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                          obscureConfirmPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 4.0),
+                            child: Text("At least 8 characters.",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14
+                            ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 4.0),
+                            child: Text("At least 1 number.",
+                              style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14
+                              ),),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 4.0),
+                            child: Text("At least 1 uppercase character.",
+                              style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14
+                              ),),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 4.0),
+                            child: Text("At least 1 lowercase character.",
+                              style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14
+                              ),),
+                          ),
+                          Text("At least 1 special character.",
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14
+                            ),)
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -187,7 +240,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       title: "Cancel",
                       width: double.infinity,
                       onPressed: () {
-                        Navigator.canPop(context) ? Navigator.pop(context) : null;
+                        Navigator.canPop(context)
+                            ? Navigator.pop(context)
+                            : null;
                       },
                     ),
                   ],

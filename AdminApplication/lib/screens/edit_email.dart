@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_admin/screens/admin_profile_page.dart';
 import 'package:findly_admin/screens/widgets/my_button.dart';
 import 'package:flutter/material.dart';
-
 import '../services/global_methods.dart';
 
 class EditEmail extends StatefulWidget {

@@ -92,6 +92,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     setState(() {
       fetchingData = false;
     });
+    print(contactChannel + "   "+theChannel+ "===+++++++==="+widget.publishedBy);
   }
 
   @override
@@ -521,7 +522,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     GlobalMethods.showCustomizedDialogue(
       context: context,
       title: "Delete Announcement",
-      message: "Are you sure you want to delete $itemName?",
+      message: "Are you sure you want to delete this announcement?",
       mainAction: "OK",
       secondaryAction: "Cancel",
       onPressedMain: () async {
@@ -544,7 +545,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         } else {
           GlobalMethods.showCustomizedDialogue(
             context: context,
-            title: "Update States",
+            title: "Update Status",
             message: "Did you return $itemName to her owner?",
             mainAction: "Yes",
             secondaryAction: "No",
@@ -569,6 +570,17 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         .collection(collection)
         .doc(widget.announcementID)
         .delete();
+
+    String notificationID;
+    final doc = FirebaseFirestore.instance
+        .collection("notifications")
+        .where('source_id', isEqualTo: widget.announcementID).get().then((value) => {
+    notificationID =  value.docs[0]["notificationID"].toString(),
+    FirebaseFirestore.instance
+        .collection("notifications")
+        .doc(notificationID)
+        .delete()});
+
     if (!mounted) return;
     Navigator.pop(context);
     Navigator.pop(context);
@@ -583,22 +595,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       count++;
       debugPrint(count.toString());
       if (widget.reportCount == 2) {
-        // await FirebaseFirestore.instance.collection('reportedItem').doc(widget.announcementID).set({
-        //   'announcementID': widget.announcementID,
-        //   'publishedBy': widget.publishedBy,
-        //   'itemName': itemName,
-        //   'itemCategory': itemCategory,
-        //   'announcementDes': announcementDes,
-        //   'announcementType': announcementType,
-        //   'contact': theChannel,
-        //   'url': announcementImg,
-        //   'buildingName': buildingName,
-        //   'annoucementDate': postDate,
-        //   'roomnumber': roomNumber,
-        //   'floornumber': floorNumber,
-        //   'reported': true,
-        //   'reportCount': count,
-        // });
+
         if (announcementType == 'lost') {
           await FirebaseFirestore.instance
               .collection('lostItem')
