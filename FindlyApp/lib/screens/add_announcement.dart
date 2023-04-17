@@ -146,7 +146,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             List<String> publishers =
             await getPublishers(isLost: true, cat: annCategory);
             if (publishers.isNotEmpty) {
-              log("all Publishers:  ${publishers.toString()}");
+              // log("all Publishers:  ${publishers.toString()}");
               List<String> fcms = [];
               await Future.forEach(publishers, (element) async {
                 var user = allUsers.firstWhere((user) => user['id'] == element,
@@ -154,7 +154,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                 if (user == {}) {
                   throw Exception("User Not found");
                 }
-                log("\n\nUser: $user\n\n");
+                // log("\n\nUser: $user\n\n");
                 String userFcm = user['fcm'] ?? "";
                 if (userFcm.isNotEmpty) {
                   fcms.add(userFcm);
@@ -174,7 +174,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                       ));
                 }
               });
-              log("All FCMs: ${fcms.length}");
+              // log("All FCMs: ${fcms.length}");
               await Future.delayed(const Duration(seconds: 1));
               if (fcms.isNotEmpty) {
                 await PushNotificationController.sendPushNotification(

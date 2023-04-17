@@ -492,21 +492,23 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     );
   }
 
-  void _adminDelete() {
+  void _adminDelete(){
     String collection = announcementType == "lost" ? "lostItem" : "foundItem";
     FirebaseFirestore.instance
         .collection(collection)
         .doc(widget.announcementID)
         .delete();
     String notificationID;
-    final doc = FirebaseFirestore.instance
+       final doc = FirebaseFirestore.instance
         .collection("notifications")
-        .where('source_id', isEqualTo: widget.announcementID).get().then((value) => {
-          notificationID =  value.docs[0]["notificationID"].toString(),
-         FirebaseFirestore.instance
-        .collection("notifications")
-        .doc(notificationID)
-        .delete()
+        .where('source_id', isEqualTo: widget.announcementID).get().then((value) async => {
+          value.docs.forEach((element) {
+            notificationID = element['notificationID'].toString();
+             FirebaseFirestore.instance
+            .collection("notifications")
+            .doc(notificationID)
+            .delete();
+          })
     });
     if (!mounted) return;
   }

@@ -92,7 +92,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     setState(() {
       fetchingData = false;
     });
-    print(contactChannel + "   "+theChannel+ "===+++++++==="+widget.publishedBy);
+    // print(contactChannel + "   "+theChannel+ "===+++++++==="+widget.publishedBy);
   }
 
   @override
@@ -102,7 +102,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     fetchAnnouncementDetails();
   }
 
-  //create chat room, then send the user to the conversation or chat screen to exchange messages
+  //create chat room, then send the user to the
+  // conversation or chat screen to exchange messages
   void createChatRoomAndSendUserToConvScreen() async {
     //get the current user id
     User? user = _auth.currentUser;
@@ -574,12 +575,14 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     String notificationID;
     final doc = FirebaseFirestore.instance
         .collection("notifications")
-        .where('source_id', isEqualTo: widget.announcementID).get().then((value) => {
-    notificationID =  value.docs[0]["notificationID"].toString(),
+        .where('source_id', isEqualTo: widget.announcementID).get().then((value) async => {
+    value.docs.forEach((element) {
+    notificationID = element['notificationID'].toString();
     FirebaseFirestore.instance
         .collection("notifications")
         .doc(notificationID)
-        .delete()});
+        .delete();
+    })});
 
     if (!mounted) return;
     Navigator.pop(context);

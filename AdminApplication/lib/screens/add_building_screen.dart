@@ -53,9 +53,7 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
               error: "Building name already exists!", context: context);
         } else {
           await FirebaseFirestore.instance
-              .collection("location")
-              .doc()
-              .set({
+              .collection("location").doc().set({
             "buildingName": _buildingNameTextController.text.trim(),
           });
           setState(() {

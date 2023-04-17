@@ -167,7 +167,6 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
 
     var ref = FirebaseStorage.instance.ref().child("images").child("$fileName.jpg");
     var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
-      // chatMethods.addChatImageMessages(widget.chatroomID, fileName, msg);
       status = 0;
     });
 

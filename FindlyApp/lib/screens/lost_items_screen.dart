@@ -271,7 +271,9 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
           //if the connection state is "waiting", a progress indicatior will appear
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: primaryColor,
+              ),
             );
             //if the connection state is "active"
           } else if (snapshot.connectionState == ConnectionState.active) {
