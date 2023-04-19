@@ -55,7 +55,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   String roomNumber = "";
   String floorNumber = "";
   bool fetchingData = true;
-
+  String lastMessage = "";
+  String test = "test";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   ChatMethods chatMethods = ChatMethods();
 
@@ -66,6 +67,22 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     return false;
   }
 
+
+  Future<void> chattedBefore(String chatroomID) async {
+    print("+++++++++++++++++++++++++++++++++++++in the new method+++++++++++++++++++++++++++++++++++++");
+    final document = await FirebaseFirestore.instance.collection("chatRooms").doc(chatroomID).get();
+    print("+++++++++++++++++++++++++++++++++++++After check      +++++++++++++++++++++++++++++++++++++");
+    if(document.exists){
+      print("+++++++++++++++++++++++++++++++++++++in the if() ++++++++++++++++++++++++++++++++++++++++");
+      setState(() {
+        lastMessage = document.get("lastMessage");
+        test="after fetching";
+      });
+      print("============================================================="+lastMessage);
+      print("============================================================="+test);
+    }
+    print("+++++++++++++++++++++++++++++++++++++at the end of the new method++++++++++++++++++++++++++");
+  }
   void fetchAnnouncementDetails() async {
     final String collection =
         announcementType == "lost" ? "lostItem" : "foundItem";
@@ -108,6 +125,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     //get the current user id
     User? user = _auth.currentUser;
     String uid = user!.uid.toString();
+
     //users id list in the form of String
     List<String> users = [uid, widget.publisherID];
     //users names
@@ -116,13 +134,15 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     String usersNames = "${myName}_$peerName";
     //generating the chatroom id
     String chatroomID = chatMethods.generateChatroomId(uid, widget.publisherID);
+    //to check if it is an old user I chatted with
+    chattedBefore(chatroomID);
     //chatroom info
     final time = DateTime.now().millisecondsSinceEpoch;
     Map<String, dynamic> chatroomMap = {
       "users": users,
       "chatroomID": chatroomID,
       "usersNames": usersNames,
-      "lastMessage": "",
+      "lastMessage": lastMessage,
       "lastMessageTime": time,
     };
     chatMethods.createChatRoom(chatroomID, chatroomMap);

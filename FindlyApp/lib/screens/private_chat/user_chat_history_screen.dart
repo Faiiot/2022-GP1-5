@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/curved_app_bar.dart';
 import 'package:findly_app/screens/private_chat/chatMethods.dart';
 import 'package:findly_app/screens/private_chat/private_chat_screen.dart';
@@ -50,9 +51,13 @@ class _UserChatHistoryScreenState extends State<UserChatHistoryScreen> {
                   );
                 },
               )
-            : const Center(
-                child: CircularProgressIndicator(),
-              );
+            : const SizedBox(
+              width: 30,
+              height: 30,
+              child:  Center(
+                  child: CircularProgressIndicator( color: primaryColor,),
+                ),
+            );
       },
     );
   }
