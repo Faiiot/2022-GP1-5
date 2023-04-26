@@ -79,10 +79,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-/*
-***Credentials***
-Member ID:
-441201238
-Password:
-Fai123456789@
-*/
+
