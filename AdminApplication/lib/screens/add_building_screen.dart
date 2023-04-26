@@ -20,6 +20,7 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
   String searchText = '';
   int buildingCount = 0;
   bool duplicate = false;
+  String buildingName ='';
   @override
   void dispose() {
     _buildingNameTextController.dispose();
@@ -27,31 +28,38 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
   }
 
   void isDuplicate() async {
-    final duplicatedBuilding = await FirebaseFirestore.instance
-        .collection("location")
-        .where("buildingName",
-            isEqualTo: _buildingNameTextController.text.trim())
-        .get();
+    List buildingsList = [];
+    String buildingNameHolder;
+    FirebaseFirestore.instance
+        .collection("location").where("buildingName",isEqualTo: buildingName)
+        .get().then((cList) => {
+      cList.docs.forEach((doc)=> {
+        buildingNameHolder = doc.get("buildingName"),
+        buildingsList.add(buildingNameHolder.toLowerCase()),
+        if(buildingsList.contains(buildingName.toLowerCase())){
+          print(buildingNameHolder),
+          setState(() {
+            duplicate = true;
+          }),
 
-    if (duplicatedBuilding.size != 0) {
-      setState(() {
-        duplicate = true;
-      });
-    }
+        }
+      })
+    });
+
   }
 
   void addBuilding() async {
-    isDuplicate();
-    final isValid = _addBuildingFormKey.currentState!.validate();
+    final bool isValid = _addBuildingFormKey.currentState!.validate();
     if (isValid) {
-      setState(() {
-        _isLoading = true;
-      });
+      isDuplicate();
       try {
         if (duplicate) {
           GlobalMethods.showErrorDialog(
               error: "Building name already exists!", context: context);
         } else {
+          setState(() {
+            _isLoading = true;
+          });
           await FirebaseFirestore.instance
               .collection("location").doc().set({
             "buildingName": _buildingNameTextController.text.trim(),
@@ -275,7 +283,9 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
                           controller: _buildingNameTextController,
                           textAlign: TextAlign.start,
                           onChanged: (value) {
-                            print(value);
+                            setState(() {
+                              buildingName = value.trim();
+                            });
                           },
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.category_outlined),
@@ -331,12 +341,13 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
                                 onPressed: () {
                                   GlobalMethods.showCustomizedDialogue(
                                       title: "Add building",
+                                      message: "Are you sure you want to add this building?",
                                       mainAction: "Yes",
                                       context: context,
                                       secondaryAction: "No",
                                       onPressedMain: () {
-                                        addBuilding();
                                         Navigator.pop(context);
+                                        addBuilding();
                                       },
                                       onPressedSecondary: () {
                                         Navigator.pop(context);

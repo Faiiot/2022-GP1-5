@@ -20,7 +20,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   bool _isLoading = false;
   String searchText = '';
   bool duplicate = false;
-
+  String category= '';
 
   @override
   void dispose() {
@@ -29,29 +29,42 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   }
 
   void isDuplicate() async {
-    final duplicatedBuilding = await FirebaseFirestore.instance
+    final duplicatedCategory = FirebaseFirestore.instance
         .collection("category")
-        .where("categoryName",
-        isEqualTo: _categoryNameController.text.trim())
+        .where("categoryName",isEqualTo: category)
         .get();
+    List categoryList = [];
+    String categoryNameHolder;
+    FirebaseFirestore.instance
+        .collection("category").where("categoryName",isEqualTo: category)
+        .get().then((cList) => {
+          cList.docs.forEach((doc)=> {
+            categoryNameHolder = doc.get("categoryName"),
+            categoryList.add(categoryNameHolder.toLowerCase()),
+            if(categoryList.contains(category.toLowerCase())){
+              print(categoryNameHolder),
+              setState(() {
+                duplicate = true;
+              }),
 
-    if (duplicatedBuilding.size != 0) {
-      setState(() {
-        duplicate = true;
-      });
-    }
+            }
+          })
+    });
+
   }
+
   void addCategory() async {
-    final isValid = _addCategoryFormKey.currentState!.validate();
+    final bool isValid = _addCategoryFormKey.currentState!.validate();
     if (isValid) {
-      setState(() {
-        _isLoading = true;
-      });
+      isDuplicate();
       try {
         if (duplicate) {
           GlobalMethods.showErrorDialog(
               error: "Category already exists!", context: context);
         } else {
+          setState(() {
+            _isLoading = true;
+          });
           await FirebaseFirestore.instance.collection("category").doc().set({
             "categoryName": _categoryNameController.text.trim(),
           });
@@ -60,6 +73,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
           });
 
           GlobalMethods.showToast("Category has been added successfully!");
+          _categoryNameController.clear();
         }
       } catch (error) {
         debugPrint(error.toString());
@@ -68,7 +82,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -162,10 +175,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.only(
-                                left: 8,
-                                right: 8,
-                                bottom: 10
-                              ),
+                                  left: 8, right: 8, bottom: 10),
                               child: TextField(
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
@@ -195,7 +205,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                   child: const Center(
                                     child: CircularProgressIndicator(
                                       color: primaryColor,
-
                                     ),
                                   ),
                                 );
@@ -208,9 +217,12 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
 
                                   if (searchText.isNotEmpty) {
                                     data.retainWhere(
-                                          (element) => element['categoryName'].toString().toLowerCase().contains(
-                                        searchText.toLowerCase(),
-                                      ),
+                                      (element) => element['categoryName']
+                                          .toString()
+                                          .toLowerCase()
+                                          .contains(
+                                            searchText.toLowerCase(),
+                                          ),
                                     );
                                   }
                                   return Padding(
@@ -261,14 +273,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                 ),
                               );
                             }),
-                        // ListView.builder(
-                        //   itemBuilder: (BuildContext context, int index) {
-                        //     List categories = ReferenceData.instance.categories.toList();
-                        //     return const ListTile(
-                        //       title: categories.data[index],
-                        //     );
-                        //   },
-                        // ),
+
                         TextFormField(
                           textInputAction: TextInputAction.done,
                           onEditingComplete: () =>
@@ -284,7 +289,11 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                           },
                           controller: _categoryNameController,
                           textAlign: TextAlign.start,
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              category = value.trim();
+                            });
+                          },
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.category_outlined),
                             hintText: "Add category",
@@ -337,18 +346,24 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                 choice: 1,
                                 title: "Add category",
                                 onPressed: () {
-                                  GlobalMethods.showCustomizedDialogue(
-                                      title: "Add category",
-                                      mainAction: "Yes",
-                                      context: context,
-                                      secondaryAction: "No",
-                                      onPressedMain: () {
-                                        addCategory();
-                                        Navigator.pop(context);
-                                      },
-                                      onPressedSecondary: () {
-                                        Navigator.pop(context);
-                                      });
+                                  final bool isValidForm = _addCategoryFormKey
+                                      .currentState!
+                                      .validate();
+                                  if (isValidForm) {
+                                    GlobalMethods.showCustomizedDialogue(
+                                        title: "Add category",
+                                        message: "Are you sure you want to add this category?",
+                                        mainAction: "Yes",
+                                        context: context,
+                                        secondaryAction: "No",
+                                        onPressedMain: () {
+                                          Navigator.pop(context);
+                                          addCategory();
+                                        },
+                                        onPressedSecondary: () {
+                                          Navigator.pop(context);
+                                        });
+                                  }
                                 },
                               ),
                         _isLoading
