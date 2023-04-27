@@ -178,8 +178,8 @@ class _LoginScreenState extends State<LoginScreen>
                           onChanged: (value) {},
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.perm_identity_rounded),
-                            hintText: "Enter your ID",
-                            labelText: "ID",
+                            hintText: "Enter your member ID",
+                            labelText: "Member ID",
                             contentPadding: EdgeInsets.symmetric(
                               vertical: 10,
                               horizontal: 20,

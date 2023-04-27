@@ -42,7 +42,7 @@ class AuthHomeScreen extends StatelessWidget {
               ),
             ),
             Image.asset(
-              "assets/ksu_black_logo.jpeg",
+              "assets/ksu_masterlogo_colour_rgb.png",
               width: MediaQuery.of(context).size.width * 0.75,
             ),
             const SizedBox(height: 48),
