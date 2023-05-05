@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_app/constants/curved_app_bar.dart';
+import 'package:findly_app/constants/dates.dart';
+import 'package:findly_app/constants/reference_data.dart';
 import 'package:findly_app/screens/widgets/announcements_widget.dart';
 import 'package:flutter/material.dart';
 import '../constants/constants.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class UserAnnouncementsScreen extends StatefulWidget {
   final String userID;
@@ -18,6 +21,27 @@ class UserAnnouncementsScreen extends StatefulWidget {
 }
 
 class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
+  DateTime? selectedDate;
+  String? selectedCategory;
+  String? selectedBuildingName;
+
+  TextButton buildTextButton(
+      BuildContext context,
+      String label,
+      bool activeColor,
+      Function()? onTap,
+      ) {
+    return TextButton(
+      onPressed: onTap,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: activeColor ? primaryColor : Colors.grey,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -34,9 +58,324 @@ class _UserAnnouncementsScreenState extends State<UserAnnouncementsScreen> {
           title: const Text('My announcements'),
           actions: [
             IconButton(
-              icon: const Icon(Icons.filter_alt_rounded),
-              onPressed: () {},
+              icon: const Icon(
+                Icons.filter_alt_rounded,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) {
+                    return AlertDialog(
+                      scrollable: true,
+                      contentPadding: const EdgeInsets.all(24.0),
+                      title: const Text("Filters"),
+                      content: Column(
+                        children: [
+                          DropdownButtonFormField<String?>(
+                            isExpanded: true,
+                            value: Dates.dateToString(selectedDate),
+                            decoration: kInputDecoration,
+                            items: const [
+                              DropdownMenuItem<String?>(
+                                value: null,
+                                child: Text(
+                                  'Date',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: Dates.kLastWeek,
+                                child: Text(
+                                  Dates.kLastWeek,
+                                  maxLines: 3,
+                                ),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: Dates.kLastTwoWeeks,
+                                child: Text(
+                                  Dates.kLastTwoWeeks,
+                                  maxLines: 3,
+                                ),
+                              ),
+                              DropdownMenuItem<String>(
+                                value: Dates.kLastMonth,
+                                child: Text(
+                                  Dates.kLastMonth,
+                                  maxLines: 3,
+                                ),
+                              ),
+                            ],
+                            onChanged: (dropDownValue) {
+                              selectedDate = Dates.stringToDate(dropDownValue);
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField(
+                            value: selectedCategory,
+                            isExpanded: true,
+                            decoration: kInputDecoration,
+                            items: [
+                              const DropdownMenuItem<String?>(
+                                  value: null,
+                                  child: Text(
+                                    'Item category',
+                                    style: TextStyle(color: Colors.grey),
+                                  )),
+                              ...ReferenceData.instance.categories
+                                  .map(
+                                    (categoryName) => DropdownMenuItem<String>(
+                                  value: categoryName,
+                                  child: Text(
+                                    categoryName,
+                                    maxLines: 3,
+                                  ),
+                                ),
+                              )
+                                  .toList(),
+                            ],
+                            onChanged: (value) {
+                              selectedCategory = value;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownSearch<String>(
+                            mode: Mode.DIALOG,
+                            showSelectedItems: true,
+                            items: ReferenceData.instance.locations,
+                            dropdownSearchDecoration: const InputDecoration(
+                              hintText: "Building name",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(16),
+                                  )),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.black,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(16),
+                                  )),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: primaryColor,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(16),
+                                  )),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(16),
+                                ),
+                                borderSide: BorderSide(color: Colors.red),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              selectedBuildingName = value;
+                            },
+                            selectedItem: selectedBuildingName,
+                            popupShape: const RoundedRectangleBorder(),
+                            showSearchBox: true,
+                            searchFieldProps: const TextFieldProps(
+                              cursorColor: primaryColor,
+                              decoration: kInputDecoration,
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        buildTextButton(
+                          context,
+                          "Reset",
+                          false,
+                              () {
+                            selectedDate = selectedCategory = selectedBuildingName = null;
+                            Navigator.pop(context);
+                          },
+                        ),
+                        buildTextButton(
+                          context,
+                          "Apply",
+                          true,
+                              () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ).then(
+                      (_) => setState(() {}),
+                );
+              },
             ),
+            // IconButton(
+            //   icon: const Icon(
+            //       Icons.filter_alt_rounded,
+            //   color: Colors.white,),
+            //   onPressed: () {
+            //     showDialog(
+            //       context: context,
+            //       barrierDismissible: false,
+            //       builder: (_) {
+            //         return AlertDialog(
+            //           scrollable: true,
+            //           contentPadding: const EdgeInsets.all(24.0),
+            //           title: const Text("Filters"),
+            //           content: Column(
+            //             children: [
+            //               DropdownButtonFormField<String?>(
+            //                 isExpanded: true,
+            //                 value: Dates.dateToString(selectedDate),
+            //                 decoration: kInputDecoration,
+            //                 items: const [
+            //                   DropdownMenuItem<String?>(
+            //                     value: null,
+            //                     child: Text(
+            //                       'Date',
+            //                       style: TextStyle(color: Colors.grey),
+            //                     ),
+            //                   ),
+            //                   DropdownMenuItem<String>(
+            //                     value: Dates.kLastWeek,
+            //                     child: Text(
+            //                       Dates.kLastWeek,
+            //                       maxLines: 3,
+            //                     ),
+            //                   ),
+            //                   DropdownMenuItem<String>(
+            //                     value: Dates.kLastTwoWeeks,
+            //                     child: Text(
+            //                       Dates.kLastTwoWeeks,
+            //                       maxLines: 3,
+            //                     ),
+            //                   ),
+            //                   DropdownMenuItem<String>(
+            //                     value: Dates.kLastMonth,
+            //                     child: Text(
+            //                       Dates.kLastMonth,
+            //                       maxLines: 3,
+            //                     ),
+            //                   ),
+            //                 ],
+            //                 onChanged: (dropDownValue) {
+            //                   selectedDate = Dates.stringToDate(dropDownValue);
+            //                 },
+            //               ),
+            //               const SizedBox(height: 20),
+            //               DropdownButtonFormField(
+            //                 value: selectedCategory,
+            //                 isExpanded: true,
+            //                 decoration: kInputDecoration,
+            //                 items: [
+            //                   const DropdownMenuItem<String?>(
+            //                       value: null,
+            //                       child: Text(
+            //                         'Item category',
+            //                         style: TextStyle(color: Colors.grey),
+            //                       )),
+            //                   ...ReferenceData.instance.categories
+            //                       .map(
+            //                         (categoryName) => DropdownMenuItem<String>(
+            //                       value: categoryName,
+            //                       child: Text(
+            //                         categoryName,
+            //                         maxLines: 3,
+            //                       ),
+            //                     ),
+            //                   )
+            //                       .toList(),
+            //                 ],
+            //                 onChanged: (value) {
+            //                   selectedCategory = value;
+            //                 },
+            //               ),
+            //               const SizedBox(height: 20),
+            //               DropdownSearch<String>(
+            //                 mode: Mode.DIALOG,
+            //                 showSelectedItems: true,
+            //                 items: ReferenceData.instance.locations,
+            //                 dropdownSearchDecoration: const InputDecoration(
+            //                   hintText: "Building name",
+            //                   hintStyle: TextStyle(color: Colors.grey),
+            //                   contentPadding: EdgeInsets.symmetric(
+            //                     vertical: 10,
+            //                     horizontal: 20,
+            //                   ),
+            //                   border: OutlineInputBorder(
+            //                       borderRadius: BorderRadius.all(
+            //                         Radius.circular(16),
+            //                       )),
+            //                   enabledBorder: OutlineInputBorder(
+            //                       borderSide: BorderSide(
+            //                         color: Colors.black,
+            //                         width: 2,
+            //                       ),
+            //                       borderRadius: BorderRadius.all(
+            //                         Radius.circular(16),
+            //                       )),
+            //                   focusedBorder: OutlineInputBorder(
+            //                       borderSide: BorderSide(
+            //                         color: primaryColor,
+            //                         width: 2,
+            //                       ),
+            //                       borderRadius: BorderRadius.all(
+            //                         Radius.circular(16),
+            //                       )),
+            //                   errorBorder: OutlineInputBorder(
+            //                     borderRadius: BorderRadius.all(
+            //                       Radius.circular(16),
+            //                     ),
+            //                     borderSide: BorderSide(color: Colors.red),
+            //                   ),
+            //                 ),
+            //                 onChanged: (value) {
+            //                   selectedBuildingName = value;
+            //                 },
+            //                 selectedItem: selectedBuildingName,
+            //                 popupShape: const RoundedRectangleBorder(),
+            //                 showSearchBox: true,
+            //                 searchFieldProps: const TextFieldProps(
+            //                   cursorColor: primaryColor,
+            //                   decoration: kInputDecoration,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //           actions: [
+            //             buildTextButton(
+            //               context,
+            //               "Reset",
+            //               false,
+            //                   () {
+            //                 selectedDate = selectedCategory = selectedBuildingName = null;
+            //                 Navigator.pop(context);
+            //               },
+            //             ),
+            //             buildTextButton(
+            //               context,
+            //               "Apply",
+            //               true,
+            //                   () {
+            //                 Navigator.pop(context);
+            //               },
+            //             ),
+            //           ],
+            //         );
+            //       },
+            //     ).then(
+            //           (_) => setState(() {}),
+            //     );
+            //   },
+            // ),
           ],
         ),
         body: Column(

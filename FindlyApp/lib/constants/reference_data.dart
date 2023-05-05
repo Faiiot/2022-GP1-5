@@ -21,6 +21,7 @@ class ReferenceData {
       ),
     );
     if (_categories.isNotEmpty) _categories.add("Others");
+
   }
 
   Future<void> _getDbLocations() async {
@@ -36,12 +37,13 @@ class ReferenceData {
     required String collection,
     required String fieldName,
   }) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(collection).get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(collection).orderBy(fieldName).get();
     final dbData = querySnapshot.docs.map((doc) => doc.data()).toList();
     final List<String> data = [];
     for (final dbDatum in dbData) {
       data.add((dbDatum as Map)[fieldName]);
     }
+    data.sort();
     return data;
   }
 

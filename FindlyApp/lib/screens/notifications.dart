@@ -35,7 +35,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
   String lastName = "";
   String fullName = "";
 
-
   Future<void> fetchAnnouncementDetails(
       String announcementID, String announcementType, String uid) async {
     final String collection =
@@ -46,7 +45,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         .get();
 
     final userDoc =
-    await FirebaseFirestore.instance.collection("users").doc(uid).get();
+        await FirebaseFirestore.instance.collection("users").doc(uid).get();
     if (!mounted) return;
     setState(() {
       firstName = userDoc.get('firstName');
@@ -71,7 +70,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
       print(fullName);
       print(phoneNumber);
       print(email);
-
     });
   }
 
@@ -111,7 +109,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
-
           if (!snapshot.hasData) {
             return const Center(
               child: Text(
@@ -161,9 +158,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             AnnouncementDetailsScreen(
-                                                announcementID: notifications[index]["source_id"],
-                                                publisherID: notifications[index]["notify_by"],
-                                                announcementType: notifications[index]["type"],
+                                                announcementID:
+                                                    notifications[index]
+                                                        ["source_id"],
+                                                publisherID:
+                                                    notifications[index]
+                                                        ["notify_by"],
+                                                announcementType:
+                                                    notifications[index]
+                                                        ["type"],
                                                 phoneNumber: phoneNumber,
                                                 email: email,
                                                 publishedBy: fullName,
@@ -181,11 +184,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 tileColor: primaryColor.withOpacity(0.25),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)),
-                                leading: const Icon(
-                                  Icons.notifications_none,
-                                  color: primaryColor,
-                                  size: 32,
-                                ),
+                                leading: notifications[index]["type"] != "chat"
+                                    ? const Icon(
+                                        Icons.notifications_active_outlined,
+                                        color: primaryColor,
+                                        size: 36,
+                                      )
+                                    : const Icon(
+                                        Icons.mark_chat_unread_outlined,
+                                        color: primaryColor,
+                                        size: 32,
+                                      ),
                                 title: Text(
                                   '${notifications[index]["title"]}',
                                   style: const TextStyle(

@@ -1,4 +1,5 @@
 import 'package:findly_app/screens/widgets/my_button.dart';
+import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -99,6 +100,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.email),
                           hintText: "Enter your Email",
+                          labelText: "Email",
                           contentPadding: EdgeInsets.symmetric(
                             vertical: 10,
                             horizontal: 20,
@@ -117,7 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
                               )),
                           focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Colors.blueAccent,
+                                color: primaryColor,
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.all(
@@ -126,20 +128,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
                         ),
                       ),
                       const SizedBox(height: 24),
-                      MyButton(
+                     WideButton(
                           //Reset password by email button
-                          color: primaryColor,
+                          choice: 1,
                           title: "Reset Now!",
                           onPressed: () {
                             _forgotPasswordFCT();
-                          }),
-                      MyButton(
+                          },
+                     width: double.infinity,),
+                      WideButton(
                         //Reset password by email button
-                        color: primaryColor,
+                        choice: 2,
                         title: "Cancel",
                         onPressed: () {
                           Navigator.canPop(context) ? Navigator.pop(context) : null;
                         },
+                        width: double.infinity,
                       ),
                     ],
                   ),

@@ -141,9 +141,10 @@ class _EditAnnouncement extends State<EditAnnouncement> {
           .child('$uniqueImgID.jpg');
       await ref.putFile(imgFile!);
       imageUrl = await ref.getDownloadURL();
-    } else {
-      imageUrl = "";
     }
+    // else {
+    //   imageUrl = "";
+    // }
     final isValid = _editFormKey.currentState!.validate();
     if (mounted) FocusScope.of(context).unfocus();
 

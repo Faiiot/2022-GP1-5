@@ -6,6 +6,7 @@ import 'package:findly_app/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:password_field_validator/password_field_validator.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const String screenRoute = 'registration_screen';
@@ -197,7 +198,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           onChanged: (value) {},
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.perm_identity_rounded),
-                            hintText: "Enter your ID",
+                            hintText: "Enter your member ID",
+                            labelText: "Member ID *",
                             contentPadding: EdgeInsets.symmetric(
                               vertical: 10,
                               horizontal: 20,
@@ -249,7 +251,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           onChanged: (value) {},
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.mail),
-                            labelText: "Email address *",
+                            labelText: "Email *",
                             hintText: "Enter your Email",
                             contentPadding: EdgeInsets.symmetric(
                               vertical: 10,
@@ -400,7 +402,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.phone),
                             labelText: "Phone number *",
-                            hintText: "Phone number",
+                            hintText: "05.. or 00966..",
                             contentPadding: EdgeInsets.symmetric(
                               vertical: 10,
                               horizontal: 20,
@@ -522,7 +524,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               },
                               child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
                             ),
-                            labelText: "Password *",
+                            labelText: "Confirm password *",
                             hintText: "Enter your Password",
                             contentPadding: const EdgeInsets.symmetric(
                               vertical: 10,
@@ -552,51 +554,64 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           ),
                         ),
+                        // Padding(
+                        //   padding: const EdgeInsets.all(8.0),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: const [
+                        //       Padding(
+                        //         padding: EdgeInsets.only(bottom: 4.0),
+                        //         child: Text("At least 8 characters.",
+                        //           style: TextStyle(
+                        //               color: Colors.black54,
+                        //               fontSize: 14
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Padding(
+                        //         padding: EdgeInsets.only(bottom: 4.0),
+                        //         child: Text("At least 1 number.",
+                        //           style: TextStyle(
+                        //               color: Colors.black54,
+                        //               fontSize: 14
+                        //           ),),
+                        //       ),
+                        //       Padding(
+                        //         padding: EdgeInsets.only(bottom: 4.0),
+                        //         child: Text("At least 1 uppercase character.",
+                        //           style: TextStyle(
+                        //               color: Colors.black54,
+                        //               fontSize: 14
+                        //           ),),
+                        //       ),
+                        //       Padding(
+                        //         padding: EdgeInsets.only(bottom: 4.0),
+                        //         child: Text("At least 1 lowercase character.",
+                        //           style: TextStyle(
+                        //               color: Colors.black54,
+                        //               fontSize: 14
+                        //           ),),
+                        //       ),
+                        //       Text("At least 1 special character.",
+                        //         style: TextStyle(
+                        //             color: Colors.black54,
+                        //             fontSize: 14
+                        //         ),)
+                        //     ],
+                        //   ),
+                        // ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 4.0),
-                                child: Text("At least 8 characters.",
-                                  style: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 14
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 4.0),
-                                child: Text("At least 1 number.",
-                                  style: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 14
-                                  ),),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 4.0),
-                                child: Text("At least 1 uppercase character.",
-                                  style: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 14
-                                  ),),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 4.0),
-                                child: Text("At least 1 lowercase character.",
-                                  style: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 14
-                                  ),),
-                              ),
-                              Text("At least 1 special character.",
-                                style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 14
-                                ),)
-                            ],
-                          ),
+                            padding: const EdgeInsets.all(16),
+                          child: PasswordFieldValidator(
+                              minLength: 8,
+                              uppercaseCharCount: 1,
+                              lowercaseCharCount: 1,
+                              numericCharCount: 1,
+                              specialCharCount: 1,
+                              defaultColor: Colors.grey,
+                              successColor: Colors.green,
+                              failureColor: const Color(0xFFA44237),
+                              controller: _passwordTextController),
                         ),
                         _isLoading
                             ? const Center(

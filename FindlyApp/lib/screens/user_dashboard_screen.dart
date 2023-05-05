@@ -464,7 +464,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ),
               Expanded(
                 child: dashboardButton(
-                  iconName: "chatbot",
+                  iconName: "chatbotOutlined",
                   label: "Need help?",
                   onTap: () {
                     Navigator.push(

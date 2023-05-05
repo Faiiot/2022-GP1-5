@@ -51,12 +51,16 @@ class OnBoardingScreen extends StatelessWidget {
                 ),
                 buildContentConfig(
                   image: "communicate.png",
-                  text: "With Findly you can communicate easier through private chat.",
+                  text: "With Findly you can communicate easier through private chat",
                 ),
                 buildContentConfig(
                   image: "notification_slide_screen.png",
                   text:
-                      "You will be notified whenever someone announce in your items matching category.",
+                      "You will be notified whenever someone announces\n in the same category of your item",
+                ),
+                buildContentConfig(
+                    image: "chatbotColored.png",
+                    text: "Findly's chatbot will help you select the category to announce your item in"
                 ),
               ],
               onSkipPress: () => navigate(context),
