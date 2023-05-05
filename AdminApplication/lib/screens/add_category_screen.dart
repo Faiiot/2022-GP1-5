@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:findly_admin/constants/constants.dart';
+import 'package:findly_admin/constants/reference_data.dart';
 import 'package:findly_admin/screens/widgets/wide_button.dart';
 import 'package:findly_admin/services/global_methods.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   bool _isLoading = false;
   String searchText = '';
   bool duplicate = false;
-  String category= '';
+  String category = '';
 
   @override
   void dispose() {
@@ -28,40 +29,36 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     super.dispose();
   }
 
-  void isDuplicate() async {
+  isDuplicate() async {
     final duplicatedCategory = FirebaseFirestore.instance
         .collection("category")
-        .where("categoryName",isEqualTo: category)
+        .where("categoryName", isEqualTo: category)
         .get();
     List categoryList = [];
+
+
     String categoryNameHolder;
-    FirebaseFirestore.instance
-        .collection("category").where("categoryName",isEqualTo: category)
-        .get().then((cList) => {
-          cList.docs.forEach((doc)=> {
-            categoryNameHolder = doc.get("categoryName"),
-            categoryList.add(categoryNameHolder.toLowerCase()),
-            if(categoryList.contains(category.toLowerCase())){
-              print(categoryNameHolder),
+    FirebaseFirestore.instance.collection("category").get().then((cList) => {
+          cList.docs.forEach((doc) => {
+                categoryNameHolder = doc.get("categoryName"),
+                categoryList.add(categoryNameHolder.toLowerCase()),
+              }),
+          if (categoryList.contains(category.toLowerCase()))
+            {
               setState(() {
                 duplicate = true;
+                return;
               }),
-
+              print(categoryList)
             }
-          })
-    });
-
+        });
   }
 
   void addCategory() async {
     final bool isValid = _addCategoryFormKey.currentState!.validate();
     if (isValid) {
-      isDuplicate();
+
       try {
-        if (duplicate) {
-          GlobalMethods.showErrorDialog(
-              error: "Category already exists!", context: context);
-        } else {
           setState(() {
             _isLoading = true;
           });
@@ -74,7 +71,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
 
           GlobalMethods.showToast("Category has been added successfully!");
           _categoryNameController.clear();
-        }
+
       } catch (error) {
         debugPrint(error.toString());
         GlobalMethods.showErrorDialog(
@@ -283,7 +280,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                               return "Please enter a category..";
                             }
                             if (!categoryName.hasMatch(value)) {
-                              return "Category contains only letters";
+                              return "Category name must start\nwith a capital letter";
                             }
                             return null;
                           },
@@ -350,19 +347,30 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                       .currentState!
                                       .validate();
                                   if (isValidForm) {
-                                    GlobalMethods.showCustomizedDialogue(
-                                        title: "Add category",
-                                        message: "Are you sure you want to add this category?",
-                                        mainAction: "Yes",
-                                        context: context,
-                                        secondaryAction: "No",
-                                        onPressedMain: () {
-                                          Navigator.pop(context);
-                                          addCategory();
-                                        },
-                                        onPressedSecondary: () {
-                                          Navigator.pop(context);
-                                        });
+                                    isDuplicate();
+                                    if (duplicate == true) {
+                                      GlobalMethods.showErrorDialog(
+                                          error:
+                                              "The category you are trying to add already exists! ",
+                                          context: context);
+                                    }
+                                    else{
+                                      GlobalMethods.showCustomizedDialogue(
+                                          title: "Add category",
+                                          message:
+                                          "Are you sure you want to add this category?",
+                                          mainAction: "Yes",
+                                          context: context,
+                                          secondaryAction: "No",
+                                          onPressedMain: () {
+                                            Navigator.pop(context);
+                                            addCategory();
+                                          },
+                                          onPressedSecondary: () {
+                                            Navigator.pop(context);
+                                          });
+                                    }
+
                                   }
                                 },
                               ),

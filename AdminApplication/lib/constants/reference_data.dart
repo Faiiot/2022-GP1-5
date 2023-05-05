@@ -38,6 +38,7 @@ class ReferenceData {
     for (final dbDatum in dbData) {
       data.add((dbDatum as Map)[fieldName]);
     }
+    data.sort();
     return data;
   }
 

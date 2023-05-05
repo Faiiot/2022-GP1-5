@@ -55,6 +55,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   String roomNumber = "";
   String floorNumber = "";
   bool fetchingData = true;
+  bool chatroomExists = false;
   String lastMessage = "";
   String test = "test";
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -75,6 +76,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     if(document.exists){
       print("+++++++++++++++++++++++++++++++++++++in the if() ++++++++++++++++++++++++++++++++++++++++");
       setState(() {
+        chatroomExists = true;
         lastMessage = document.get("lastMessage");
         test="after fetching";
       });
@@ -106,6 +108,21 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     announcementDes = announcement["announcementDes"];
     roomNumber = announcement["roomnumber"];
     floorNumber = announcement["floornumber"];
+    if (floorNumber.isNotEmpty){
+      setState(() {
+        String floor =floorNumber;
+        floorNumber = ", Floor: $floor";
+      });
+      if(roomNumber.isNotEmpty){
+        setState(() {
+          String room = roomNumber;
+          roomNumber = ", Room: $room";
+        });
+      }
+    }else{setState(() {
+      roomNumber = "";
+    });}
+
     setState(() {
       fetchingData = false;
     });
@@ -121,7 +138,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
 
   //create chat room, then send the user to the
   // conversation or chat screen to exchange messages
-  void createChatRoomAndSendUserToConvScreen() async {
+   createChatRoomAndSendUserToConvScreen() async {
     //get the current user id
     User? user = _auth.currentUser;
     String uid = user!.uid.toString();
@@ -135,7 +152,20 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     //generating the chatroom id
     String chatroomID = chatMethods.generateChatroomId(uid, widget.publisherID);
     //to check if it is an old user I chatted with
-    chattedBefore(chatroomID);
+    await chattedBefore(chatroomID);
+    if (chatroomExists == true){
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PrivateChatScreen(
+            widget.publishedBy,
+            chatroomID,
+            peerId: widget.publisherID,
+          ),
+        ),
+      );
+      return;
+    }
     //chatroom info
     final time = DateTime.now().millisecondsSinceEpoch;
     Map<String, dynamic> chatroomMap = {
@@ -369,6 +399,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           const SizedBox(
                             height: 8,
                           ),
+                          buildingName.isNotEmpty?
                           Row(
                             children: [
                               const Icon(
@@ -380,7 +411,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Text(
-                                    "$buildingName, $floorNumber, $roomNumber",
+                                    "$buildingName $floorNumber $roomNumber",
                                     maxLines: 2,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
@@ -388,7 +419,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                 ),
                               ),
                             ],
-                          ),
+                          )
+                          :
+                          const SizedBox.shrink(),
                           const SizedBox(
                             height: 8,
                           ),

@@ -21,42 +21,38 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
   int buildingCount = 0;
   bool duplicate = false;
   String buildingName ='';
+  RegExp buildingRegExp= RegExp(r'^[A-Z][a-zA-Z0-9]*$');
   @override
   void dispose() {
     _buildingNameTextController.dispose();
     super.dispose();
   }
 
-  void isDuplicate() async {
-    List buildingsList = [];
+  isDuplicate() async {
+    List buildingList = [];
+
     String buildingNameHolder;
-    FirebaseFirestore.instance
-        .collection("location").where("buildingName",isEqualTo: buildingName)
-        .get().then((cList) => {
-      cList.docs.forEach((doc)=> {
+    FirebaseFirestore.instance.collection("location").get().then((cList) => {
+      cList.docs.forEach((doc) => {
         buildingNameHolder = doc.get("buildingName"),
-        buildingsList.add(buildingNameHolder.toLowerCase()),
-        if(buildingsList.contains(buildingName.toLowerCase())){
-          print(buildingNameHolder),
+        buildingList.add(buildingNameHolder.toLowerCase()),
+      }),
+      if (buildingList.contains(buildingName.toLowerCase()))
+        {
           setState(() {
             duplicate = true;
+            return;
           }),
-
+          print(buildingList)
         }
-      })
     });
-
   }
 
   void addBuilding() async {
     final bool isValid = _addBuildingFormKey.currentState!.validate();
     if (isValid) {
-      isDuplicate();
+      // isDuplicate();
       try {
-        if (duplicate) {
-          GlobalMethods.showErrorDialog(
-              error: "Building name already exists!", context: context);
-        } else {
           setState(() {
             _isLoading = true;
           });
@@ -70,7 +66,7 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
 
           GlobalMethods.showToast("Building has been added successfully!");
           _buildingNameTextController.clear();
-        }
+
       } catch (error) {
         debugPrint(error.toString());
         GlobalMethods.showErrorDialog(
@@ -278,6 +274,9 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
                             if (value!.isEmpty) {
                               return "Please enter a building name..";
                             }
+                            if(!buildingRegExp.hasMatch(value)){
+                              return "Building name must start\nwith a capital letter";
+                            }
                             return null;
                           },
                           controller: _buildingNameTextController,
@@ -339,19 +338,35 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
                                 choice: 1,
                                 title: "Add building",
                                 onPressed: () {
-                                  GlobalMethods.showCustomizedDialogue(
-                                      title: "Add building",
-                                      message: "Are you sure you want to add this building?",
-                                      mainAction: "Yes",
-                                      context: context,
-                                      secondaryAction: "No",
-                                      onPressedMain: () {
-                                        Navigator.pop(context);
-                                        addBuilding();
-                                      },
-                                      onPressedSecondary: () {
-                                        Navigator.pop(context);
-                                      });
+                                  final bool isValidForm = _addBuildingFormKey
+                                      .currentState!
+                                      .validate();
+                                  if (isValidForm) {
+                                    isDuplicate();
+                                    if (duplicate == true) {
+                                      GlobalMethods.showErrorDialog(
+                                          error:
+                                          "The building you are trying to add already exists! ",
+                                          context: context);
+                                    }
+                                    else{
+                                      GlobalMethods.showCustomizedDialogue(
+                                          title: "Add building",
+                                          message:
+                                          "Are you sure you want to add this building?",
+                                          mainAction: "Yes",
+                                          context: context,
+                                          secondaryAction: "No",
+                                          onPressedMain: () {
+                                            Navigator.pop(context);
+                                            addBuilding();
+                                          },
+                                          onPressedSecondary: () {
+                                            Navigator.pop(context);
+                                          });
+                                    }
+
+                                  }
                                 },
                               ),
                         _isLoading
