@@ -554,52 +554,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.all(8.0),
-                        //   child: Column(
-                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                        //     children: const [
-                        //       Padding(
-                        //         padding: EdgeInsets.only(bottom: 4.0),
-                        //         child: Text("At least 8 characters.",
-                        //           style: TextStyle(
-                        //               color: Colors.black54,
-                        //               fontSize: 14
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       Padding(
-                        //         padding: EdgeInsets.only(bottom: 4.0),
-                        //         child: Text("At least 1 number.",
-                        //           style: TextStyle(
-                        //               color: Colors.black54,
-                        //               fontSize: 14
-                        //           ),),
-                        //       ),
-                        //       Padding(
-                        //         padding: EdgeInsets.only(bottom: 4.0),
-                        //         child: Text("At least 1 uppercase character.",
-                        //           style: TextStyle(
-                        //               color: Colors.black54,
-                        //               fontSize: 14
-                        //           ),),
-                        //       ),
-                        //       Padding(
-                        //         padding: EdgeInsets.only(bottom: 4.0),
-                        //         child: Text("At least 1 lowercase character.",
-                        //           style: TextStyle(
-                        //               color: Colors.black54,
-                        //               fontSize: 14
-                        //           ),),
-                        //       ),
-                        //       Text("At least 1 special character.",
-                        //         style: TextStyle(
-                        //             color: Colors.black54,
-                        //             fontSize: 14
-                        //         ),)
-                        //     ],
-                        //   ),
-                        // ),
+
                         Padding(
                             padding: const EdgeInsets.all(16),
                           child: PasswordFieldValidator(

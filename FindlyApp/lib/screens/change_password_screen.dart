@@ -2,6 +2,7 @@ import 'package:findly_app/screens/widgets/wide_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
+import 'package:password_field_validator/password_field_validator.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../constants/constants.dart';
@@ -44,6 +45,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool obscureCurrentPassword = true;
   bool obscureNewPassword = true;
   bool obscureConfirmPassword = true;
+  late final TextEditingController _passwordTextController = TextEditingController(text: '');
 
   Future<void> changePassword(
     String currentPassword,
@@ -61,6 +63,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         GlobalMethods.getMessage(error.toString()),
       );
     }
+  }
+  @override
+  void dispose() {
+    _passwordTextController.dispose();
+    super.dispose();
   }
 
   @override
@@ -137,6 +144,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     const SizedBox(height: 16),
                     buildTextField(
+                      controller: _passwordTextController,
                       label: "New Password",
                       formControlName: "new_password",
                       obscureText: obscureNewPassword,
@@ -155,7 +163,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     const SizedBox(height: 16),
                     buildTextField(
-                      label: "Confirm New Password",
+                      label: "Confirm Password",
                       formControlName: "confirm_new_password",
                       obscureText: obscureConfirmPassword,
                       suffixIcon: GestureDetector(
@@ -172,50 +180,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 4.0),
-                            child: Text("At least 8 characters.",
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14
-                            ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 4.0),
-                            child: Text("At least 1 number.",
-                              style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14
-                              ),),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 4.0),
-                            child: Text("At least 1 uppercase character.",
-                              style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14
-                              ),),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 4.0),
-                            child: Text("At least 1 lowercase character.",
-                              style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14
-                              ),),
-                          ),
-                          Text("At least 1 special character.",
-                            style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14
-                            ),)
-                        ],
-                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: PasswordFieldValidator(
+                          minLength: 8,
+                          uppercaseCharCount: 1,
+                          lowercaseCharCount: 1,
+                          numericCharCount: 1,
+                          specialCharCount: 1,
+                          defaultColor: Colors.grey,
+                          successColor: Colors.green,
+                          failureColor: const Color(0xFFA44237),
+                          controller: _passwordTextController),
                     ),
                     const SizedBox(height: 16),
                     ReactiveFormConsumer(
@@ -235,6 +210,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         );
                       },
                     ),
+                    // Padding(
+                    //   padding: const EdgeInsets.all(16),
+                    //   child: PasswordFieldValidator(
+                    //       minLength: 8,
+                    //       uppercaseCharCount: 1,
+                    //       lowercaseCharCount: 1,
+                    //       numericCharCount: 1,
+                    //       specialCharCount: 1,
+                    //       defaultColor: Colors.grey,
+                    //       successColor: Colors.green,
+                    //       failureColor: const Color(0xFFA44237),
+                    //       controller: _passwordTextController),
+                    // ),
                     WideButton(
                       choice: 2,
                       title: "Cancel",
@@ -260,8 +248,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     required String formControlName,
     Widget? suffixIcon,
     bool obscureText = true,
+    TextEditingController? controller,
   }) {
     return ReactiveTextField(
+      controller: controller,
       formControlName: formControlName,
       obscureText: obscureText,
       textAlign: TextAlign.start,
