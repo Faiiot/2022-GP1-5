@@ -51,6 +51,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   String announcementDes = "";
   String roomNumber = "";
   String floorNumber = "";
+  String floor ="";
+  String room = "";
   bool fetchingData = true;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -85,6 +87,23 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     announcementDes = announcement["announcementDes"];
     roomNumber = announcement["roomnumber"];
     floorNumber = announcement["floornumber"];
+
+    floor =floorNumber;
+    room = roomNumber;
+    if (floorNumber.isNotEmpty){
+      setState(() {
+        floor = ", Floor: $floor";
+      });
+
+      if(roomNumber.isNotEmpty){
+        setState(() {
+          room = ", Room: $room";
+        });
+      }
+    }else{setState(() {
+      room = "";
+    });}
+
     setState(() {
       fetchingData = false;
     });
@@ -239,6 +258,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           const SizedBox(
                             height: 8,
                           ),
+                          buildingName.isNotEmpty?
                           Row(
                             children: [
                               const Icon(
@@ -250,7 +270,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Text(
-                                    "$buildingName, $floorNumber, $roomNumber",
+                                    "$buildingName $floor $room",
                                     maxLines: 2,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
@@ -258,7 +278,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                 ),
                               ),
                             ],
-                          ),
+                          )
+                              :
+                          const SizedBox.shrink(),
                           const SizedBox(
                             height: 8,
                           ),

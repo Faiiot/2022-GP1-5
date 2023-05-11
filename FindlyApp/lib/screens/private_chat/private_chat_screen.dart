@@ -250,6 +250,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                                                         onPressed: () {
                                                           String source = "gallery";
                                                           pickImage(source);
+                                                          Navigator.pop(context);
                                                         },
                                                         icon: const SizedBox(
                                                           height: 100,
@@ -284,6 +285,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
                                                     onPressed: () {
                                                       String source = "camera";
                                                       pickImage(source);
+                                                      Navigator.pop(context);
                                                     },
                                                     icon: const SizedBox(
                                                       height: 100,
@@ -353,7 +355,7 @@ class MessageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return type == "text"
         ? Container(
-            padding: EdgeInsets.only(left: isSentByMe ? 0 : 18, right: isSentByMe ? 18 : 0),
+            padding: EdgeInsets.only(left: isSentByMe ? 64 : 18, right: isSentByMe ? 18 : 64),
             margin: const EdgeInsets.symmetric(vertical: 8),
             width: MediaQuery.of(context).size.width,
             alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -437,7 +439,8 @@ class MessageTile extends StatelessWidget {
                     width: MediaQuery.of(context).size.width / 2,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
+                      child: message.isNotEmpty?
+                      GestureDetector(
                         child: Image.network(message),
                         onTap: () {
                           Navigator.push(
@@ -447,7 +450,15 @@ class MessageTile extends StatelessWidget {
                                         imageUrl: message,
                                       )));
                         },
-                      ),
+                      )
+                          :
+                          const Center(
+                            child: SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircularProgressIndicator(color: Colors.white,),
+                            ),
+                          ),
                     )),
                 const SizedBox(
                   height: 4.0,

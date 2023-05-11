@@ -27,7 +27,7 @@ class _UserChatHistoryScreenState extends State<UserChatHistoryScreen> {
     return StreamBuilder(
       stream: chatMethods.getChatRooms(widget.userID),
       builder: (context, snapshot) {
-        return snapshot.hasData
+        return snapshot.data!.docs.isNotEmpty
             ? ListView.builder(
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) {
@@ -45,19 +45,19 @@ class _UserChatHistoryScreenState extends State<UserChatHistoryScreen> {
                         )
                         .first,
                     chatRooms[index]["lastMessage"],
-                    DateTime.fromMillisecondsSinceEpoch(chatRooms[index]["lastMessageTime"])
+                    DateTime.fromMillisecondsSinceEpoch(
+                            chatRooms[index]["lastMessageTime"])
                         .toString()
                         .substring(0, 16),
                   );
                 },
               )
-            : const SizedBox(
-              width: 30,
-              height: 30,
-              child:  Center(
-                  child: CircularProgressIndicator( color: primaryColor,),
+            : const Center(
+                child: Text(
+                  "No chats yet!",
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 18),
                 ),
-            );
+              );
       },
     );
   }

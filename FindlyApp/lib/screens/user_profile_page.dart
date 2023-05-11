@@ -120,7 +120,7 @@ class UserProfileState extends State<UserProfilePage> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset(
-                  "assets/user_outlined.png",
+                  "assets/user_dp_placeholder.png",
                   width: 48,
                   height: 48,
                 ),
@@ -187,60 +187,7 @@ class UserProfileState extends State<UserProfilePage> {
                       ),
                     ),
                   ),
-                  // const SizedBox(
-                  //   width: 4,
-                  // ),
-                  // IconButton(
-                  //   onPressed: () {
-                  //     GlobalMethods.showCustomizedDialogue(
-                  //       context: context,
-                  //       title: "Update",
-                  //       content: ReactiveForm(
-                  //         formGroup: userInfo,
-                  //         child: buildTextField(
-                  //           label: "Email address *",
-                  //           prefixIcon: Icons.mail,
-                  //           formControlName: "email",
-                  //           keyboardType: TextInputType.emailAddress,
-                  //         ),
-                  //       ),
-                  //       mainAction: "Update",
-                  //       secondaryAction: "Cancel",
-                  //       onPressedMain: () async {
-                  //         final bool isInvalidEmail = !userInfo.control("email").valid;
-                  //         if (isInvalidEmail) return;
-                  //         try {
-                  //           await FirebaseFirestore.instance
-                  //               .collection('users')
-                  //               .doc(widget.userID)
-                  //               .update(
-                  //             {
-                  //               'Email': userInfo.control("email").value,
-                  //             },
-                  //           );
-                  //           await getUserInfo();
-                  //           await GlobalMethods.showToast(
-                  //             "Email updated successfully",
-                  //           );
-                  //           if (mounted) Navigator.pop(context);
-                  //         } catch (error) {
-                  //           GlobalMethods.showErrorDialog(
-                  //             context: context,
-                  //             error: error.toString(),
-                  //           );
-                  //         }
-                  //       },
-                  //       onPressedSecondary: () {
-                  //         userInfo.reset();
-                  //         Navigator.pop(context);
-                  //       },
-                  //     );
-                  //   },
-                  //   icon: const Icon(
-                  //     Icons.edit,
-                  //     color: primaryColor,
-                  //   ),
-                  // ),
+
                 ],
               ),
               const SizedBox(
@@ -274,7 +221,7 @@ class UserProfileState extends State<UserProfilePage> {
                     onPressed: () {
                       GlobalMethods.showCustomizedDialogue(
                         context: context,
-                        title: "Update",
+                        title: "Update phone number",
                         content: ReactiveForm(
                           formGroup: userInfo,
                           child: buildTextField(

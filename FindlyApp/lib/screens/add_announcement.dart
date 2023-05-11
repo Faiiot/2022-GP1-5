@@ -920,6 +920,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                                 onPressed: () {
                                                                   //pick by gallery
                                                                   _pickImageUsingGallery();
+                                                                  Navigator.pop(context);
                                                                 },
                                                                 icon:
                                                                     const SizedBox(
@@ -960,6 +961,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                               onPressed: () {
                                                                 //pick by camera
                                                                 _pickImageUsingCamera();
+                                                                Navigator.pop(context);
                                                               },
                                                               icon:
                                                                   const SizedBox(
@@ -993,8 +995,20 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   padding: const EdgeInsets.all(12.0),
                                   child: Center(
                                       child: ElevatedButton(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                            MaterialStateProperty.all(
+                                              primaryColor.withOpacity(0.8),
+                                            ),
+                                            shape: MaterialStateProperty.all(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                          ),
                                           //Button to cancel the uploaded image
-                                          child: const Text('Cancel'),
+                                          child: const Text('Cancel image'),
                                           onPressed: () {
                                             setState(() {
                                               imgFile = null;

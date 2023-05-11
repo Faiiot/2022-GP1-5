@@ -57,7 +57,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
   bool fetchingData = true;
   bool chatroomExists = false;
   String lastMessage = "";
-  String test = "test";
+  String floor ="";
+  String room = "";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   ChatMethods chatMethods = ChatMethods();
 
@@ -78,10 +79,10 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       setState(() {
         chatroomExists = true;
         lastMessage = document.get("lastMessage");
-        test="after fetching";
+
       });
       print("============================================================="+lastMessage);
-      print("============================================================="+test);
+
     }
     print("+++++++++++++++++++++++++++++++++++++at the end of the new method++++++++++++++++++++++++++");
   }
@@ -108,19 +109,21 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     announcementDes = announcement["announcementDes"];
     roomNumber = announcement["roomnumber"];
     floorNumber = announcement["floornumber"];
+
+    floor =floorNumber;
+    room = roomNumber;
     if (floorNumber.isNotEmpty){
       setState(() {
-        String floor =floorNumber;
-        floorNumber = ", Floor: $floor";
+        floor = ", Floor: $floor";
       });
+
       if(roomNumber.isNotEmpty){
         setState(() {
-          String room = roomNumber;
-          roomNumber = ", Room: $room";
+          room = ", Room: $room";
         });
       }
     }else{setState(() {
-      roomNumber = "";
+      room = "";
     });}
 
     setState(() {
@@ -207,7 +210,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         ),
         title: Text(
           "Announcement Details",
-          style: TextStyles.appBarTitleStyle.copyWith(color: primaryColor),
+          style: TextStyles.appBarTitleStyle.copyWith(color: primaryColor,),
+          maxLines: 2,
         ),
         actions: [
           if (widget.profile)
@@ -411,7 +415,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
                                   child: Text(
-                                    "$buildingName $floorNumber $roomNumber",
+                                    "$buildingName $floor $room",
                                     maxLines: 2,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),

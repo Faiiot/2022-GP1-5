@@ -293,6 +293,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                       ),
                 );
               }
+              if(data.isNotEmpty){
               return GridView.builder(
                 itemCount: data.length,
                 padding: const EdgeInsets.all(
@@ -324,21 +325,40 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                     floorNumber: data[index]['floornumber'],
                   );
                 },
-              );
+              );}
+              else{
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    //if no announcement was uploaded
+                    child: Text(
+                      "No announcements match your search or filters!",
+                      style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
             } else {
-              return const Center(
-                //if no announcement was uploaded
-                child: Text(
-                  "No Announcements has been uploaded yet!",
-                  style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+              return const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(
+                  //if no announcement was uploaded
+                  child: Text(
+                    "No Announcements has been uploaded yet!",
+                    style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                  ),
                 ),
               );
             }
           }
-          return const Center(
-            //if something went wrong
-            child: Text(
-              "Something went wrong",
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Center(
+              //if something went wrong
+              child: Text(
+                "Something went wrong",
+              ),
             ),
           );
         },

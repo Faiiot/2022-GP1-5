@@ -910,6 +910,18 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Center(
                                   child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                      MaterialStateProperty.all(
+                                        primaryColor.withOpacity(0.8),
+                                      ),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
                                     //Button to upload image
                                     child: const Text('Upload item image'),
                                     onPressed: () async {
@@ -1022,8 +1034,20 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Center(
                                   child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                      MaterialStateProperty.all(
+                                        primaryColor.withOpacity(0.8),
+                                      ),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
                                     //Button to cancel the uploaded image
-                                    child: const Text('Cancel'),
+                                    child: const Text('Cancel image'),
                                     onPressed: () {
                                       setState(
                                         () {
@@ -1061,7 +1085,7 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                         child: WideButton(
                           choice: 1,
                           width: double.infinity,
-                          title: "Update announcement!",
+                          title: "Edit announcement!",
                           onPressed: () {
                             final isValid = _editFormKey.currentState!
                               .validate();
@@ -1070,7 +1094,8 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                           if (isValid) {
                               GlobalMethods.showCustomizedDialogue(
                                   title:
-                                  "Are you sure you want to edit this announcement?",
+                                  "Edit Announcement",
+                                  message: "Are you sure you want to edit this announcement?",
                                   mainAction: "Yes",
                                   context: context,
                                   secondaryAction: "No",
