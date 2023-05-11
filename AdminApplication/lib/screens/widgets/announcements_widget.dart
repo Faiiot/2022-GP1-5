@@ -24,6 +24,7 @@ class Announcement extends StatefulWidget {
   final String floorNumber;
   final bool reported;
   final int reportCount;
+  final bool reportsScreen;
 
   // a constructor to get each announcement info
   const Announcement({
@@ -43,6 +44,7 @@ class Announcement extends StatefulWidget {
     required this.floorNumber,
     required this.reported,
     required this.reportCount,
+    required this.reportsScreen,
   });
 
   @override
@@ -103,6 +105,7 @@ class _AnnouncementState extends State<Announcement> {
               profile: widget.profile,
               reported: widget.reported,
               reportCount: widget.reportCount,
+              reportsScreen: widget.reportsScreen,
             ),
           ),
         );

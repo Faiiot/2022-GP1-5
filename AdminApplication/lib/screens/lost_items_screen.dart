@@ -321,6 +321,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> {
                     reportCount: data[index]['reportCount'],
                     roomNumber: data[index]['roomnumber'],
                     floorNumber: data[index]['floornumber'],
+                    reportsScreen: false,
                   );
                 },
               );}

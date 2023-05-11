@@ -360,6 +360,7 @@ class _ReportedAnnouncement extends State<ReportedAnnouncement> {
                                 reportCount: data[index]['reportCount'],
                                 roomNumber: data[index]['roomnumber'],
                                 floorNumber: data[index]['floornumber'],
+                                reportsScreen: true,
                               );
                             },
                           );

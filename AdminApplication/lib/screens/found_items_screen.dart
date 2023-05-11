@@ -322,6 +322,7 @@ class _FoundItemsScreenState extends State<FoundItemsScreen> {
                     reportCount: data[index]['reportCount'],
                     roomNumber: data[index]['roomnumber'],
                     floorNumber: data[index]['floornumber'],
+                    reportsScreen: false,
                   );
                 },
               );}

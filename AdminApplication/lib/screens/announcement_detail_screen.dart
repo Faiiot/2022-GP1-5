@@ -19,6 +19,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
   final bool profile;
   final bool reported;
   final int reportCount;
+  final bool reportsScreen;
 
   //constructor to require the announcement's information
   const AnnouncementDetailsScreen({
@@ -32,6 +33,7 @@ class AnnouncementDetailsScreen extends StatefulWidget {
     required this.profile,
     required this.reportCount,
     required this.reported,
+    required this.reportsScreen,
   });
 
   @override
@@ -415,6 +417,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                     const SizedBox(
                       height: 16,
                     ),
+                    widget.reportsScreen?
                     Container(
                       height: 1.0,
                       decoration: const BoxDecoration(
@@ -428,10 +431,13 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                           ),
                         ],
                       ),
-                    ),
+                    )
+                    :
+                        const SizedBox.shrink(),
                     const SizedBox(
                       height: 16,
                     ),
+                    widget.reportsScreen?
                     Column(
                       children: [
                         Padding(
@@ -506,7 +512,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                             },
                             width: double.infinity),
                       ],
-                    ),
+                    )
+                        :
+                        const SizedBox.shrink(),
                   ],
                 ),
               ),
