@@ -225,7 +225,7 @@ class UserProfileState extends State<UserProfilePage> {
                         content: ReactiveForm(
                           formGroup: userInfo,
                           child: buildTextField(
-                            label: "Phone number *",
+                            label: "05.. or 00966 *",
                             prefixIcon: Icons.phone,
                             formControlName: "phone_number",
                             keyboardType: TextInputType.phone,

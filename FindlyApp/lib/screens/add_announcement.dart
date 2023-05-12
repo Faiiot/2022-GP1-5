@@ -311,7 +311,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
       appBar: AppBar(
         elevation: 0,
         title: const Text(
-          "Add Announcement",
+          "Add announcement",
           style: TextStyles.appBarTitleStyle,
         ),
         leading: IconButton(
@@ -503,7 +503,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                     ),
                                   );
                                 },
-                                child: AnimatedAlign(duration:const Duration(minutes: 2),curve:Curves.bounceIn,alignment:Alignment.centerLeft,child: Image.asset("assets/chatbot.png",width: MediaQuery.of(context).size.width*0.08,)),
+                                child: AnimatedAlign(duration:const Duration(minutes: 2),curve:Curves.bounceIn,alignment:Alignment.centerLeft,child: Image.asset("assets/chatbotOutlined.png",width: MediaQuery.of(context).size.width*0.08,)),
                               )
                             ],
                           ),
@@ -1054,8 +1054,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                             if (annType == "found") {
                               GlobalMethods.showCustomizedDialogue(
                                   title:
-                                  "Are you sure you want to add this announcement?",
-                                  message: "If you proceed the addition, the item will be under your responsibility",
+                                  "Add announcement",
+                                  message: "If you proceed the addition, the found item will be under your responsibility",
                                   mainAction: "Yes",
                                   context: context,
                                   secondaryAction: "No",
@@ -1068,8 +1068,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   });
                             } else {
                               GlobalMethods.showCustomizedDialogue(
-                                  title:
-                                  "Are you sure you want to add this announcement?",
+                                  title:"Add announcement",
+                                  message: "Are you sure you want to add this announcement?",
                                   mainAction: "Yes",
                                   context: context,
                                   secondaryAction: "No",

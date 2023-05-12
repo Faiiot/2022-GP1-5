@@ -33,7 +33,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final FocusNode _passwordFocusNode = FocusNode();
   final FocusNode _confirmPasswordFocusNode = FocusNode();
   final FocusNode _phoneNoFocusNode = FocusNode();
-  bool _obscureText = true;
+  bool _obscurePassword = true;
+  bool _obsecureConfirmPassword =true;
   final _signUpFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
@@ -451,7 +452,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           },
                           keyboardType: TextInputType.visiblePassword,
                           controller: _passwordTextController,
-                          obscureText: _obscureText,
+                          obscureText: _obscurePassword,
                           textAlign: TextAlign.start,
                           onChanged: (value) {},
                           decoration: InputDecoration(
@@ -459,10 +460,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             suffixIcon: GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  _obscureText = !_obscureText;
+                                  _obscurePassword = !_obscurePassword;
                                 });
                               },
-                              child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                              child: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
                             ),
                             labelText: "Password *",
                             hintText: "Enter your Password",
@@ -511,7 +512,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           },
                           keyboardType: TextInputType.visiblePassword,
                           controller: _confirmPasswordTextController,
-                          obscureText: _obscureText,
+                          obscureText: _obsecureConfirmPassword,
                           textAlign: TextAlign.start,
                           onChanged: (value) {},
                           decoration: InputDecoration(
@@ -519,10 +520,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             suffixIcon: GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  _obscureText = !_obscureText;
+                                  _obsecureConfirmPassword = !_obsecureConfirmPassword;
                                 });
                               },
-                              child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                              child: Icon(_obsecureConfirmPassword ? Icons.visibility : Icons.visibility_off),
                             ),
                             labelText: "Confirm password *",
                             hintText: "Enter your Password",

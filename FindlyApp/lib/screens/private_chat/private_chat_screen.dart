@@ -7,6 +7,7 @@ import 'package:findly_app/services/push_notifications_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -90,61 +91,34 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     if (source == "gallery") {
       await picker.pickImage(source: ImageSource.gallery).then((xFile) async {
         if (xFile != null) {
-          // CroppedFile? croppedFile = await ImageCropper().cropImage(
-          //   sourcePath: xFile.path,
-          //   aspectRatioPresets: [
-          //     CropAspectRatioPreset.square,
-          //     CropAspectRatioPreset.ratio3x2,
-          //     CropAspectRatioPreset.original,
-          //     CropAspectRatioPreset.ratio4x3,
-          //     CropAspectRatioPreset.ratio16x9
-          //   ],
-          //   uiSettings: [
-          //     AndroidUiSettings(
-          //         toolbarTitle: 'Cropper',
-          //         toolbarColor: Colors.deepOrange,
-          //         toolbarWidgetColor: Colors.white,
-          //         initAspectRatio: CropAspectRatioPreset.original,
-          //         lockAspectRatio: false),
-          //     IOSUiSettings(
-          //       title: 'Cropper',
-          //     ),
-          //     WebUiSettings(
-          //       context: context,
-          //     ),
-          //   ],
-          // );
-          imageFile = File(xFile.path);
+          CroppedFile? croppedFile = await ImageCropper().cropImage(
+            sourcePath: xFile.path,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9
+            ],
+            uiSettings: [
+              AndroidUiSettings(
+                  statusBarColor: primaryColor,
+                  activeControlsWidgetColor: Colors.white,
+                  toolbarTitle: 'Cropper',
+                  toolbarColor: primaryColor,
+                  toolbarWidgetColor: Colors.white,
+                  initAspectRatio: CropAspectRatioPreset.original,
+                  lockAspectRatio: false),
+
+            ],
+          );
+          imageFile = File(croppedFile!.path);
           uploadImage();
         }
       });
     } else {
       await picker.pickImage(source: ImageSource.camera).then((xFile) async {
         if (xFile != null) {
-          // CroppedFile? croppedFile = await ImageCropper().cropImage(
-          //   sourcePath: xFile.path,
-          //   aspectRatioPresets: [
-          //     CropAspectRatioPreset.square,
-          //     CropAspectRatioPreset.ratio3x2,
-          //     CropAspectRatioPreset.original,
-          //     CropAspectRatioPreset.ratio4x3,
-          //     CropAspectRatioPreset.ratio16x9
-          //   ],
-          //   uiSettings: [
-          //     AndroidUiSettings(
-          //         toolbarTitle: 'Cropper',
-          //         toolbarColor: Colors.deepOrange,
-          //         toolbarWidgetColor: Colors.white,
-          //         initAspectRatio: CropAspectRatioPreset.original,
-          //         lockAspectRatio: false),
-          //     IOSUiSettings(
-          //       title: 'Cropper',
-          //     ),
-          //     WebUiSettings(
-          //       context: context,
-          //     ),
-          //   ],
-          // );
           imageFile = File(xFile.path);
           uploadImage();
         }
