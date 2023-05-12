@@ -586,35 +586,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       onPressedMain: () async {
         Navigator.pop(context);
         if (announcementType == 'lost') {
-          GlobalMethods.showCustomizedDialogue(
-            context: context,
-            title: "Update Status",
-            message: "Did you find $itemName?",
-            mainAction: "Yes",
-            secondaryAction: "No",
-            onPressedMain: () async {
-              await GlobalMethods.incrementDeleteItemCount();
-              await deletedDbAnnouncement("lostItem");
-            },
-            onPressedSecondary: () async {
-              await deletedDbAnnouncement("lostItem");
-            },
-          );
+          await deletedDbAnnouncement("lostItem");
         } else {
-          GlobalMethods.showCustomizedDialogue(
-            context: context,
-            title: "Update Status",
-            message: "Did you return $itemName to her owner?",
-            mainAction: "Yes",
-            secondaryAction: "No",
-            onPressedMain: () async {
-              await GlobalMethods.incrementDeleteItemCount();
-              await deletedDbAnnouncement("foundItem");
-            },
-            onPressedSecondary: () async {
-              await deletedDbAnnouncement("foundItem");
-            },
-          );
+          await deletedDbAnnouncement("foundItem");
         }
       },
       onPressedSecondary: () {
@@ -630,7 +604,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         .delete();
 
     String notificationID;
-    final doc = FirebaseFirestore.instance
+    // final doc =
+    FirebaseFirestore.instance
         .collection("notifications")
         .where('source_id', isEqualTo: widget.announcementID).get().then((value) async => {
     value.docs.forEach((element) {
