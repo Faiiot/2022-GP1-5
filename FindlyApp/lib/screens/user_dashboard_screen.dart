@@ -336,11 +336,8 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                           docs[index]["url"],
                                         ),
                                       )
-                                    : Expanded(
-                                        child: Image.asset(
-                                          "assets/Image_not_available.png",
-                                          fit: BoxFit.fill,
-                                        ),
+                                    : const Expanded(
+                                        child: Icon(Icons.image,size: 60,color: Colors.grey,)
                                       ),
                                 Text(
                                   docs != null ? docs[index]["itemName"] : "",

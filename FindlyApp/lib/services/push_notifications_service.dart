@@ -35,12 +35,16 @@ class PushNotificationController {
   static String fcm = '';
   static Future<void> getUserAndSendPush(String body,String receiverId, String chatroomID) async {
     var current = FirebaseAuth.instance.currentUser;
-    DocumentSnapshot snap =
-        await FirebaseFirestore.instance.collection("users").doc(current!.uid).get();
-    if (snap.exists) {
-      var a = snap.data() as Map;
-      var title = (a['firstName'] ?? "") + " " + (a['LastName'] ?? "");
-      log("User: ${snap.data()}");
+    DocumentSnapshot receiver =
+        await FirebaseFirestore.instance.collection("users").doc(receiverId).get();
+    DocumentSnapshot sender =
+    await FirebaseFirestore.instance.collection("users").doc(current!.uid).get();
+
+    if (receiver.exists) {
+      var receiverData = receiver.data() as Map;
+      var senderData = sender.data() as Map;
+      var title = (senderData['firstName'] ?? "") + " " + (senderData['LastName'] ?? "");
+      log("User: ${receiver.data()}");
       String time = Timestamp.now().toString();
       await InAppNotifications.sendInAppNotification(
           time,
@@ -49,8 +53,8 @@ class PushNotificationController {
 
       // final Map<String, dynamic> doc = sna.data as Map<String, dynamic>;
 
-      if (a['fcm'] != null) {
-        sendPushNotification([a["fcm"]], title, body);
+      if (receiverData['fcm'] != null) {
+        sendPushNotification([receiverData["fcm"]], title, body);
       }
     }
   }

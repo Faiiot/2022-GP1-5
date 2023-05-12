@@ -49,12 +49,12 @@ class _DialogflowChatBotScreenState extends State<DialogflowChatBotScreen> {
                   children: [
                     Flexible(
                       child: Image.asset(
-                        "assets/chatbot.png",
+                        "assets/chatbotOutlined.png",
                       ),
                     ),
                     const Flexible(
                       child: Text(
-                        "Welcome!\nHow may I help you?",
+                        "Welcome!\nLet's find your\nitem category",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 24,

@@ -150,6 +150,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
       chatMethods.updateLastMessageOfChatroom("Image", widget.chatroomID, time);
       debugPrint(imageUrl);
     }
+    PushNotificationController.getUserAndSendPush("Sent you an image", widget.peerId,widget.chatroomID);
   }
 
   @override

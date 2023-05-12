@@ -11,6 +11,7 @@ import 'package:findly_app/services/push_notifications_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -57,6 +58,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   final FocusNode _roomNumberFocusNode = FocusNode();
   final _addFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  final uid = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void dispose() {
@@ -88,11 +90,40 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
   //Method for picking announcement image using gallery
   void _pickImageUsingGallery() async {
-    XFile? pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
-    //to show the image to the user
-    setState(() {
-      imgFile = File(pickedFile!.path);
+    // XFile? pickedFile = await ImagePicker().pickImage(
+    //     source: ImageSource.gallery, maxHeight: 1080, maxWidth: 1080);
+    // //to show the image to the user
+    // setState(() {
+    //   imgFile = File(pickedFile!.path);
+    // });
+    ImagePicker picker = ImagePicker();
+    await picker.pickImage(source: ImageSource.gallery).then((xFile) async {
+      if (xFile != null) {
+        CroppedFile? croppedFile = await ImageCropper().cropImage(
+          sourcePath: xFile.path,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+          uiSettings: [
+            AndroidUiSettings(
+                statusBarColor: primaryColor,
+                activeControlsWidgetColor: primaryColor,
+                toolbarTitle: 'Cropper',
+                toolbarColor: primaryColor,
+                toolbarWidgetColor: Colors.white,
+                initAspectRatio: CropAspectRatioPreset.original,
+                lockAspectRatio: false),
+          ],
+        );
+
+        setState(() {
+          imgFile = File(croppedFile!.path);
+        });
+      }
     });
   }
 
@@ -144,21 +175,29 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
           });
           try {
             List<String> publishers =
-            await getPublishers(isLost: true, cat: annCategory);
+                await getPublishers(isLost: true, cat: annCategory);
             if (publishers.isNotEmpty) {
               // log("all Publishers:  ${publishers.toString()}");
               List<String> fcms = [];
               await Future.forEach(publishers, (element) async {
-                var user = allUsers.firstWhere((user) => user['id'] == element,
-                    orElse: () => {});
-                if (user == {}) {
-                  throw Exception("User Not found");
+                var publisher = FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(element)
+                    .get();
+                if (element != uid) {
+                  publisher.then(
+                      (value) => {fcms.add(value.get("fcm").toString() ?? "")});
                 }
-                // log("\n\nUser: $user\n\n");
-                String userFcm = user['fcm'] ?? "";
-                if (userFcm.isNotEmpty) {
-                  fcms.add(userFcm);
-                }
+                // var user = allUsers.firstWhere((user) => user['id'] == element,
+                //     orElse: () => {});
+                // if (user == {}) {
+                //   throw Exception("User Not found");
+                // }
+                // // log("\n\nUser: $user\n\n");
+                // String userFcm = user['fcm'] ?? "";
+                // if (userFcm.isNotEmpty) {
+                //   fcms.add(userFcm);
+                // }
                 String notificationTime = Timestamp.now().toString();
                 if (element != uid) {
                   await InAppNotifications.sendInAppNotification(
@@ -208,21 +247,30 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
 
         try {
           List<String> publishers =
-          await getPublishers(isLost: false, cat: annCategory);
+              await getPublishers(isLost: false, cat: annCategory);
           if (publishers.isNotEmpty) {
             log("all Publishers:  ${publishers.toString()}");
             List<String> fcms = [];
+            // getAllUsers();
             await Future.forEach(publishers, (element) async {
-              var user = allUsers.firstWhere((user) => user['id'] == element,
-                  orElse: () => {});
-              if (user == {}) {
-                throw Exception("User Not found");
+              var publisher = FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(element)
+                  .get();
+              if (element != uid) {
+                publisher.then(
+                    (value) => {fcms.add(value.get("fcm").toString() ?? "")});
               }
-              log("\n\nUser: $user\n\n");
-              String userFcm = user['fcm'] ?? "";
-              if (userFcm.isNotEmpty) {
-                fcms.add(userFcm);
-              }
+              // var user = allUsers.firstWhere((user) => user['id'] == element,
+              //     orElse: () => {});
+              // if (user == {}) {
+              //   throw Exception("User Not found");
+              // }
+              // log("\n\nUser: $user\n\n");
+              // String userFcm = user['fcm'] ?? "";
+              // if (userFcm.isNotEmpty) {
+              //   fcms.add(userFcm);
+              // }
               String notificationTime = Timestamp.now().toString();
               if (element != uid) {
                 await InAppNotifications.sendInAppNotification(
@@ -239,7 +287,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
               }
             });
             log("All FCMs: ${fcms.length}");
-            await Future.delayed(const Duration(seconds: 1));
+            await Future.delayed(const Duration(seconds: 2));
             if (fcms.isNotEmpty) {
               PushNotificationController.sendPushNotification(fcms,
                   "Item Found", " Hi, I have found $itemName in $annCategory");
@@ -283,7 +331,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
   List<Map<String, dynamic>> allUsers = [];
   getAllUsers() async {
     QuerySnapshot qs =
-    await FirebaseFirestore.instance.collection("users").get();
+        await FirebaseFirestore.instance.collection("users").get();
 
     allUsers = qs.docs.map((e) => e.data() as Map<String, dynamic>).toList();
     log("All Users: $allUsers");
@@ -474,7 +522,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(16),
                                   ),
-                                  borderSide: BorderSide(color: Colors.redAccent)),
+                                  borderSide:
+                                      BorderSide(color: Colors.redAccent)),
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -484,26 +533,37 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                             },
                           ),
                           Row(
-                            children:  [
-                               const Text(
+                            children: [
+                              const Text(
                                 'Item category *',
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 4,),
+                              const SizedBox(
+                                width: 4,
+                              ),
                               const Text(" Need help? "),
                               InkWell(
-                                onTap: (){
+                                onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const DialogflowChatBotScreen(),
+                                      builder: (context) =>
+                                          const DialogflowChatBotScreen(),
                                     ),
                                   );
                                 },
-                                child: AnimatedAlign(duration:const Duration(minutes: 2),curve:Curves.bounceIn,alignment:Alignment.centerLeft,child: Image.asset("assets/chatbotOutlined.png",width: MediaQuery.of(context).size.width*0.08,)),
+                                child: AnimatedAlign(
+                                    duration: const Duration(minutes: 2),
+                                    curve: Curves.bounceIn,
+                                    alignment: Alignment.centerLeft,
+                                    child: Image.asset(
+                                      "assets/chatbotOutlined.png",
+                                      width: MediaQuery.of(context).size.width *
+                                          0.08,
+                                    )),
                               )
                             ],
                           ),
@@ -660,7 +720,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(16),
                                   ),
-                                  borderSide: BorderSide(color: Colors.redAccent)),
+                                  borderSide:
+                                      BorderSide(color: Colors.redAccent)),
                             ),
                           ),
 
@@ -718,7 +779,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(16),
                                   ),
-                                  borderSide: BorderSide(color: Colors.redAccent)),
+                                  borderSide:
+                                      BorderSide(color: Colors.redAccent)),
                             ),
                           ),
 
@@ -920,7 +982,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                                 onPressed: () {
                                                                   //pick by gallery
                                                                   _pickImageUsingGallery();
-                                                                  Navigator.pop(context);
+                                                                  Navigator.pop(
+                                                                      context);
                                                                 },
                                                                 icon:
                                                                     const SizedBox(
@@ -961,7 +1024,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                                               onPressed: () {
                                                                 //pick by camera
                                                                 _pickImageUsingCamera();
-                                                                Navigator.pop(context);
+                                                                Navigator.pop(
+                                                                    context);
                                                               },
                                                               icon:
                                                                   const SizedBox(
@@ -997,13 +1061,13 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                       child: ElevatedButton(
                                           style: ButtonStyle(
                                             backgroundColor:
-                                            MaterialStateProperty.all(
+                                                MaterialStateProperty.all(
                                               primaryColor.withOpacity(0.8),
                                             ),
                                             shape: MaterialStateProperty.all(
                                               RoundedRectangleBorder(
                                                 borderRadius:
-                                                BorderRadius.circular(12),
+                                                    BorderRadius.circular(12),
                                               ),
                                             ),
                                           ),
@@ -1045,46 +1109,47 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                           choice: 1,
                           width: double.infinity,
                           title: "Add announcement!",
-                          onPressed: () {final isValid = _addFormKey.currentState!
-                              .validate();
-                          if (!mounted) return;
-                          FocusScope.of(context).unfocus();
+                          onPressed: () {
+                            final isValid =
+                                _addFormKey.currentState!.validate();
+                            if (!mounted) return;
+                            FocusScope.of(context).unfocus();
 
-                          if (isValid) {
-                            if (annType == "found") {
-                              GlobalMethods.showCustomizedDialogue(
-                                  title:
-                                  "Add announcement",
-                                  message: "If you proceed the addition, the found item will be under your responsibility",
-                                  mainAction: "Yes",
-                                  context: context,
-                                  secondaryAction: "No",
-                                  onPressedMain: () {
-                                    submitFormOnAdd();
-                                    Navigator.pop(context);
-                                  },
-                                  onPressedSecondary: () {
-                                    Navigator.pop(context);
-                                  });
+                            if (isValid) {
+                              if (annType == "found") {
+                                GlobalMethods.showCustomizedDialogue(
+                                    title: "Add announcement",
+                                    message:
+                                        "If you proceed the addition, the found item will be under your responsibility",
+                                    mainAction: "Yes",
+                                    context: context,
+                                    secondaryAction: "No",
+                                    onPressedMain: () {
+                                      submitFormOnAdd();
+                                      Navigator.pop(context);
+                                    },
+                                    onPressedSecondary: () {
+                                      Navigator.pop(context);
+                                    });
+                              } else {
+                                GlobalMethods.showCustomizedDialogue(
+                                    title: "Add announcement",
+                                    message:
+                                        "Are you sure you want to add this announcement?",
+                                    mainAction: "Yes",
+                                    context: context,
+                                    secondaryAction: "No",
+                                    onPressedMain: () {
+                                      submitFormOnAdd();
+                                      Navigator.pop(context);
+                                    },
+                                    onPressedSecondary: () {
+                                      Navigator.pop(context);
+                                    });
+                              }
                             } else {
-                              GlobalMethods.showCustomizedDialogue(
-                                  title:"Add announcement",
-                                  message: "Are you sure you want to add this announcement?",
-                                  mainAction: "Yes",
-                                  context: context,
-                                  secondaryAction: "No",
-                                  onPressedMain: () {
-                                    submitFormOnAdd();
-                                    Navigator.pop(context);
-                                  },
-                                  onPressedSecondary: () {
-                                    Navigator.pop(context);
-                                  });
+                              debugPrint("form not valid!");
                             }
-                          }
-                          else {
-                            debugPrint("form not valid!");
-                          }
                           },
                         ),
                       ),
