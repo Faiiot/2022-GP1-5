@@ -110,26 +110,6 @@ class _DialogflowChatBotScreenState extends State<DialogflowChatBotScreen> {
     );
   }
 
-  // sendMessages(String text) async {
-  //   if (text.isEmpty) {
-  //     debugPrint("Message is empty");
-  //   } else {
-  //     setState(() {
-  //       //sending the dialog letter text that the user has written and based on that
-  //       //dialog text or dialog flutter is going to send the text
-  //       addMessage(Message(text: DialogText(text: [text])), true);
-  //     });
-  //
-  //     //Based on the text I will get a response
-  //     DetectIntentResponse response =
-  //         await dialogFlowtter.detectIntent(queryInput: QueryInput(text: TextInput(text: text)));
-  //     if (response.message == null) return;
-  //     //Handle the dialogflow message
-  //     setState(() {
-  //       addMessage(response.message!);
-  //     });
-  //   }
-  // }
 
   sendMessage(String text) async {
     if (text.isEmpty) {

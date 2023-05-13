@@ -529,7 +529,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         .doc(widget.announcementID)
         .delete();
     String notificationID;
-       final doc = FirebaseFirestore.instance
+
+       FirebaseFirestore.instance
         .collection("notifications")
         .where('source_id', isEqualTo: widget.announcementID).get().then((value) async => {
           value.docs.forEach((element) {

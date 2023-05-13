@@ -926,6 +926,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
+                          _isLoading != true?
                           imgFile == null
                               ? Padding(
                                   padding: const EdgeInsets.all(12.0),
@@ -1080,7 +1081,8 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
                                             debugPrint(
                                               imgFile.toString(),
                                             );
-                                          }))),
+                                          })))
+                              : const SizedBox.shrink()
                         ],
                       ),
                     ),

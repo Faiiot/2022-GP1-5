@@ -229,8 +229,8 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
               child: GestureDetector(
                 onTap: () async {
                   GlobalMethods.showCustomizedDialogue(
-                      title:
-                          "Are you sure you want to report this item announcement?",
+                      title:"Report announcement",
+                      message: "Are you sure you want to report this item announcement?",
                       mainAction: "Yes",
                       context: context,
                       secondaryAction: "No",
