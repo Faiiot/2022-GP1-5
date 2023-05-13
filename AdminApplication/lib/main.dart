@@ -1,3 +1,4 @@
+import 'package:findly_admin/constants/reference_data.dart';
 import 'package:findly_admin/services/global_methods.dart';
 import 'package:findly_admin/user_state.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,6 +8,7 @@ import 'package:reactive_forms/reactive_forms.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await ReferenceData.instance.getReferenceData();
   runApp(const MyApp());
 }
 

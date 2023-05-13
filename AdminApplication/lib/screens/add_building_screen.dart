@@ -21,7 +21,7 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
   int buildingCount = 0;
   bool duplicate = false;
   String buildingName ='';
-  RegExp buildingRegExp= RegExp(r'^[A-Z][a-zA-Z0-9]*$');
+  RegExp buildingRegExp= RegExp(r'^[A-Z][a-zA-Z0-9#]*$');
   @override
   void dispose() {
     _buildingNameTextController.dispose();
@@ -285,6 +285,7 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
                             setState(() {
                               buildingName = value.trim();
                             });
+                            isDuplicate();
                           },
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.category_outlined),
@@ -342,7 +343,7 @@ class _AddBuildingScreenState extends State<AddBuildingScreen> {
                                       .currentState!
                                       .validate();
                                   if (isValidForm) {
-                                    isDuplicate();
+
                                     if (duplicate == true) {
                                       GlobalMethods.showErrorDialog(
                                           error:

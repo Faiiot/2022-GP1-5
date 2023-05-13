@@ -290,6 +290,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                             setState(() {
                               category = value.trim();
                             });
+                            isDuplicate();
                           },
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.category_outlined),
@@ -347,7 +348,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                       .currentState!
                                       .validate();
                                   if (isValidForm) {
-                                    isDuplicate();
+
                                     if (duplicate == true) {
                                       GlobalMethods.showErrorDialog(
                                           error:
