@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../../constants/constants.dart';
-
+//This component is to make users view an image sent in a private chat
 class ImageViewScreen extends StatefulWidget {
   const ImageViewScreen({
     Key? key,

@@ -36,6 +36,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   File? imageFile;
 
+  // to send a text message
   sendMessage() {
     final message = msgController.text.trim();
     final time = DateTime.now().millisecondsSinceEpoch;
@@ -60,6 +61,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     }
   }
 
+  //load chat room messages and update in real time
   StreamBuilder<dynamic> chatMessagesList() {
     String uid = _auth.currentUser!.uid.toString();
     return StreamBuilder(
@@ -86,6 +88,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
         });
   }
 
+  //to pick an image either by camera or gallery, in order to send it
   Future pickImage(String source) async {
     ImagePicker picker = ImagePicker();
     if (source == "gallery") {
@@ -126,6 +129,7 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
     }
   }
 
+  //upload the image as a message
   Future uploadImage() async {
     String fileName = const Uuid().v1();
     int status = 1;

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//to insert the chatroom info into the collection to create it
+//to insert the chat room info into the collection to create it
 class ChatMethods {
   createChatRoom(String chatroomID, chatroomMap) {
     FirebaseFirestore.instance
@@ -10,7 +10,7 @@ class ChatMethods {
         .catchError((e) {});
   }
 
-  // to generate the same chatroom id for the to users always to avid duplicate rooms for the same users
+  // to generate the same chat room id for the to users always to avid duplicate rooms for the same users
   String generateChatroomId(userID, peerID) {
     String chatID;
     if (userID.compareTo(peerID) > 0) {
@@ -21,6 +21,7 @@ class ChatMethods {
     return chatID;
   }
 
+  //to add text messages to the specific chat room
   Future<void> addChatMessages(String chatroomID, messageMap) async {
     await FirebaseFirestore.instance
         .collection("chatRooms")
@@ -30,6 +31,7 @@ class ChatMethods {
         .catchError((e) {});
   }
 
+  //to add image messages to the specific chat room
   Future<void> addChatImageMessages(
     String chatroomID,
     String imageID,
@@ -44,6 +46,7 @@ class ChatMethods {
         .catchError((e) {});
   }
 
+  //to update image url stored in database to be retrieved and shown to user
   Future<void> updateChatImageMessageField(
     String chatroomID,
     String imageID,
@@ -57,6 +60,7 @@ class ChatMethods {
         .update({"message": imageUrl});
   }
 
+  //to load chat messages ordered
   Stream<dynamic> getChatMessages(String chatroomID) {
     return FirebaseFirestore.instance
         .collection("chatRooms")
@@ -67,6 +71,7 @@ class ChatMethods {
         .asBroadcastStream();
   }
 
+  //to load chat rooms that a user is a party in
   Stream<dynamic> getChatRooms(String userID) {
     return FirebaseFirestore.instance
         .collection("chatRooms")
@@ -74,7 +79,7 @@ class ChatMethods {
         .snapshots()
         .asBroadcastStream();
   }
-
+//to get the user name
   Future<String> getUsername(String userID) async {
     try {
       final DocumentSnapshot userDoc =
@@ -90,6 +95,7 @@ class ChatMethods {
     }
   }
 
+  //to update last message of a chat room
   updateLastMessageOfChatroom(String message, String chatroomID, int time) {
     FirebaseFirestore.instance.collection("chatRooms").doc(chatroomID).update(
       {

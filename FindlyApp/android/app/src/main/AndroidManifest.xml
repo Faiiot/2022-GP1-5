@@ -37,12 +37,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-       <activity
-           android:name="com.yalantis.ucrop.UCropActivity"
-           android:screenOrientation="portrait"
-           android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-           tools:ignore="MissingClass" />
-
     </application>
     <!-- Provide required visibility configuration for API level 30 and above -->
     <queries>

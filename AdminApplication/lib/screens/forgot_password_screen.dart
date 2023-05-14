@@ -1,9 +1,7 @@
-import 'package:findly_admin/screens/widgets/my_button.dart';
+import 'package:findly_admin/screens/widgets/wide_button.dart';
 import 'package:findly_admin/services/global_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-
 import '../constants/constants.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -17,6 +15,8 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with TickerProviderStateMixin {
   final TextEditingController _forgotPasswordController = TextEditingController(text: '');
+  final _ForgotPasswordFormKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,15 +27,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
 
   //Method to send an email to reset the password
   void _forgotPasswordFCT() {
-    debugPrint('_forgotPasswordController :${_forgotPasswordController.text}');
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    auth.sendPasswordResetEmail(email: _forgotPasswordController.text.toLowerCase().trim());
-    Navigator.of(context).pop();
+    final isValid = _ForgotPasswordFormKey.currentState!.validate();
+    if (isValid){
+      setState(() {
+        _isLoading = true;
+      });
+      try{
+        final FirebaseAuth auth = FirebaseAuth.instance;
+        auth.sendPasswordResetEmail(email: _forgotPasswordController.text.toLowerCase().trim());
+        Navigator.of(context).pop();
 
-    //show a message when the email is sent
-    GlobalMethods.showToast(
-      "An Email has been sent to you!",
-    );
+        //show a message when the email is sent
+        GlobalMethods.showToast(
+          "An Email has been sent to you!",
+        );
+      }
+      catch(error){
+        GlobalMethods.showErrorDialog(error: error.toString(), context: context);
+      }
+    }else{
+      return;
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -91,55 +106,70 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> with Ticker
                         ),
                       ),
                       const SizedBox(height: 16),
-                      TextField(
-                        controller: _forgotPasswordController,
-                        keyboardType: TextInputType.emailAddress,
-                        textAlign: TextAlign.start,
-                        onChanged: (value) {},
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.email),
-                          hintText: "Enter your Email",
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 20,
+                      Form(
+                        key: _ForgotPasswordFormKey,
+                        child: TextFormField(
+                          validator: (value){
+                            if(value.toString().isEmpty){
+                              return "Please enter your email";
+                            }
+                            if(GlobalMethods.validateEmail(email: _forgotPasswordController)== false)
+                            {
+                              return "Please enter a valid Email!";
+                            }
+                          },
+                          controller: _forgotPasswordController,
+                          keyboardType: TextInputType.emailAddress,
+                          textAlign: TextAlign.start,
+                          onChanged: (value) {},
+                          decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.email),
+                            hintText: "Enter your Email",
+                            labelText: "Email",
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: primaryColor,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                )),
                           ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          )),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              )),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.blueAccent,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10),
-                              )),
                         ),
                       ),
                       const SizedBox(height: 24),
-                      MyButton(
-                          //Reset password by email button
-                          color: primaryColor,
-                          title: "Reset Now!",
-                          onPressed: () {
-                            _forgotPasswordFCT();
-                          }),
-                      MyButton(
+                      WideButton(
                         //Reset password by email button
-                        color: primaryColor,
+                        choice: 1,
+                        title: "Reset Now!",
+                        onPressed: () {
+                          _forgotPasswordFCT();
+                        },
+                        width: double.infinity,),
+                      WideButton(
+                        //Reset password by email button
+                        choice: 2,
                         title: "Cancel",
                         onPressed: () {
                           Navigator.canPop(context) ? Navigator.pop(context) : null;
                         },
+                        width: double.infinity,
                       ),
                     ],
                   ),

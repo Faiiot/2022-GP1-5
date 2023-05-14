@@ -445,6 +445,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   iconName: "dialog",
                   label: "My Chats",
                   onTap: () {
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(

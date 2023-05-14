@@ -2,6 +2,7 @@ import 'dart:core';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:findly_app/constants/reference_data.dart';
 import 'package:findly_app/screens/dialogflow_chatbot_screen.dart';
 import 'package:findly_app/screens/widgets/wide_button.dart';
@@ -567,40 +568,55 @@ class _EditAnnouncement extends State<EditAnnouncement> {
                         const SizedBox(
                           height: 8.0,
                         ),
-                        DropdownButtonFormField(
-                          focusNode: _buildingNameFocusNode,
-                          isExpanded: true,
-                          decoration: kInputDecoration,
-                          items: [
-                            const DropdownMenuItem<String>(
-                              value: '',
-                              child: Text(
-                                'Choose Building name',
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                        DropdownSearch<String>(
+                          mode: Mode.DIALOG,
+                          showSelectedItems: true,
+                          items: ReferenceData.instance.locations,
+                          dropdownSearchDecoration: const InputDecoration(
+                            hintText: "Choose building name",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
                             ),
-                            ...ReferenceData.instance.locations
-                                .map(
-                                  (buildingName) => DropdownMenuItem<String>(
-                                    value: buildingName,
-                                    child: Text(
-                                      buildingName,
-                                      maxLines: 3,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ],
-                          value: widget.buildingName,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(16),
+                                )),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(16),
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: primaryColor,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(16),
+                                )),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(16),
+                              ),
+                              borderSide: BorderSide(color: Colors.red),
+                            ),
+                          ),
+
                           onChanged: (value) {
                             buildingName = value.toString();
-                            setState(() {
-                              buildingName = value.toString();
-                            });
-
-                            FocusScope.of(context)
-                                .requestFocus(_annDesFocusNode);
                           },
+                          selectedItem: widget.buildingName,
+                          popupShape: const RoundedRectangleBorder(),
+                          showSearchBox: true,
+                          searchFieldProps: const TextFieldProps(
+                            cursorColor: primaryColor,
+                            decoration: kInputDecoration,
+                          ),
                         ),
 
                         const SizedBox(

@@ -10,6 +10,7 @@ import '../../constants/constants.dart';
 class UserChatHistoryScreen extends StatefulWidget {
   final String userID;
 
+
   const UserChatHistoryScreen({
     super.key,
     required this.userID,
@@ -23,6 +24,7 @@ class _UserChatHistoryScreenState extends State<UserChatHistoryScreen> {
   ChatMethods chatMethods = ChatMethods();
   String myName = "";
 
+  //to load all chat rooms in real time
   Widget chatRoomsList() {
     return StreamBuilder(
       stream: chatMethods.getChatRooms(widget.userID),
@@ -151,36 +153,40 @@ class ChatRoomsTile extends StatelessWidget {
               const SizedBox(
                 width: 8,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    peerName,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      color: primaryColor,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      peerName,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        color: primaryColor,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 2.0,
-                  ),
-                  Text(
-                    lastMessage,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    const SizedBox(
+                      height: 2.0,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 2.0,
-                  ),
-                  Text(
-                    lastMessageTime,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.blueGrey,
+                    Text(
+                      lastMessage,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(
+                      height: 2.0,
+                    ),
+                    Text(
+                      lastMessageTime,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
