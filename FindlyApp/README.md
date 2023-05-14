@@ -1,5 +1,5 @@
 <p align="center">
-<img src="FindlyApp/assets/FindlyBlue.png" alt="Findly logo" height="180">
+<img src="assets/FindlyBlue.png" alt="Findly logo" height="180">
 </p>
 Project title: Findly Application
 
