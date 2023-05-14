@@ -1,7 +1,7 @@
 <p align="center">
 <img src="assets/img.png" alt="Findly logo" height="360">
 </p>
-Project title: Findly Application
+<p align="center" style="bold">Project title: Findly Application</p> 
 
 Findly is an android mobile application that offers an announcement system for lost and found
 items on KSU female campus. Our application aims to improve the effectiveness of the communication between
@@ -40,7 +40,7 @@ Log in credentials:
 <p align="left"> User:</p>
 <p align="left"> Member ID: 441111111</p>
 <p align="left"> Password: TestUser123456789@</p>
-<p align="left">/p>
+<p align="left"></p>
 <p align="left"> Admin:</p>
 <p align="left"> Admin ID: a1234</p>
 <p align="left"> Password: Rr123456789@</p>
