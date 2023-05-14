@@ -1,7 +1,7 @@
 <p align="center">
 <img src="assets/img.png" alt="Findly logo" height="360">
 </p>
-<p align="center" style="bold">Project title: Findly Application</p> 
+<p align="center" style="bold"><b>Project title: Findly Application</b></p> 
 
 Findly is an android mobile application that offers an announcement system for lost and found
 items on KSU female campus. Our application aims to improve the effectiveness of the communication between
