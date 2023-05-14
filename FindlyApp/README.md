@@ -34,3 +34,13 @@ Launching instruction:
 4- Make sure the device is chosen and then run it by clicking on the green
    triangle.
 5-The application will be running on the device.
+
+Log in credentials:
+
+<p align="left"> User:</p>
+<p align="left"> Member ID: 441111111</p>
+<p align="left"> Password: TestUser123456789@</p>
+
+<p align="left"> Admin:</p>
+<p align="left"> Admin ID: a1234</p>
+<p align="left"> Password: Rr123456789@</p>
