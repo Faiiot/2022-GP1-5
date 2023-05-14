@@ -1,5 +1,5 @@
 <p align="center">
-<img src="assets/FindlyBlue.png" alt="Findly logo" height="180">
+<img src="assets/img.png" alt="Findly logo" height="180">
 </p>
 Project title: Findly Application
 
@@ -40,7 +40,7 @@ Log in credentials:
 <p align="left"> User:</p>
 <p align="left"> Member ID: 441111111</p>
 <p align="left"> Password: TestUser123456789@</p>
-
+<p align="left">/p>
 <p align="left"> Admin:</p>
 <p align="left"> Admin ID: a1234</p>
 <p align="left"> Password: Rr123456789@</p>
