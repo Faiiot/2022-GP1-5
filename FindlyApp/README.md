@@ -1,9 +1,24 @@
+<p align="center">
+<img src="FindlyApp/assets/FindlyBlue.png" alt="Findly logo" height="180">
+</p>
 Project title: Findly Application
 
 Findly is an android mobile application that offers an announcement system for lost and found
 items on KSU female campus. Our application aims to improve the effectiveness of the communication between
 the founder and the person who lost an item. With our service it is faster and easier to create and browse 
 for an announcement that quickly can reach others in the area. Findly saves you time, money, effort, and stress.
+
+Main users features:
+   -Private chat.
+   -Chatbot assistance.
+   -Notification system.
+   -Filtering.
+
+Findly offers an Admin application to help improve the presented benefits via managing the application content.
+
+Main admin features:
+   -Manage reported announcements.
+   -Add categories and buildings.
 
 In this project Flutter framework is used with Dart programming language, and we used Firebase services
 (Authentication, Firestore, Storage, etc.).
